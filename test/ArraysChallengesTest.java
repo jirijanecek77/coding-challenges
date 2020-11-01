@@ -28,4 +28,11 @@ public class ArraysChallengesTest {
         assertEquals(31, result);
     }
 
+    @Test
+    void maximumSubarraySum() {
+        int[] arr = {2, 3, -10, -1, 5, 1, 1, -2, 15, -2, 3, 0, -1};
+        int result = ArraysChallenges.maximumSubarraySum(arr);
+
+        assertEquals(21, result);
+    }
 }

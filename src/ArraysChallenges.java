@@ -55,4 +55,14 @@ public class ArraysChallenges {
 
         return result;
     }
+
+    static int maximumSubarraySum(int[] arr) {
+        int sum = 0, best = 0;
+
+        for (int item : arr) {
+            sum = Math.max(item, sum + item);
+            best = Math.max(best, sum);
+        }
+        return best;
+    }
 }

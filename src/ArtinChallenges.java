@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ArtinChallenges {
 
@@ -140,5 +142,22 @@ public class ArtinChallenges {
             from++;
             to--;
         }
+    }
+
+
+    public static int amazonFindMax2DigitNumberInString(String S) {
+        int max = 0;
+        for (int i = 1; i < S.length(); i++) {
+            int number = Integer.parseInt(S.substring(i - 1, i + 1));
+            max = Math.max(max, number);
+        }
+        return max;
+    }
+
+    public static boolean amazonGraph(int[] A, int[] B) {
+        List<Integer> listA = Arrays.stream(A).boxed().collect(Collectors.toList());
+        List<Integer> listB = Arrays.stream(B).boxed().collect(Collectors.toList());
+        Collections.rotate(listA, 1);
+        return listA.equals(listB);
     }
 }

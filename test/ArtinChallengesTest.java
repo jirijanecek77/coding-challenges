@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ArtinChallengesTest {
 
@@ -49,4 +50,17 @@ public class ArtinChallengesTest {
         assertEquals(3, result.get(2));
     }
 
+    @Test
+    void testAmazonFindMax2DigitNumberInString() {
+        int result = ArtinChallenges.amazonFindMax2DigitNumberInString("54326254610");
+        assertEquals(62, result);
+    }
+
+    @Test
+    void testAmazonGraph() {
+        int[] A = {1, 3, 2, 4};
+        int[] B = {4, 1, 3, 2};
+
+        assertTrue(ArtinChallenges.amazonGraph(A, B));
+    }
 }

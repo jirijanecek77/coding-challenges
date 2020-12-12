@@ -1,7 +1,4 @@
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class StringManipulationChallenges {
@@ -46,6 +43,45 @@ public class StringManipulationChallenges {
                     .map(e -> e.getKey() * e.getValue()).get() == 1 ? "YES" : "NO";
         }
         return "NO";
+    }
+
+    public static int read_and_find_repetitions(String short_s, String long_s) {
+        int result = 0, shortLen = short_s.length();
+        if (shortLen > long_s.length()) return 0;
+
+        for (int longIdx = 0, shortIdx = 0; longIdx <= long_s.length(); longIdx++, shortIdx++) {
+            if (longIdx == long_s.length() || long_s.charAt(longIdx) != short_s.charAt(shortIdx % shortLen)) {
+                if (shortIdx % shortLen == 0) {
+                    result = Math.max(result, shortIdx / shortLen);
+                }
+                shortIdx = 0;
+            }
+        }
+
+        return result;
+    }
+
+    public static int count_invalid_boxes(List<List<String>> box_template_list) {
+        return box_template_list.stream()
+                .mapToInt(e -> {
+                    String box = e.get(0);
+                    String template = e.get(1);
+
+                    if (!compareUnordered(box, template)) return 1;
+                    return 0;
+                })
+                .sum();
+    }
+
+    private static boolean compareUnordered(String box, String template) {
+        if (box.length() != template.length()) return false;
+
+        char[] boxItems = box.toCharArray();
+        Arrays.sort(boxItems);
+        char[] templateItems = template.toCharArray();
+        Arrays.sort(templateItems);
+
+        return Arrays.equals(boxItems, templateItems);
     }
 
 }

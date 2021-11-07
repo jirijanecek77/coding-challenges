@@ -57,6 +57,18 @@ public class ArtinChallengesTest {
     }
 
     @Test
+    void testAmazonFindMax2DigitNumberInString_empty() {
+        int result = ArtinChallenges.amazonFindMax2DigitNumberInString("");
+        assertEquals(0, result);
+    }
+
+    @Test
+    void testAmazonFindMax2DigitNumberInString_one() {
+        int result = ArtinChallenges.amazonFindMax2DigitNumberInString("1");
+        assertEquals(1, result);
+    }
+
+    @Test
     void testAmazonGraph() {
         int[] A = {1, 3, 2, 4};
         int[] B = {4, 1, 3, 2};

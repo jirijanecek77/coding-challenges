@@ -1,6 +1,6 @@
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ArraysChallengesTest {
 
@@ -34,5 +34,21 @@ public class ArraysChallengesTest {
         int result = ArraysChallenges.maximumSubarraySum(arr);
 
         assertEquals(21, result);
+    }
+
+    @Test
+    void zeroSubarraySum() {
+        int[] arr = {800, 2, 3, -10, -1, 5, 1, 1, -2, 15, -2, 3, 0, -1};
+        boolean result = ArraysChallenges.zeroSubarraySum(arr);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void zeroSubarraySum_notSum() {
+        int[] arr = {2, 3, 5, 1};
+        boolean result = ArraysChallenges.zeroSubarraySum(arr);
+
+        assertFalse(result);
     }
 }

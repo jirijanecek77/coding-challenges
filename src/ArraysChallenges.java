@@ -1,3 +1,6 @@
+import java.util.HashSet;
+import java.util.Set;
+
 public class ArraysChallenges {
 
     static int minimumBribes(int[] q) {
@@ -64,5 +67,21 @@ public class ArraysChallenges {
             best = Math.max(best, sum);
         }
         return best;
+    }
+
+    static boolean zeroSubarraySum(int[] arr) {
+        Set<Integer> sums = new HashSet<>();
+        int sum = 0;
+        for (int i = 0; i< arr.length; i++) {
+            sum += arr[i];
+
+            // if prefix sum is zero or found same prefix sum before
+            if (sum == 0 || sums.contains(sum)) {
+                return true;
+            }
+
+            sums.add(sum);
+        }
+        return false;
     }
 }

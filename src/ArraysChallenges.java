@@ -84,4 +84,25 @@ public class ArraysChallenges {
         }
         return false;
     }
+
+
+    static int maximumNonAdjacentSum(int[] arr) {
+        int incl = arr[0];
+        int excl = 0;
+        int excl_new;
+        int i;
+
+        for (i = 1; i < arr.length; i++) {
+            // Current max excluding i
+            excl_new = Math.max(incl, excl);
+
+            // Current max including i
+            incl = excl + arr[i];
+            excl = excl_new;
+        }
+
+        // Return max of incl and excl
+        return Math.max(incl, excl);
+    }
+
 }

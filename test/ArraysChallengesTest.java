@@ -51,4 +51,12 @@ public class ArraysChallengesTest {
 
         assertFalse(result);
     }
+
+    @Test
+    void maximumNonAdjacentSum() {
+        int[] arr = {-2, 1, 3, -4, 5};
+        int result = ArraysChallenges.maximumNonAdjacentSum(arr);
+
+        assertEquals(8, result);
+    }
 }

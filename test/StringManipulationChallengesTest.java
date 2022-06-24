@@ -1,10 +1,9 @@
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class StringManipulationChallengesTest {
 
@@ -53,5 +52,12 @@ class StringManipulationChallengesTest {
         int result = StringManipulationChallenges.count_invalid_boxes(data);
 
         assertEquals(1, result);
+    }
+
+    @Test
+    void test_longest_common_substring() {
+        int result = StringManipulationChallenges.longestStringSubsequence("HARRY", "SALLY");
+
+        assertEquals(2, result);
     }
 }

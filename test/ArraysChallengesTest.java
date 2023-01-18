@@ -59,4 +59,11 @@ public class ArraysChallengesTest {
 
         assertEquals(8, result);
     }
+
+    @Test
+    void longestDecreasingSubarray() {
+        int[] arr = {-2, 1, 3, -4, 5};
+
+        assertEquals(2, ArraysChallenges.longestDecreasingSubarray(arr));
+    }
 }

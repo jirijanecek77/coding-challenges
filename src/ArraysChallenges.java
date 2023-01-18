@@ -72,7 +72,7 @@ public class ArraysChallenges {
     static boolean zeroSubarraySum(int[] arr) {
         Set<Integer> sums = new HashSet<>();
         int sum = 0;
-        for (int i = 0; i< arr.length; i++) {
+        for (int i = 0; i < arr.length; i++) {
             sum += arr[i];
 
             // if prefix sum is zero or found same prefix sum before
@@ -103,6 +103,31 @@ public class ArraysChallenges {
 
         // Return max of incl and excl
         return Math.max(incl, excl);
+    }
+
+    static int longestDecreasingSubarray(int[] arr) {
+        int n = arr.length;
+        int lds[] = new int[n];
+        int i, j, max = 0;
+
+        for (i = 0; i < n; i++)
+            lds[i] = 1;
+
+        for (i = 1; i < n; i++) {
+            for (j = 0; j < i; j++) {
+                if (arr[i] < arr[j] && lds[i] < lds[j] + 1) {
+                    lds[i] = lds[j] + 1;
+                }
+            }
+        }
+
+        for (i = 0; i < n; i++) {
+            if (max < lds[i]) {
+                max = lds[i];
+            }
+        }
+
+        return max;
     }
 
 }

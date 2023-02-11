@@ -13,4 +13,10 @@ class BitChallengesTest {
         assertEquals(result, 35);
     }
 
+    @Test
+    void testClosestPowerOf() {
+        int result = BitChallenges.closestPowerOf(15);
+        assertEquals(3, result);
+    }
+
 }

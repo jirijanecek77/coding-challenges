@@ -11,4 +11,15 @@ public class BitChallenges {
         }
         return x;
     }
+
+    public static int closestPowerOf( int n) {
+        int i = 0, a = 1;
+
+        while (a <= n) {
+            a = a << 1;
+            i++;
+        }
+
+        return i - 1;
+    }
 }

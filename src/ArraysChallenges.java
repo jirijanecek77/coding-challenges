@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -130,4 +131,26 @@ public class ArraysChallenges {
         return max;
     }
 
+    static int findLocalMaximum(int[] arr) {
+        int x = -1;
+        int N = arr.length;
+        for (int b = (N - 1) / 2; b >= 1; b /= 2) {
+            while (arr[x + b] < arr[x + b + 1]) {
+                x += b;
+            }
+        }
+        return arr[x + 1];
+    }
+
+    static int secondLargest(int[] arr) {
+        Arrays.sort(arr);
+
+        int i;
+        for (i = arr.length - 2; i >= 0 && arr[i + 1] == arr[i]; i--) ;
+
+        if (i < 0) {
+            return -1;
+        }
+        return arr[i];
+    }
 }

@@ -81,4 +81,25 @@ public class ArraysChallengesTest {
 
         assertEquals(-1, ArraysChallenges.secondLargest(new int[]{1, 1, 1}));
     }
+
+    @Test
+    void kThLargest() {
+        assertEquals(4, ArraysChallenges.kThLargest(new int[]{1, -3, 4, 5, 6, 5, 4, 23}, 3));
+    }
+
+    @Test
+    void oneInteger() {
+        assertEquals(33, ArraysChallenges.oneInteger(new int[]{1, 2, 3, 4, 5}));
+    }
+
+    @Test
+    void maxScoreRemovingStones() {
+        assertEquals(6, ArraysChallenges.maxScoreRemovingStones(2, 4, 6));
+    }
+
+    @Test
+    void findKthClosest() {
+        assertArrayEquals(new int[]{1, 2, 3, 4}, ArraysChallenges.findKthClosest(new int[]{1, 2, 3, 4, 5, 7}, 4, 3));
+        assertArrayEquals(new int[]{2, 4, 4, 5}, ArraysChallenges.findKthClosest(new int[]{1, 2, 4, 4, 5, 7}, 4, 3));
+    }
 }

@@ -1,7 +1,9 @@
+package domain;
+
 public class Node {
-    int data;
-    Node left = null;
-    Node right = null;
+    public int data;
+    public Node left = null;
+    public Node right = null;
 
     public Node(int data) {
         this.data = data;

@@ -71,9 +71,9 @@ public class ArtinChallenges {
 
     /**
      * Please implement this method to
-     * traverse the tree and return the sum of the values (Node.getValue()) of all nodes
+     * traverse the tree and return the sum of the values (domain.Node.getValue()) of all nodes
      * at the level N in the tree.
-     * Node root is assumed to be at the level 0. All its children are level 1, etc.
+     * domain.Node root is assumed to be at the level 0. All its children are level 1, etc.
      */
     public static int getLevelSum(Node root, int n) {
         if (root == null)

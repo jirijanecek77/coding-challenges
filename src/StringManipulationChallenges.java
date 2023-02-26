@@ -1,9 +1,4 @@
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class StringManipulationChallenges {
@@ -89,31 +84,51 @@ public class StringManipulationChallenges {
         return Arrays.equals(boxItems, templateItems);
     }
 
-  public static int longestStringSubsequence(String s1, String s2) {
-    //https://www.hackerrank.com/challenges/common-child/problem?isFullScreen=true&h_l=interview&playlist_slugs%5B%5D=interview-preparation-kit&playlist_slugs%5B%5D=strings
+    public static int longestStringSubsequence(String s1, String s2) {
+        //https://www.hackerrank.com/challenges/common-child/problem?isFullScreen=true&h_l=interview&playlist_slugs%5B%5D=interview-preparation-kit&playlist_slugs%5B%5D=strings
 
-    if (s1 == null || s2 == null) {
-      throw new InputMismatchException("Both strings must be defined");
-    }
-    if (s1.length() != s2.length()) {
-      throw new InputMismatchException("Strings must be of the same length.");
-    }
-
-    int N = s1.length();
-    int[][] dp = new int[N + 1][N + 1];
-
-    for (int i = 0; i <= N; i++) {
-      for (int j = 0; j <= N; j++) {
-        if (i == 0 || j == 0) {
-          dp[i][j] = 0;
-        } else if (s1.charAt(i - 1) == s2.charAt(j - 1)) {
-          dp[i][j] = 1 + dp[i - 1][j - 1];
-        } else {
-          dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+        if (s1 == null || s2 == null) {
+            throw new InputMismatchException("Both strings must be defined");
         }
-      }
+        if (s1.length() != s2.length()) {
+            throw new InputMismatchException("Strings must be of the same length.");
+        }
+
+        int N = s1.length();
+        int[][] dp = new int[N + 1][N + 1];
+
+        for (int i = 0; i <= N; i++) {
+            for (int j = 0; j <= N; j++) {
+                if (i == 0 || j == 0) {
+                    dp[i][j] = 0;
+                } else if (s1.charAt(i - 1) == s2.charAt(j - 1)) {
+                    dp[i][j] = 1 + dp[i - 1][j - 1];
+                } else {
+                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+                }
+            }
+        }
+
+        return dp[N][N];
     }
 
-    return dp[N][N];
-  }
+    public static char firstUniqueChar(String str) {
+
+        Queue<Character> unique = new ArrayDeque<>();
+        Set<Character> duplicates = new HashSet<>();
+
+        for (char ch : str.toCharArray()) {
+            if (!duplicates.contains(ch)) {
+                if (unique.contains(ch)) {
+                    unique.remove(ch);
+                    duplicates.add(ch);
+                }
+                else {
+                    unique.add(ch);
+                }
+            }
+        }
+
+        return unique.isEmpty() ? Character.MIN_VALUE : unique.peek();
+    }
 }

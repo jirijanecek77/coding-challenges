@@ -1,6 +1,4 @@
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class ArraysChallenges {
 
@@ -152,5 +150,90 @@ public class ArraysChallenges {
             return -1;
         }
         return arr[i];
+    }
+
+    public static int kThLargest(int[] data, int k) {
+        var dataSet = Arrays.stream(data)
+                .collect(() -> new TreeSet<Integer>(), TreeSet::add, TreeSet::addAll);
+        var it = dataSet.iterator();
+
+        for (int i = 1; i <= k; i++) {
+            if (!it.hasNext()) {
+                return 0;
+            }
+            if (i == k) {
+                return it.next();
+            }
+            it.next();
+        }
+        return 0;
+    }
+
+    public static int oneInteger(int[] data) {
+        // You are given a list of integers nums. You can reduce the length of nums by taking any two integers,
+        // removing them, and appending their sum to the end.
+        // The cost of doing this is the sum of the two integers you removed.
+        // Return the minimum total cost of reducing nums to one integer.
+        // Note : Cost can be negative also.
+        // Constraints: n ≤ 100,000 where n is length of nums.
+
+        var result = 0;
+        var queue = Arrays.stream(data)
+                .collect(() -> new PriorityQueue<Integer>(), PriorityQueue::add, PriorityQueue::addAll);
+
+        while (queue.size() > 1) {
+            var first = queue.poll();
+            var second = queue.poll();
+
+            queue.add(first + second);
+            result += first + second;
+        }
+
+        return result;
+    }
+
+    public static int maxScoreRemovingStones(int a, int b, int c) {
+        // Maximum Score From Removing Stones
+        // You are playing a solitaire game with three piles of stones of sizes a, b, and c respectively.
+        // Each turn you choose two different non-empty piles, take one stone from each, and add 1 point to your score.
+        // The game stops when there are fewer than two non-empty piles (meaning there are no more available moves).
+        // Given three integers a, b, and c, return the maximum score you can get.
+
+        var queue = new PriorityQueue<Integer>(3, (x, y) -> -x.compareTo(y));
+        queue.add(a);
+        queue.add(b);
+        queue.add(c);
+
+        var result = 0;
+        while (queue.size() > 1) {
+            var first = queue.poll();
+            var second = queue.poll();
+
+            if (first > 1) {
+                queue.add(first - 1);
+            }
+            if (second > 1) {
+                queue.add(second - 1);
+            }
+            result += 1;
+        }
+
+        return result;
+    }
+
+    public static int[] findKthClosest(int[] nums, int k, int value) {
+        // nums is sorted asc
+        var index = Math.abs(Arrays.binarySearch(nums, value));
+
+        int left = index, right = index;
+        for (int i = 0; i < k; i++) {
+            if (nums[index] - nums[left] <= nums[right] - nums[index]) {
+                left -= 1;
+            } else {
+                right += 1;
+            }
+        }
+
+        return Arrays.copyOfRange(nums, left, right);
     }
 }

@@ -1,9 +1,10 @@
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class StringManipulationChallengesTest {
 
@@ -59,5 +60,19 @@ class StringManipulationChallengesTest {
         int result = StringManipulationChallenges.longestStringSubsequence("HARRY", "SALLY");
 
         assertEquals(2, result);
+    }
+
+    @Test
+    void test_firstUniqueChar_no() {
+        int result = StringManipulationChallenges.firstUniqueChar("caabbc");
+
+        assertEquals(Character.MIN_VALUE, result);
+    }
+
+    @Test
+    void test_firstUniqueChar_found() {
+        int result = StringManipulationChallenges.firstUniqueChar("codingminutes");
+
+        assertEquals('c', result);
     }
 }

@@ -25,4 +25,14 @@ class BitChallengesTest {
         int[] result = BitChallenges.sortBy1s(new int[]{0, 2, 1, 3, 5, 7, 4, 6, 8});
         assertArrayEquals(new int[]{0, 1, 2, 4, 8, 3, 5, 6, 7}, result);
     }
+
+    @Test
+    void testUnique2N() {
+        assertEquals(3, BitChallenges.unique2N(new int[]{1, 1, 5, 4, 3, 6, 6, 5, 4}));
+    }
+
+    @Test
+    void testUnique3N() {
+        assertEquals(3, BitChallenges.unique3N(new int[]{1, 1, 1, 5, 4, 5, 3, 4, 6, 6, 5, 6, 4}));
+    }
 }

@@ -8,7 +8,6 @@ public class BitChallenges {
     public static long swapBits(long x, int i, int j) {
         long ithBit = (x >>> i) & 1;
         long jthBit = (x >>> j) & 1;
-        int a = 0xFFFF;
 
         if (ithBit != jthBit) {
             long bitMask = (1L << i) | (1L << j);
@@ -51,5 +50,58 @@ public class BitChallenges {
             result++;
         }
         return result;
+    }
+
+    public static int unique2N(int[] arr) {
+        // find one unique number, the others occur twice
+
+        var result = 0;
+        for (int i : arr) {
+            result ^= i;  // XOR of two the same numbers is always zero, XOR of a number with zero is always the number
+        }
+
+        return result;
+    }
+
+    public static int unique3N(int[] arr) {
+        // find one unique number, the others occur 3 times
+
+        // split to array by bits
+        // sum
+        // calc modulo 3 for each item in array
+        // transform result to decimal
+
+        int[] sumArr = new int[32];
+        for (int i : arr) {
+            getSumArray(sumArr, i);
+        }
+
+        for (int i = 0; i < sumArr.length; i++) {
+            sumArr[i] %= 3;
+        }
+
+        return bitArrayToDecimal(sumArr);
+    }
+
+    private static int bitArrayToDecimal(int[] arr) {
+        var result = 0;
+        var pow = 1;
+
+        for (int i : arr) {
+            result += pow * i;
+            pow <<= 1;
+        }
+
+        return result;
+    }
+
+    private static void getSumArray(int[] arr, int number) {
+        int i = 0;
+        while (number > 0) {
+            var iThBit = number & 1;
+            arr[i] += iThBit;
+            number >>= 1;
+            i++;
+        }
     }
 }

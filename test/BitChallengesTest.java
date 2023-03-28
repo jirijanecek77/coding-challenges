@@ -1,5 +1,7 @@
 import org.junit.jupiter.api.Test;
 
+import java.math.BigInteger;
+
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -34,5 +36,11 @@ class BitChallengesTest {
     @Test
     void testUnique3N() {
         assertEquals(3, BitChallenges.unique3N(new int[]{1, 1, 1, 5, 4, 5, 3, 4, 6, 6, 5, 6, 4}));
+    }
+
+    @Test
+    void testPow() {
+        assertEquals(BigInteger.valueOf(8), BitChallenges.pow(2, 3));
+        assertEquals(BigInteger.valueOf(45325).pow(100), BitChallenges.pow(45325, 100));
     }
 }

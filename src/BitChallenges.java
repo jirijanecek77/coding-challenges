@@ -1,3 +1,4 @@
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -103,5 +104,20 @@ public class BitChallenges {
             number >>= 1;
             i++;
         }
+    }
+
+    public static BigInteger pow(int a, int b) {
+        BigInteger result = BigInteger.ONE;
+        BigInteger base = BigInteger.valueOf(a);
+        while (b > 0) {
+            if ((b & 1) > 0) {
+                result = result.multiply(base);
+            }
+
+            base = base.multiply(base);
+            b >>= 1;
+        }
+
+        return result;
     }
 }

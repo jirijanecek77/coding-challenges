@@ -1,3 +1,5 @@
+package challenge;
+
 public class CodilityOctober2021Challenge {
     public int solution(int[] A) {
         // https://app.codility.com/programmers/custom_challenge/spooktober_2021/

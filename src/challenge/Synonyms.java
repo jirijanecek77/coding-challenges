@@ -1,3 +1,5 @@
+package challenge;
+
 import domain.Pair;
 
 import java.io.BufferedReader;

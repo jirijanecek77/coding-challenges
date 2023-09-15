@@ -1,3 +1,5 @@
+package challenge;
+
 import domain.Pair;
 import org.junit.jupiter.api.Test;
 

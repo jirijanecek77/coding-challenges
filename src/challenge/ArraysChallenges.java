@@ -1,3 +1,5 @@
+package challenge;
+
 import java.util.*;
 
 public class ArraysChallenges {

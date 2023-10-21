@@ -14,13 +14,13 @@ class SortedLinkedListTest {
     }
 
     @Test
-    void giveEmpty_whenAddNull_thenThrowsException() {
+    void givenEmpty_whenAddNull_thenThrowsException() {
         var list = new SortedLinkedList<String>();
         assertThrows(IllegalArgumentException.class, () -> list.add(null));
     }
 
     @Test
-    void giveEmpty_whenGet_thenThrowsException() {
+    void givenEmpty_whenGet_thenThrowsException() {
         var list = new SortedLinkedList<String>();
         assertThrows(IndexOutOfBoundsException.class, () -> list.get(0));
     }
@@ -29,11 +29,12 @@ class SortedLinkedListTest {
     void givenEmptyList_whenAdd_thenOneItem() {
         var list = new SortedLinkedList<String>();
         list.add("foo");
+        assertEquals("foo", list.iterator().next());
         assertEquals(1, list.size());
     }
 
     @Test
-    void givenList_whenAddAtTheBeginningOfTheList_thenCorrectOrder() {
+    void givenList_whenAddAtTheBeginning_thenCorrectOrder() {
         var list = new SortedLinkedList<>(List.of("z"));
         list.add("foo");
 
@@ -60,26 +61,51 @@ class SortedLinkedListTest {
     }
 
     @Test
-    void givenEmptyList_whenAddAll_thenCorrectItem() {
+    void givenEmptyList_whenAddAllAndIterate_thenCorrectResult() {
         var list = new SortedLinkedList<String>();
         list.addAll(List.of("z", "a", "b", "c", "x", "a"));
-        assertEquals("a", list.get(0));
-        assertEquals("a", list.get(1));
-        assertEquals("b", list.get(2));
-        assertEquals("c", list.get(3));
-        assertEquals("x", list.get(4));
-        assertEquals("z", list.get(5));
+
+        StringBuilder result = new StringBuilder();
+        for (String item : list) {
+            result.append(item);
+        }
+        assertEquals("aabcxz", result.toString());
     }
 
     @Test
-    void giveList_whenContains_thenCorrect() {
+    void givenList_whenAddAllAndIterate_thenCorrectResult() {
+        var list = new SortedLinkedList<>(List.of("c", "e"));
+        list.addAll(List.of("d", "x", "y", "b", "a", "z"));
+
+        StringBuilder result = new StringBuilder();
+        for (String item : list) {
+            result.append(item);
+        }
+        assertEquals("abcdexyz", result.toString());
+    }
+
+    @Test
+    void givenList_whenAddAllSame_thenCorrectResult() {
+        var list = new SortedLinkedList<>(List.of("a", "b", "c"));
+        list.addAll(List.of("c", "b", "a"));
+
+        StringBuilder result = new StringBuilder();
+        for (String item : list) {
+            result.append(item);
+        }
+        assertEquals("aabbcc", result.toString());
+    }
+
+
+    @Test
+    void givenList_whenContains_thenCorrect() {
         var list = new SortedLinkedList<>(List.of("z", "a", "b", "c", "x", "a"));
         assertTrue(list.contains("a"));
         assertFalse(list.contains("d"));
     }
 
     @Test
-    void giveList_whenRemove_thenCorrect() {
+    void givenList_whenRemove_thenCorrect() {
         var list = new SortedLinkedList<>(List.of("a", "b", "c"));
         assertTrue(list.remove("b"));
         assertTrue(list.remove("c"));
@@ -90,9 +116,10 @@ class SortedLinkedListTest {
     }
 
     @Test
-    void giveListOfIntegers_whenContains_thenCorrect() {
-        var list = new SortedLinkedList<Integer>();
+    void givenListOfIntegers_whenContains_thenCorrect() {
+        var list = new SortedLinkedList<Integer>(List.of(12, 11, 9));
         list.add(10);
         assertTrue(list.contains(10));
+        assertEquals(4, list.size());
     }
 }

@@ -1,9 +1,8 @@
 package domain;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
 
 /**
  * Sorted Linked list implementation permits all elements (except {@code null}).
@@ -14,7 +13,7 @@ import java.util.List;
  * @author Jiri Janecek
  */
 
-public class SortedLinkedList<T extends Comparable<T>> {
+public class SortedLinkedList<T extends Comparable<T>> implements Iterable<T> {
 
     private int size = 0;
     /**
@@ -25,12 +24,14 @@ public class SortedLinkedList<T extends Comparable<T>> {
     private class Node {
 
         T item;
+
         Node next;
 
         Node(Node next, T item) {
             this.item = item;
             this.next = next;
         }
+
 
     }
 
@@ -39,7 +40,6 @@ public class SortedLinkedList<T extends Comparable<T>> {
      */
     public SortedLinkedList() {
     }
-
 
     /**
      * Constructs a list containing the elements of the specified collection.
@@ -50,6 +50,10 @@ public class SortedLinkedList<T extends Comparable<T>> {
      */
     public SortedLinkedList(Collection<? extends T> c) {
         this();
+        initializeByCollection(c);
+    }
+
+    private void initializeByCollection(Collection<? extends T> c) {
         List<T> sortedList = new ArrayList<>(c);
         sortedList.sort(Collections.reverseOrder());
 
@@ -58,6 +62,12 @@ public class SortedLinkedList<T extends Comparable<T>> {
             first = new Node(first, item);
         }
         size = sortedList.size();
+    }
+
+    @NotNull
+    @Override
+    public Iterator<T> iterator() {
+        return new SorterdLinkedListIterator();
     }
 
     /**
@@ -149,12 +159,49 @@ public class SortedLinkedList<T extends Comparable<T>> {
 
     /**
      * Appends all the items of the collection {@code c} to correct position to keep list sorted
+     * Sort items in the collection {@code c} and merge it with the current list
      *
      * @param c the collection whose elements are to be placed into this list
      * @throws NullPointerException if the specified collection is null
      */
     public void addAll(Collection<? extends T> c) {
-        c.forEach(this::add);
+        if (first == null) {
+            initializeByCollection(c);
+            return;
+        }
+
+        List<T> itemsToAdd = new ArrayList<>(c);
+        Collections.sort(itemsToAdd);
+
+        Node current = first;
+        Node last = null;
+        for (T itemToAdd : itemsToAdd) {
+
+            // skip all nodes which are before itemToAdd
+            while (current != null && current.item.compareTo(itemToAdd) <= 0) {
+                last = current;
+                current = current.next;
+            }
+
+            Node newNode = new Node(null, itemToAdd);
+            if (current != null) {
+                if (last == null) {
+                    // add before the first node
+                    newNode.next = current;
+                    first = newNode;
+                } else {
+                    // add before current
+                    newNode.next = current;
+                    last.next = newNode;
+                }
+                last = newNode;
+            } else {
+                // add the rest of items to the end of the list
+                last.next = newNode;
+                last = last.next;
+            }
+            size++;
+        }
     }
 
     /**
@@ -178,14 +225,31 @@ public class SortedLinkedList<T extends Comparable<T>> {
     public boolean contains(T item) {
         checkNonNull(item);
 
-        Node current = first;
-        while (current != null) {
-            if (current.item.equals(item)) {
+        for (T current : this) {
+            if (current.equals(item)) {
                 return true;
             }
-            current = current.next;
         }
         return false;
+    }
+
+    private class SorterdLinkedListIterator implements Iterator<T> {
+        private Node currentNode = first;
+
+        @Override
+        public boolean hasNext() {
+            return currentNode != null;
+        }
+
+        @Override
+        public T next() {
+            if (hasNext()) {
+                T item = currentNode.item;
+                currentNode = currentNode.next;
+                return item;
+            }
+            throw new NoSuchElementException();
+        }
     }
 
     private void checkNonNull(T item) {

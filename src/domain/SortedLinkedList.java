@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 /**
- * Sorted Linked list implementation permits all elements (except {@code null}).
+ * Sorted singly Linked list implementation permits all elements (except {@code null}).
  *
  * <p><strong>Note that this implementation is not synchronized.</strong>
  *
@@ -16,9 +16,6 @@ import java.util.*;
 public class SortedLinkedList<T extends Comparable<T>> implements Iterable<T> {
 
     private int size = 0;
-    /**
-     * Pointer to first node.
-     */
     private Node first;
 
     private class Node {
@@ -53,17 +50,12 @@ public class SortedLinkedList<T extends Comparable<T>> implements Iterable<T> {
         initializeByCollection(c);
     }
 
-    private void initializeByCollection(Collection<? extends T> c) {
-        List<T> sortedList = new ArrayList<>(c);
-        sortedList.sort(Collections.reverseOrder());
-
-        // Iterate over the sorted elements
-        for (T item : sortedList) {
-            first = new Node(first, item);
-        }
-        size = sortedList.size();
-    }
-
+    /**
+     * Returns a iterator of the elements in this list (in proper
+     * sequence), starting at the begging of the list.
+     *
+     * @return a Iterator of the elements in this list
+     */
     @NotNull
     @Override
     public Iterator<T> iterator() {
@@ -74,36 +66,23 @@ public class SortedLinkedList<T extends Comparable<T>> implements Iterable<T> {
      * Appends the specified element to the correct position of this list to keep it sorted.
      * *
      *
-     * @param e element to be appended to this list
+     * @param item element to be appended to this list
      */
-    public void add(T e) {
-        checkNonNull(e);
+    public void add(T item) {
+        checkNonNull(item);
 
-        if (first == null) {
-            // handle empty list
-            first = new Node(null, e);
-            size = 1;
-            return;
-        }
-
-        Node current = first;
-        Node last = null;
-        while (current != null) {
-            if (current.item.compareTo(e) >= 0) {
-                if (last == null) {
-                    first = new Node(first, e);
-                } else {
-                    last.next = new Node(current, e);
-                }
-                size++;
-                return;
+        Node newNode = new Node(null, item);
+        if (first == null || first.item.compareTo(item) >= 0) {
+            newNode.next = first;
+            first = newNode;
+        } else {
+            Node current = first;
+            while (current.next != null && current.next.item.compareTo(item) < 0) {
+                current = current.next;
             }
-            last = current;
-            current = current.next;
+            newNode.next = current.next;
+            current.next = newNode;
         }
-
-        // add to the end of the list
-        last.next = new Node(null, e);
         size++;
     }
 
@@ -111,6 +90,7 @@ public class SortedLinkedList<T extends Comparable<T>> implements Iterable<T> {
      * Returns item on position of index, if index exceeds size of list, returns IndexOutOfBoundsException
      *
      * @param index element to be appended to this list
+     * @throws IndexOutOfBoundsException {@inheritDoc}
      */
     public T get(int index) {
         if (index < 0 || index >= size) {
@@ -139,6 +119,7 @@ public class SortedLinkedList<T extends Comparable<T>> implements Iterable<T> {
      */
     public boolean remove(T item) {
         checkNonNull(item);
+
         Node current = first;
         Node last = null;
         while (current != null) {
@@ -177,7 +158,7 @@ public class SortedLinkedList<T extends Comparable<T>> implements Iterable<T> {
         Node last = null;
         for (T itemToAdd : itemsToAdd) {
 
-            // skip all nodes which are before itemToAdd
+            // skip all nodes before itemToAdd
             while (current != null && current.item.compareTo(itemToAdd) <= 0) {
                 last = current;
                 current = current.next;
@@ -194,12 +175,11 @@ public class SortedLinkedList<T extends Comparable<T>> implements Iterable<T> {
                     newNode.next = current;
                     last.next = newNode;
                 }
-                last = newNode;
             } else {
-                // add the rest of items to the end of the list
+                // add to the end of the list
                 last.next = newNode;
-                last = last.next;
             }
+            last = newNode;
             size++;
         }
     }
@@ -234,6 +214,7 @@ public class SortedLinkedList<T extends Comparable<T>> implements Iterable<T> {
     }
 
     private class SorterdLinkedListIterator implements Iterator<T> {
+
         private Node currentNode = first;
 
         @Override
@@ -250,6 +231,17 @@ public class SortedLinkedList<T extends Comparable<T>> implements Iterable<T> {
             }
             throw new NoSuchElementException();
         }
+
+    }
+
+    private void initializeByCollection(Collection<? extends T> c) {
+        c.stream()
+                .filter(Objects::nonNull)
+                .sorted(Comparator.reverseOrder())
+                .forEach(item -> {
+                    first = new Node(first, item);
+                    size++;
+                });
     }
 
     private void checkNonNull(T item) {

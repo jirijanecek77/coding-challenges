@@ -2,6 +2,7 @@ package domain;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -70,6 +71,7 @@ class SortedLinkedListTest {
             result.append(item);
         }
         assertEquals("aabcxz", result.toString());
+        assertEquals(6, list.size());
     }
 
     @Test
@@ -82,6 +84,7 @@ class SortedLinkedListTest {
             result.append(item);
         }
         assertEquals("abcdexyz", result.toString());
+        assertEquals(8, list.size());
     }
 
     @Test
@@ -94,14 +97,18 @@ class SortedLinkedListTest {
             result.append(item);
         }
         assertEquals("aabbcc", result.toString());
+        assertEquals(6, list.size());
     }
 
 
     @Test
-    void givenList_whenContains_thenCorrect() {
-        var list = new SortedLinkedList<>(List.of("z", "a", "b", "c", "x", "a"));
+    void givenListInitializedInConstructor_whenContains_thenCorrect() {
+        List<String> data = new ArrayList<>(List.of("z", "a", "b", "c", "x", "a"));
+        data.add(null);
+        var list = new SortedLinkedList<>(data);
         assertTrue(list.contains("a"));
         assertFalse(list.contains("d"));
+        assertEquals(6, list.size());
     }
 
     @Test

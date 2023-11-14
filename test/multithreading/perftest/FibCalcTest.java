@@ -13,6 +13,6 @@ class FibCalcTest {
         assertEquals(1, new FibCalcImpl().fib(2));
         assertEquals(2, new FibCalcImpl().fib(3));
         assertEquals(3, new FibCalcImpl().fib(4));
-        assertEquals(102334155, new FibCalcImpl().fib(60));
+        assertEquals(1548008755920L, new FibCalcImpl().fib(60));
     }
 }

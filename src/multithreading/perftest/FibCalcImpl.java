@@ -6,7 +6,7 @@ public class FibCalcImpl implements FibCalc {
         if (n < 0) throw new IllegalArgumentException("Argument must be greater than 0");
         if (n >= 1476) throw new IllegalArgumentException("Argument must be smaller than 1476");
 
-        long result = fibRecursively(n);
+        long result = fibIteratively(n);
         System.out.printf("Calculation of fib(%d)=%d done in %s%n", n, result, Thread.currentThread().getName());
         return result;
     }

@@ -8,9 +8,78 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.IntStream;
+
+import static java.util.stream.Collectors.toMap;
 
 public class Synonyms {
+
+    private static class DisjointUnionSets {
+        private final int[] rank;
+        private final int[] parent;
+
+        // Constructor
+        public DisjointUnionSets(int n) {
+            this.rank = new int[n];
+            this.parent = new int[n];
+
+            for (int i = 0; i < n; i++) {
+                // Initially, all elements are in their own set.
+                this.parent[i] = i;
+            }
+        }
+
+        // Returns representative of x's set
+        int find(int x) {
+            // Finds the representative of the set
+            // that x is an element of
+            if (parent[x] != x) {
+                // if x is not the parent of itself
+                // Then x is not the representative of his set,
+                parent[x] = find(parent[x]);
+
+                // so we recursively call Find on its parent and move i's node directly under the
+                // representative of this set
+            }
+
+            return parent[x];
+        }
+
+        // Unites the set that includes x and the set that includes x
+        void union(int x, int y) {
+            // Find representatives of two sets
+            int xRoot = find(x), yRoot = find(y);
+
+            // Elements are in the same set, no need to unite anything.
+            if (xRoot == yRoot)
+                return;
+
+            // If x's rank is less than y's rank
+            if (rank[xRoot] < rank[yRoot])
+
+                // Then move x under y  so that depth of tree remains less
+                parent[xRoot] = yRoot;
+
+                // Else if y's rank is less than x's rank
+            else if (rank[yRoot] < rank[xRoot])
+
+                // Then move y under x so that depth of tree remains less
+                parent[yRoot] = xRoot;
+
+            else // if ranks are the same
+            {
+                // Then move y under x (doesn't matter which one goes where)
+                parent[yRoot] = xRoot;
+
+                // And increment the result tree's rank by 1
+                rank[xRoot] = rank[xRoot] + 1;
+            }
+        }
+    }
 
     public void checkSynonyms(String inputFileName) throws IOException {
         final String outputFileName = "resources/synonyms/output.txt";
@@ -18,26 +87,39 @@ public class Synonyms {
         final BufferedReader reader = Files.newBufferedReader(Paths.get(inputFileName));
         final BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName));
 
-
         try (reader; writer) {
             int testCases = Integer.parseInt(reader.readLine());
 
             for (int testCase = 0; testCase < testCases; testCase++) {
                 int synLen = Integer.parseInt(reader.readLine());
                 List<Pair<String, String>> synonyms = readWords(reader, synLen);
+                List<String> words = synonyms.stream().map(p -> List.of(p.first(), p.second()))
+                        .flatMap(List::stream).distinct().toList();
+                Map<String, Integer> wordToIndexMap = IntStream.range(0, words.size())
+                        .boxed()
+                        .collect(toMap(words::get, Function.identity()));
+                DisjointUnionSets disjointSet = new DisjointUnionSets(words.size());
 
-                Map<String, Integer> clusters = clusterSynonyms(synonyms);
+
+                for (Pair<String, String> s : synonyms) {
+                    disjointSet.union(wordToIndexMap.get(s.first()), wordToIndexMap.get(s.second()));
+                }
 
                 int queryLen = Integer.parseInt(reader.readLine());
                 List<Pair<String, String>> queries = readWords(reader, queryLen);
 
-                queries.forEach(query -> {
-                    try {
-                        writer.write(evaluate(query, clusters) ? "synonyms\n" : "different\n");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+                for (Pair<String, String> query : queries) {
+                    String word1 = query.first();
+                    String word2 = query.second();
+                    Integer index1 = wordToIndexMap.get(word1);
+                    Integer index2 = wordToIndexMap.get(word2);
+                    writer.write(
+                            word1.equals(word2)
+                                    || (index1 != null && index2 != null && disjointSet.find(index1) == disjointSet.find(index2))
+                                    ? "synonyms\n"
+                                    : "different\n"
+                    );
+                }
             }
 
         }
@@ -55,64 +137,4 @@ public class Synonyms {
 
         return result;
     }
-
-    private Map<String, Integer> clusterSynonyms(List<Pair<String, String>> synonyms) {
-        int clusterNr = 1;
-        Map<String, Integer> clusters = new HashMap<>();
-
-        for (Pair<String, String> pair : synonyms) {
-            Optional<Integer> fromCluster = clusters.entrySet().stream()
-                    .filter(from -> from.getKey().equals(pair.first()))
-                    .findFirst()
-                    .map(Map.Entry::getValue);
-
-            Optional<Integer> toCluster = clusters.entrySet().stream()
-                    .filter(to -> to.getKey().equals(pair.second()))
-                    .findFirst()
-                    .map(Map.Entry::getValue);
-
-            if (fromCluster.isEmpty() && toCluster.isEmpty()) {
-                clusters.put(pair.first(), clusterNr);
-                clusters.put(pair.second(), clusterNr);
-                clusterNr++;
-                continue;
-            }
-
-            fromCluster.ifPresent(newCluster -> {
-                Integer oldCluster = clusters.get(pair.second());
-                clusters.put(pair.second(), newCluster);
-
-                if (oldCluster != null) {
-                    clusters.entrySet()
-                            .stream()
-                            .filter(e -> e.getValue().equals(oldCluster))
-                            .forEach(e -> clusters.put(e.getKey(), newCluster));
-                }
-            });
-
-            toCluster.ifPresent(newCluster -> {
-                Integer oldCluster = clusters.get(pair.first());
-                clusters.put(pair.first(), newCluster);
-
-                if (oldCluster != null) {
-                    clusters.entrySet()
-                            .stream()
-                            .filter(e -> e.getValue().equals(oldCluster))
-                            .forEach(e -> clusters.put(e.getKey(), newCluster));
-                }
-            });
-        }
-
-        return clusters;
-    }
-
-    private boolean evaluate(Pair query, Map<String, Integer> clusters) {
-        if (query.first().equals(query.second())) {
-            return true;
-        }
-
-        return clusters.get(query.first()) != null && clusters.get(query.first()).equals(clusters.get(query.second()));
-    }
-
-
 }

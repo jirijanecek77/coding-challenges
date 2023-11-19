@@ -77,4 +77,10 @@ class StringManipulationChallengesTest {
 
         assertEquals('c', result);
     }
+
+    @Test
+    void test_longestPalindrome() {
+        assertEquals("bab", StringManipulationChallenges.longestPalindrome("babad"));
+        assertEquals("bb", StringManipulationChallenges.longestPalindrome("bb"));
+    }
 }

@@ -133,4 +133,31 @@ public class StringManipulationChallenges {
 
         return unique.isEmpty() ? Character.MIN_VALUE : unique.peek();
     }
+
+    public static String longestPalindrome(String s) {
+        // https://leetcode.com/problems/longest-palindromic-substring/description/
+        int n = s.length();
+        if (n <= 1) {
+            return s;
+        }
+        String maxPalindrome = "";
+        for (int i = 0; i < n; i ++) {
+            maxPalindrome = maxPalindromeForRange(i, i, s, maxPalindrome);
+            maxPalindrome = maxPalindromeForRange(i, i + 1, s, maxPalindrome);
+        }
+        return maxPalindrome;
+    }
+
+    private static String maxPalindromeForRange(int left, int right, String s, String maxPalindrome) {
+        int maxLength = maxPalindrome.length();
+        while (left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right)) {
+            if (right - left + 1 > maxLength) {
+                maxPalindrome = s.substring(left, right + 1);
+                maxLength = right - left + 1;
+            }
+            left--;
+            right++;
+        }
+        return maxPalindrome;
+    }
 }

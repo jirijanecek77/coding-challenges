@@ -16,7 +16,7 @@ import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toMap;
 
-public class Synonyms {
+public class DisjointSet {
 
     private static class DisjointUnionSets {
         private final int[] rank;
@@ -81,7 +81,7 @@ public class Synonyms {
         }
     }
 
-    public void checkSynonyms(String inputFileName) throws IOException {
+    public static void checkSynonyms(String inputFileName) throws IOException {
         final String outputFileName = "resources/synonyms/output.txt";
 
         final BufferedReader reader = Files.newBufferedReader(Paths.get(inputFileName));
@@ -125,7 +125,7 @@ public class Synonyms {
         }
     }
 
-    private List<Pair<String, String>> readWords(BufferedReader reader, int synLen) throws IOException {
+    private static List<Pair<String, String>> readWords(BufferedReader reader, int synLen) throws IOException {
         List<Pair<String, String>> result = new ArrayList<>();
 
         for (int i = 0; i < synLen; i++) {

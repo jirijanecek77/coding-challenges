@@ -82,7 +82,7 @@ public class DisjointSet {
     }
 
     public static void checkSynonyms(String inputFileName) throws IOException {
-        final String outputFileName = "resources/synonyms/output.txt";
+        final String outputFileName = "src/test/resources/synonyms/output.txt";
 
         final BufferedReader reader = Files.newBufferedReader(Paths.get(inputFileName));
         final BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName));

@@ -1,4 +1,4 @@
-package advent;
+package advent.year_2022;
 
 import java.io.BufferedReader;
 import java.io.IOException;

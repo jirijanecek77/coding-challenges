@@ -3,8 +3,6 @@ package SsmlParser;
 import java.util.ArrayList;
 import java.util.List;
 
-import static SsmlParser.Ssml.unescapeXMLChars;
-
 public class SSMLParser {
 
     private final String ssml;
@@ -21,7 +19,7 @@ public class SSMLParser {
         TokenData token;
         while ((token = getNextToken()) != null) {
             if (token.text() != null) {
-                children.add(new Ssml.SSMLText(unescapeXMLChars(token.text())));
+                children.add(new Ssml.SSMLText(Ssml.unescapeXMLChars(token.text())));
             } else if (token.isOpening()) {
                 children.add(
                         new Ssml.SSMLElement(token.name(), token.attributes(), parseChildElements(token.name()))

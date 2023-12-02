@@ -8,6 +8,6 @@ class DisjointSetTest {
 
     @Test
     void test_synonyms() throws IOException {
-        DisjointSet.checkSynonyms("resources/synonyms/example.in");
+        DisjointSet.checkSynonyms("src/test/resources/synonyms/example.in");
     }
 }

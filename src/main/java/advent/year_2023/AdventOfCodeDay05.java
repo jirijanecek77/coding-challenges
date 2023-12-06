@@ -6,13 +6,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 public class AdventOfCodeDay05 {
 
@@ -37,12 +34,12 @@ public class AdventOfCodeDay05 {
                 .orElse(0);
     }
 
-    private static Long transform(List<Transformation> trans, Long newSeed) {
-        return trans.stream()
-                .filter(e -> newSeed >= e.start() && newSeed <= e.end)
+    private static Long transform(List<Transformation> intervals, Long seed) {
+        return intervals.stream()
+                .filter(e -> seed >= e.start() && seed <= e.end)
                 .findFirst()
-                .map(e -> newSeed + e.delta)
-                .orElse(newSeed);
+                .map(e -> seed + e.delta)
+                .orElse(seed);
     }
 
     public static long mapNumbersRanges(String inputFileName) throws IOException {
@@ -51,23 +48,27 @@ public class AdventOfCodeDay05 {
 
         parseInputFile(inputFileName, seeds, transformations);
 
-        long minValue = Long.MAX_VALUE;
+        Set<Pair<Long, Long>> intervals = new HashSet<>();
         for (int i = 0; i < seeds.size(); i += 2) {
             Long start = seeds.get(i);
             Long delta = seeds.get(i + 1);
-            Stream<Pair<Long, Long>> intervals = Stream.of(Pair.of(start, start + delta - 1));
-
-            for (List<Transformation> trans : transformations) {
-                intervals = intervals
-                        .flatMap(interval -> trans.stream()
-                                .filter(e -> !(e.end() < interval.first() || e.start() > interval.second()))
-                                .map(e -> new Transformation(Math.max(interval.first(), e.start), Math.min(interval.second(), e.end), e.delta))
-                                .map(e -> Pair.of(e.start + e.delta, e.end + e.delta))
-                        );
-
-            }
-            minValue = Math.min(minValue, intervals.mapToLong(Pair::first).min().orElse(Long.MAX_VALUE));
+            intervals.add(Pair.of(start, start + delta - 1));
         }
+
+        for (List<Transformation> trans : transformations) {
+            System.out.println(intervals);
+            System.out.println(trans);
+            intervals = intervals.stream()
+                    .flatMap(interval -> trans.stream()
+                            .filter(e -> !(e.end() < interval.first() || e.start() > interval.second()))
+                            .map(e -> new Transformation(Math.max(interval.first(), e.start), Math.min(interval.second(), e.end), e.delta))
+                            .map(e -> Pair.of(e.start + e.delta, e.end + e.delta))
+                    )
+                    .collect(Collectors.toSet());
+            System.out.println("New seed intervals: " + intervals + "\n");
+        }
+        var minValue = intervals.stream().mapToLong(Pair::first).min().orElseThrow();
+        System.out.println("Result : " + minValue + "\n\n");
         return minValue;
     }
 
@@ -76,24 +77,24 @@ public class AdventOfCodeDay05 {
 
         try (reader) {
             List<Transformation> transformationGroup = new ArrayList<>();
+
+            Matcher matcher = SEEDS_PATTERN.matcher(reader.readLine());
+            if (matcher.find()) {
+                seeds.addAll(Arrays.stream(matcher.group(2).split(" ")).map(Long::parseLong).toList());
+                reader.readLine();
+            }
+
             String line = reader.readLine();
             while (line != null) {
-                Matcher matcher = SEEDS_PATTERN.matcher(line);
-                if (matcher.find()) {
-                    seeds.addAll(Arrays.stream(matcher.group(2).split(" ")).map(Long::parseLong).toList());
-                    reader.readLine();
-                }
-
                 if (line.isBlank()) {
                     transformations.add(prepareTransformation(transformationGroup));
                 } else if (Character.isDigit(line.charAt(0))) {
-                    List<Long> intervalData = Arrays.stream(line.split(" "))
-                            .map(Long::parseLong).toList();
+                    List<Long> transData = Arrays.stream(line.split(" ")).map(Long::parseLong).toList();
                     transformationGroup.add(
                             new Transformation(
-                                    intervalData.get(1),
-                                    intervalData.get(1) + intervalData.get(2) - 1,
-                                    intervalData.get(0) - intervalData.get(1)
+                                    transData.get(1),
+                                    transData.get(1) + transData.get(2) - 1,
+                                    transData.get(0) - transData.get(1)
                             )
                     );
                 } else {
@@ -109,11 +110,18 @@ public class AdventOfCodeDay05 {
 
     private static List<Transformation> prepareTransformation(List<Transformation> transformations) {
         var result = new ArrayList<>(transformations.stream().sorted(Comparator.comparing(e -> e.start)).toList());
-        result.add(0, new Transformation(Long.MIN_VALUE, result.get(0).start - 1, 0L));
+
+        if (result.get(0).start > 0) {
+            result.add(0, new Transformation(0L, result.get(0).start - 1, 0L));
+        }
         result.add(new Transformation(result.get(result.size() - 1).end + 1, Long.MAX_VALUE, 0L));
         return result;
     }
 
     private record Transformation(Long start, Long end, Long delta) {
+        @Override
+        public String toString() {
+            return "(" + start + ", " + end + ", delta: " + delta + ')';
+        }
     }
 }

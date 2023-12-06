@@ -16,6 +16,7 @@ class AdventOfCodeDay05Test {
 
     @Test
     void mapNumbersRanges() throws IOException {
+        assertEquals(46, AdventOfCodeDay05.mapNumbersRanges("src/test/resources/advent/2023_5/input_test.in"));
         assertEquals(184903631, AdventOfCodeDay05.mapNumbersRanges("src/test/resources/advent/2023_5/input.in"));
     }
 }

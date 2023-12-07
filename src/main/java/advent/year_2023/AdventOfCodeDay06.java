@@ -58,11 +58,11 @@ public class AdventOfCodeDay06 {
         return (half - (value + 1)) * 2 + (idEven ? 1 : 2);
     }
 
-    private static long binarySearch(long time, long key) {
-        long left = 1, right = time / 2;
+    private static long binarySearch(long n, long key) {
+        long left = 1, right = n / 2;
         while (left <= right) {
             long mid = (left + right) >>> 1;
-            long value = (time - mid) * mid;
+            long value = (n - mid) * mid;
 
             if (value < key)
                 left = mid + 1;

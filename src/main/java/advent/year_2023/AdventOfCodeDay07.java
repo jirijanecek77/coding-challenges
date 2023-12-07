@@ -74,10 +74,7 @@ public class AdventOfCodeDay07 {
 
     private static int cardinalitiesToRank(Collection<Long> cardinalities) {
         int n = cardinalities.size();
-        int topCardinality = cardinalities.stream()
-                .max(Comparator.comparing(Function.identity()))
-                .map(Long::intValue)
-                .orElse(0);
+        int topCardinality = cardinalities.stream().mapToInt(Long::intValue).max().orElse(0);
 
         if (n == 1) {
             // all same
@@ -118,8 +115,7 @@ public class AdventOfCodeDay07 {
             return cardinalityMap.values();
         }
 
-        List<Long> result = new ArrayList<>(withoutJokersMap.values());
-        Collections.sort(result);
+        List<Long> result = withoutJokersMap.values().stream().sorted().collect(Collectors.toList());
         long highestCardinality = result.remove(result.size() - 1);
         result.add(highestCardinality + jokers);
 

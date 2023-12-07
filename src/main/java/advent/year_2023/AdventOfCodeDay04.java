@@ -1,10 +1,13 @@
 package advent.year_2023;
 
-import java.util.*;
+import domain.Pair;
+
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class AdventOfCodeDay04 {
 
@@ -29,10 +32,33 @@ public class AdventOfCodeDay04 {
     }
 
     public static int checkSublist2(String data) {
-        Queue<Integer> queue = new PriorityQueue<>();
-        return Arrays.stream(data.split("\n"))
-                .mapToInt(row -> countCards(row, queue))
-                .sum();
+        Map<Integer, Integer> cards = Arrays.stream(data.split("\n"))
+                .map(AdventOfCodeDay04::parseCards)
+                .collect(Collectors.toMap(Pair::first, Pair::second));
+
+        int[] arr = new int[cards.size()];
+        Arrays.fill(arr, 1);
+        int sum = 0;
+
+        for (int i = 0; i < cards.size(); i++) {
+            sum += arr[i];
+            for (int j = i + 1; j < i + 1 + cards.get(i + 1); j++) {
+                arr[j] += arr[i];
+            }
+        }
+
+        return sum;
+    }
+
+    private static Pair<Integer, Integer> parseCards(String data) {
+        Matcher matcher = CARD_LINE_PATTERN.matcher(data);
+        if (!matcher.find()) {
+            throw new RuntimeException(data + " has unknown format");
+        }
+        int gameNumber = Integer.parseInt(matcher.group(2));
+        int winningCount = getWinningCardsCount(matcher);
+
+        return Pair.of(gameNumber, winningCount);
     }
 
     private static int getWinningCardsCount(Matcher matcher) {
@@ -40,25 +66,5 @@ public class AdventOfCodeDay04 {
         Set<String> current = Arrays.stream(matcher.group(5).split(" ")).filter(e -> !e.isBlank()).collect(Collectors.toSet());
         current.retainAll(winning);
         return current.size();
-    }
-
-    private static int countCards(String data, Queue<Integer> queue) {
-        Matcher matcher = CARD_LINE_PATTERN.matcher(data);
-        if (!matcher.find()) {
-            throw new RuntimeException(data + " has unknown format");
-        }
-        int result = 0;
-        int gameNumber = Integer.parseInt(matcher.group(2));
-        int winningCount = getWinningCardsCount(matcher);
-        List<Integer> nextCards = IntStream.range(gameNumber + 1, gameNumber + 1 + winningCount).boxed().toList();
-
-        queue.add(gameNumber);
-        while (Objects.equals(queue.peek(), gameNumber)) {
-            queue.remove();
-            queue.addAll(nextCards);
-            result++;
-        }
-
-        return result;
     }
 }

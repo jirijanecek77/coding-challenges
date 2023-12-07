@@ -87,7 +87,7 @@ public class AdventOfCodeDay05 {
             String line = reader.readLine();
             while (line != null) {
                 if (line.isBlank()) {
-                    transformations.add(prepareTransformation(transformationGroup));
+                    transformations.add(fillTransformationGaps(transformationGroup));
                 } else if (Character.isDigit(line.charAt(0))) {
                     List<Long> transData = Arrays.stream(line.split(" ")).map(Long::parseLong).toList();
                     transformationGroup.add(
@@ -104,16 +104,29 @@ public class AdventOfCodeDay05 {
                 // read next line
                 line = reader.readLine();
             }
-            transformations.add(prepareTransformation(transformationGroup));
+            transformations.add(fillTransformationGaps(transformationGroup));
         }
     }
 
-    private static List<Transformation> prepareTransformation(List<Transformation> transformations) {
-        var result = new ArrayList<>(transformations.stream().sorted(Comparator.comparing(e -> e.start)).toList());
+    private static List<Transformation> fillTransformationGaps(List<Transformation> transformations) {
+        var result = new ArrayList<>(transformations.stream()
+                .sorted(Comparator.comparing(e -> e.start))
+                .toList());
 
-        if (result.get(0).start > 0) {
+        if (!result.isEmpty() && result.get(0).start > 0) {
             result.add(0, new Transformation(0L, result.get(0).start - 1, 0L));
         }
+
+        for (int i = 1; i < result.size(); i++) {
+            long start = result.get(i).start;
+            long end = result.get(i - 1).end;
+
+            if (end + 1 < start) {
+                result.add(i, new Transformation(end + 1, start - 1, 0L));
+                i++;
+            }
+        }
+
         result.add(new Transformation(result.get(result.size() - 1).end + 1, Long.MAX_VALUE, 0L));
         return result;
     }

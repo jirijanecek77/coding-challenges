@@ -3,11 +3,13 @@ package advent.year_2023;
 import domain.Pair;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class AdventOfCodeDay04 {
 
@@ -36,18 +38,39 @@ public class AdventOfCodeDay04 {
                 .map(AdventOfCodeDay04::parseCards)
                 .collect(Collectors.toMap(Pair::first, Pair::second));
 
-        int[] arr = new int[cards.size()];
-        Arrays.fill(arr, 1);
-        int sum = 0;
+        if (true) {
+            // DP
+            int[] arr = new int[cards.size()];
+            Arrays.fill(arr, 1);
+            int sum = 0;
 
-        for (int i = 0; i < cards.size(); i++) {
-            sum += arr[i];
-            for (int j = i + 1; j < i + 1 + cards.get(i + 1); j++) {
-                arr[j] += arr[i];
+            for (int i = 0; i < cards.size(); i++) {
+                sum += arr[i];
+                for (int j = i + 1; j < i + 1 + cards.get(i + 1); j++) {
+                    arr[j] += arr[i];
+                }
             }
+            return sum;
+        } else {
+
+            // DP with memoization
+            Map<Integer, Integer> memoization = new HashMap<>();
+            return IntStream.range(1, cards.size() + 1).map(e -> calcRecursive(e, cards, memoization)).sum();
+        }
+    }
+
+    private static int calcRecursive(int i, Map<Integer, Integer> cards, Map<Integer, Integer> memoization) {
+        if (i > cards.size()) {
+            return 0;
+        }
+        var result = memoization.get(i);
+        if (result != null) {
+            return result;
         }
 
-        return sum;
+        result = 1 + IntStream.range(i + 1, i + 1 + cards.get(i)).map(e -> calcRecursive(e, cards, memoization)).sum();
+        memoization.put(i, result);
+        return result;
     }
 
     private static Pair<Integer, Integer> parseCards(String data) {

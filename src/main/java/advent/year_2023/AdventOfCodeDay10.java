@@ -1,20 +1,26 @@
 package advent.year_2023;
 
-import domain.Coordinate;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class AdventOfCodeDay10 {
-    static int cycleLength(String inputFileName) throws IOException {
+
+    private static final char EMPTY = 'X';
+    private static final char LEFT = 'L';
+    private static final char RIGHT = 'R';
+    private static final char PATH = '.';
+
+    static int loopLength(String inputFileName) throws IOException {
         final BufferedReader reader = Files.newBufferedReader(Paths.get(inputFileName));
 
         char[][] data = new char[][]{};
-        Coordinate start = null;
+        Step start = null;
         int rowIndex = 0;
         try (reader) {
             String line = reader.readLine();
@@ -24,7 +30,7 @@ public class AdventOfCodeDay10 {
 
                 int colIndex = line.indexOf('S');
                 if (colIndex >= 0) {
-                    start = new Coordinate(rowIndex, colIndex);
+                    start = new Step(rowIndex, colIndex, 'S');
                 }
 
                 rowIndex++;
@@ -36,11 +42,11 @@ public class AdventOfCodeDay10 {
         return searchPath(data, start).size() / 2;
     }
 
-    static int cycleArea(String inputFileName) throws IOException {
+    static int loopAreaSize(String inputFileName) throws IOException {
         final BufferedReader reader = Files.newBufferedReader(Paths.get(inputFileName));
 
         char[][] data = new char[][]{};
-        Coordinate start = null;
+        Step start = null;
         int rows = 0;
         try (reader) {
             String line = reader.readLine();
@@ -50,7 +56,7 @@ public class AdventOfCodeDay10 {
 
                 int colIndex = line.indexOf('S');
                 if (colIndex >= 0) {
-                    start = new Coordinate(rows, colIndex);
+                    start = new Step(rows, colIndex, 'S');
                 }
 
                 rows++;
@@ -59,124 +65,147 @@ public class AdventOfCodeDay10 {
                 line = reader.readLine();
             }
         }
-        Set<Coordinate> path = searchPath(data, start);
-        int columns = data[0].length;
-        return (rows * columns) - path.size() - outerArea(path, rows, columns, data);
-    }
-
-    private static int outerArea(Set<Coordinate> path, int rows, int columns, char[][] chars) {
-        boolean[][] data = new boolean[rows + 2][columns + 2];
-        path.forEach(coordinate -> data[coordinate.x() + 1][coordinate.y() + 1] = true);
-
-        Set<Coordinate> visited = new HashSet<>();
-        Stack<Coordinate> stack = new Stack<>();
-        stack.push(new Coordinate(0, 0));
-        int areaSize = 0;
-
-        while (!stack.isEmpty()) {
-            Coordinate current = stack.pop();
-
-            List<Coordinate> nextSteps = new ArrayList<>();
-            if (!data[current.x()][current.y()]) {
-                if (!visited.contains(current) && current.x() > 0 && current.x() < data.length - 1 && current.y() > 0 && current.y() < data[current.x()].length - 1) {
-                    System.out.println((current.x() - 1) + ", " + (current.y() - 1));
-                    areaSize++;
-                }
-
-                if (current.x() + 1 < data.length) {
-                    Coordinate nextStep = new Coordinate(current.x() + 1, current.y());
-                    nextSteps.add(nextStep);
-                }
-                if (current.x() - 1 >= 0) {
-                    Coordinate nextStep = new Coordinate(current.x() - 1, current.y());
-                    nextSteps.add(nextStep);
-                }
-                if (current.y() - 1 >= 0) {
-                    Coordinate nextStep = new Coordinate(current.x(), current.y() - 1);
-                    nextSteps.add(nextStep);
-                }
-                if (current.y() + 1 < data[current.x()].length) {
-                    Coordinate nextStep = new Coordinate(current.x(), current.y() + 1);
-                    nextSteps.add(nextStep);
-                }
-            } else {
-
+        List<Step> path = searchPath(data, start);
+        int columns = data[rows - 1].length;
+        char[][] area = new char[rows][columns];
+        for (int x = 0; x < rows; x++) {
+            for (int y = 0; y < columns; y++) {
+                area[x][y] = EMPTY;
             }
-            visited.add(current);
-            nextSteps.stream().filter(step -> !visited.contains(step)).forEach(stack::push);
         }
 
-//        for (int x = 1; x < data.length -1 ; x++) {
-//            for (int y = 1; y < data[x].length -1 ; y++) {
-//                System.out.print(chars[x-1][y-1]);
-//            }
-//            System.out.println();
-//        }
+        path.forEach(e -> area[e.x()][e.y] = PATH);
+
+        for (Step current : path) {
+            int x = current.x;
+            int y = current.y;
+            switch (current.direction()) {
+                case 'L':
+                    mark(area, LEFT, x + 1, y);
+                    mark(area, RIGHT, x - 1, y);
+                    break;
+                case 'R':
+                    mark(area, LEFT, x - 1, y);
+                    mark(area, RIGHT, x + 1, y);
+                    break;
+                case 'U':
+                    mark(area, LEFT, x, y - 1);
+                    mark(area, RIGHT, x, y + 1);
+                    break;
+                case 'D':
+                    mark(area, LEFT, x, y + 1);
+                    mark(area, RIGHT, x, y - 1);
+                    if (data[x][y] == 'J') {
+                        mark(area, LEFT, x + 1, y);
+                    }
+                    if (data[x][y] == 'L') {
+                        mark(area, RIGHT, x + 1, y);
+                    }
+                    break;
+            }
+        }
+
+        int areaSize = 0;
+        char outerChar = area[0][0] == 'L' ? 'R' : 'L';
+        for (int x = 0; x < rows; x++) {
+            for (int y = 0; y < columns; y++) {
+                if (area[x][y] == outerChar) {
+                    areaSize++;
+                }
+                System.out.print(area[x][y]);
+            }
+            System.out.println();
+        }
+        System.out.println();
 
         return areaSize;
     }
 
-    private static Set<Coordinate> searchPath(char[][] data, Coordinate start) {
-        Set<Coordinate> visited = new HashSet<>();
-
-        List<Coordinate> startNeighbors = getNextStepsFromStart(data, start);
-        Coordinate left = startNeighbors.get(0), right = startNeighbors.get(1);
-        visited.add(start);
-        while (!left.equals(right)) {
-            visited.add(left);
-            visited.add(right);
-            left = getNextSteps(data, left).stream().filter(e -> !visited.contains(e)).findFirst().orElseThrow();
-            right = getNextSteps(data, right).stream().filter(e -> !visited.contains(e)).findFirst().orElseThrow();
+    private static void mark(char[][] area, char ch, int x, int y) {
+        if (x >= 0 && x < area.length && y >= 0 && y < area[x].length && area[x][y] == EMPTY) {
+            area[x][y] = ch;
+            mark(area, ch, x + 1, y);
+            mark(area, ch, x - 1, y);
+            mark(area, ch, x, y - 1);
+            mark(area, ch, x, y + 1);
         }
-
-        visited.add(left);
-        return visited;
     }
 
-    private static List<Coordinate> getNextSteps(char[][] data, Coordinate current) {
-        return switch (data[current.x()][current.y()]) {
-            case 'F' -> List.of(new Coordinate(current.x() + 1, current.y()), new Coordinate(current.x(), current.y() + 1));
-            case 'J' -> List.of(new Coordinate(current.x() - 1, current.y()), new Coordinate(current.x(), current.y() - 1));
-            case 'L' -> List.of(new Coordinate(current.x() - 1, current.y()), new Coordinate(current.x(), current.y() + 1));
-            case '7' -> List.of(new Coordinate(current.x() + 1, current.y()), new Coordinate(current.x(), current.y() - 1));
-            case '|' -> List.of(new Coordinate(current.x() - 1, current.y()), new Coordinate(current.x() + 1, current.y()));
-            case '-' -> List.of(new Coordinate(current.x(), current.y() - 1), new Coordinate(current.x(), current.y() + 1));
-            default -> throw new RuntimeException("unknown pipe " + data[current.x()][current.y()]);
+    private static List<Step> searchPath(char[][] data, Step start) {
+        List<Step> path = new ArrayList<>();
+        Step current = getNextStepsFromStart(data, start);
+        if (current.x > start.x) {
+            start = new Step(start.x, start.y, 'D');
+        } else if (current.x < start.x) {
+            start = new Step(start.x, start.y, 'U');
+        } else if (current.y < start.y) {
+            start = new Step(start.x, start.y, 'L');
+        } else if (current.y > start.y) {
+            start = new Step(start.x, start.y, 'R');
+        }
+
+        path.add(start);
+        while (current.x != start.x || current.y != start.y) {
+            path.add(current);
+            current = getNextStep(data, current);
+        }
+
+        return path;
+    }
+
+    private static Step getNextStep(char[][] data, Step currentStep) {
+        int x = currentStep.x;
+        int y = currentStep.y;
+        return switch (data[x][y]) {
+            case 'F' -> currentStep.direction == 'L' ? new Step(x + 1, y, 'D') : new Step(x, y + 1, 'R');
+            case 'J' -> currentStep.direction == 'R' ? new Step(x - 1, y, 'U') : new Step(x, y - 1, 'L');
+            case 'L' -> currentStep.direction == 'L' ? new Step(x - 1, y, 'U') : new Step(x, y + 1, 'R');
+            case '7' -> currentStep.direction == 'R' ? new Step(x + 1, y, 'D') : new Step(x, y - 1, 'L');
+            case '|' -> currentStep.direction == 'U' ? new Step(x - 1, y, 'U') : new Step(x + 1, y, 'D');
+            case '-' -> currentStep.direction == 'L' ? new Step(x, y - 1, 'L') : new Step(x, y + 1, 'R');
+            default -> throw new RuntimeException("unknown pipe " + data[x][y]);
         };
     }
 
 
-    private static List<Coordinate> getNextStepsFromStart(char[][] data, Coordinate start) {
-        List<Coordinate> nextSteps = new ArrayList<>();
-
-        if (start.x() + 1 < data.length) {
-            Coordinate nextStep = new Coordinate(start.x() + 1, start.y());
-            if (contains(data, nextStep, '|', 'J', 'L')) {
-                nextSteps.add(nextStep);
+    private static Step getNextStepsFromStart(char[][] data, Step start) {
+        int x = start.x;
+        int y = start.y;
+        if (x + 1 < data.length) {
+            Step nextStep = new Step(x + 1, y, 'D');
+            if (findByStep(data, nextStep, '|', 'J', 'L')) {
+                return nextStep;
             }
         }
-        if (start.x() - 1 >= 0) {
-            Coordinate nextStep = new Coordinate(start.x() - 1, start.y());
-            if (contains(data, nextStep, '|', 'F', '7')) {
-                nextSteps.add(nextStep);
+        if (x - 1 >= 0) {
+            Step nextStep = new Step(x - 1, y, 'U');
+            if (findByStep(data, nextStep, '|', 'F', '7')) {
+                return nextStep;
             }
         }
-        if (start.y() - 1 >= 0) {
-            Coordinate nextStep = new Coordinate(start.x(), start.y() - 1);
-            if (contains(data, nextStep, '-', 'L', 'F')) {
-                nextSteps.add(nextStep);
+        if (y - 1 >= 0) {
+            Step nextStep = new Step(x, y - 1, 'L');
+            if (findByStep(data, nextStep, '-', 'L', 'F')) {
+                return nextStep;
             }
         }
-        if (start.y() + 1 < data[start.x()].length) {
-            Coordinate nextStep = new Coordinate(start.x(), start.y() + 1);
-            if (contains(data, nextStep, '-', '7', 'J', 'S')) {
-                nextSteps.add(nextStep);
+        if (y + 1 < data[x].length) {
+            Step nextStep = new Step(x, y + 1, 'R');
+            if (findByStep(data, nextStep, '-', '7', 'J', 'S')) {
+                return nextStep;
             }
         }
-        return nextSteps;
+        return null;
     }
 
-    private static boolean contains(char[][] data, Coordinate coordinate, Character... targets) {
-        return Stream.of(targets).anyMatch(ch -> data[coordinate.x()][coordinate.y()] == ch);
+    private static boolean findByStep(char[][] data, Step step, Character... targets) {
+        return Stream.of(targets).anyMatch(ch -> data[step.x][step.y] == ch);
+    }
+
+    private record Step(int x, int y, char direction) {
+        @Override
+        public String toString() {
+            return "(" + x + ", " + y + ", dir: " + direction + ")";
+        }
     }
 }

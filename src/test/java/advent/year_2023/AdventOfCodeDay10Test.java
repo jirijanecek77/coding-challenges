@@ -10,14 +10,14 @@ class AdventOfCodeDay10Test {
 
     @Test
     void cycleLength() throws IOException {
-        assertEquals(8, AdventOfCodeDay10.cycleLength("src/test/resources/advent/2023_10/input_test.in"));
-        assertEquals(6942, AdventOfCodeDay10.cycleLength("src/test/resources/advent/2023_10/input.in"));
+        assertEquals(8, AdventOfCodeDay10.loopLength("src/test/resources/advent/2023_10/input_test.in"));
+        assertEquals(6942, AdventOfCodeDay10.loopLength("src/test/resources/advent/2023_10/input.in"));
     }
 
     @Test
     void cycleArea() throws IOException {
-        assertEquals(1, AdventOfCodeDay10.cycleArea("src/test/resources/advent/2023_10/input_test.in"));
-        assertEquals(4, AdventOfCodeDay10.cycleArea("src/test/resources/advent/2023_10/input_test2.in"));
-//        assertEquals(547, AdventOfCodeDay10.cycleArea("src/test/resources/advent/2023_10/input.in"));
+        assertEquals(1, AdventOfCodeDay10.loopAreaSize("src/test/resources/advent/2023_10/input_test.in"));
+        assertEquals(4, AdventOfCodeDay10.loopAreaSize("src/test/resources/advent/2023_10/input_test2.in"));
+        assertEquals(297, AdventOfCodeDay10.loopAreaSize("src/test/resources/advent/2023_10/input.in"));
     }
 }

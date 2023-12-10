@@ -12,8 +12,8 @@ public class BinaryTreeChallenges {
         if (root == null) return true;
 
 
-        return (root.left == null || root.left.data < root.data && checkBST(root.left))
-                && (root.right == null || root.right.data > root.data && checkBST(root.right));
+        return (root.left() == null || root.left().data() < root.data() && checkBST(root.left()))
+                && (root.right() == null || root.right().data() > root.data() && checkBST(root.right()));
     }
 
     public static int treeHeight(Node root) {
@@ -21,8 +21,8 @@ public class BinaryTreeChallenges {
             return 0;
         }
 
-        var leftHeight = treeHeight(root.left);
-        var rightHeight = treeHeight(root.right);
+        var leftHeight = treeHeight(root.left());
+        var rightHeight = treeHeight(root.right());
 
         if (leftHeight > rightHeight) {
             return leftHeight + 1;
@@ -55,10 +55,10 @@ public class BinaryTreeChallenges {
             while (nodeCount > 0) {
                 Node newnode = q.peek();
                 q.remove();
-                if (newnode.left != null)
-                    q.add(newnode.left);
-                if (newnode.right != null)
-                    q.add(newnode.right);
+                if (newnode.left() != null)
+                    q.add(newnode.left());
+                if (newnode.right() != null)
+                    q.add(newnode.right());
                 nodeCount--;
             }
         }

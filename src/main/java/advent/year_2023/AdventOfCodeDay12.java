@@ -20,7 +20,7 @@ public class AdventOfCodeDay12 {
     static long combinationsCount(String inputFileName, int repetitions) throws IOException {
         final BufferedReader reader = Files.newBufferedReader(Paths.get(inputFileName));
 
-        int sum = 0;
+        long sum = 0;
 
         try (reader) {
             String line = reader.readLine();
@@ -40,10 +40,10 @@ public class AdventOfCodeDay12 {
                 String input = cleanData(data);
                 String target = counts.stream().map("#"::repeat).collect(Collectors.joining("."));
 
-                System.out.println(input + counts);
-                int s = solve(input, counts, target);
-                System.out.println(s);
-                sum += s;
+                System.out.println(input + " -> " + target);
+                long count = solve(input, counts, target);
+                System.out.println(count);
+                sum += count;
 
                 // read next line
                 line = reader.readLine();
@@ -53,7 +53,20 @@ public class AdventOfCodeDay12 {
         }
     }
 
-    private static int solve(String data, List<Integer> counts, String target) {
+    private static long solveDP(String input, String target) {
+        long[] dp = new long[input.length()];
+        dp[0] = input.charAt(0) == '?' ? 1L : 0;
+        for (int i = 1; i < input.length(); i++) {
+            if (input.charAt(i) == '?') {
+                dp[i] = dp[i - 1] + 2;
+            } else {
+                dp[i] = dp[i - 1];
+            }
+        }
+        return dp[input.length() - 1];
+    }
+
+    private static long solve(String data, List<Integer> counts, String target) {
 //        System.out.println(data + counts);
         int first = data.indexOf('?');
         if (first < 0) {

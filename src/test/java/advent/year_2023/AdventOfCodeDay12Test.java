@@ -16,7 +16,7 @@ class AdventOfCodeDay12Test {
 
     @Test
     void combinationsCount5() throws IOException {
-        assertEquals(525152, AdventOfCodeDay12.combinationsCount("src/test/resources/advent/2023_12/input_test.in", 5));
-//        assertEquals(742305960572L, AdventOfCodeDay12.combinationsCount("src/test/resources/advent/2023_12/input.in", 5));
+//        assertEquals(525152, AdventOfCodeDay12.combinationsCount("src/test/resources/advent/2023_12/input_test.in", 5));
+        assertEquals(742305960572L, AdventOfCodeDay12.combinationsCount("src/test/resources/advent/2023_12/input.in", 5));
     }
 }

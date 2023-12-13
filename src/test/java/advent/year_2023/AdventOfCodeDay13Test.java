@@ -16,7 +16,7 @@ class AdventOfCodeDay13Test {
 
     @Test
     void countMirrorWithFix() throws IOException {
-        assertEquals(400, AdventOfCodeDay13.countMirror("src/test/resources/advent/2023_13/input_test.in", true));
-//        assertEquals(40700, AdventOfCodeDay13.countMirror("src/test/resources/advent/2023_13/input.in", true));
+//        assertEquals(400, AdventOfCodeDay13.countMirror("src/test/resources/advent/2023_13/input_test.in", true));
+        assertEquals(41000, AdventOfCodeDay13.countMirror("src/test/resources/advent/2023_13/input.in", true));
     }
 }

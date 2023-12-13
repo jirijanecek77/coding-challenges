@@ -44,17 +44,18 @@ public class AdventOfCodeDay13 {
         return rowCount * 100 + colCount;
     }
 
-    private static int calcRowsWithFix(char[][] input) {
-        List<Pair<char[][], Integer>> queue = new LinkedList<>();
-        Set<Integer> visited = new HashSet<>();
+    private static int calcRowsWithFix(char[][] data) {
+        Queue<char[][]> queue = new LinkedList<>();
+        List<Pair<Integer, Integer>> positions = calcFixPositions(data);
 
-        calcDist(input, queue, visited);
+        if (positions.isEmpty()) {
+            queue.add(data);
+        } else {
+            positions.forEach(e -> queue.add(copyOf(data, e.first(), e.second())));
+        }
 
         while (!queue.isEmpty()) {
-            Pair<char[][], Integer> queueItem = queue.remove(0);
-            char[][] data = queueItem.first();
-            Integer restricted = queueItem.second();
-            int result = calc(data, restricted);
+            int result = calc(queue.poll());
             if (result > 0) {
                 return result;
             }
@@ -62,19 +63,17 @@ public class AdventOfCodeDay13 {
         return 0;
     }
 
-    private static int calc(char[][] data, Integer restricted) {
+    private static int calc(char[][] data) {
         boolean isMirror;
         for (int i = 1; i < data.length; i++) {
             isMirror = true;
             int j = 0;
             while (j < i && i + j < data.length) {
-                for (int col = 0; col < data[i - j - 1].length; col++) {
-                    isMirror = isMirror && (data[i - j - 1][col] == data[i + j][col]);
-                }
+                isMirror = isMirror && Arrays.compare(data[i - j - 1], data[i + j]) == 0;
                 j++;
 
                 if (isMirror) {
-                    System.out.println("found line " + i + " with fixed line: " + restricted);
+                    System.out.println("found result for line " + i);
                     return i;
                 }
             }
@@ -82,10 +81,9 @@ public class AdventOfCodeDay13 {
         return 0;
     }
 
-    private static void calcDist(char[][] data, List<Pair<char[][], Integer>> queue, Set<Integer> visited) {
-        visited.add(Arrays.deepHashCode(data));
+    private static List<Pair<Integer, Integer>> calcFixPositions(char[][] data) {
+        List<Pair<Integer, Integer>> smudges = new ArrayList<>();
 
-        boolean inserted = false;
         for (int i = 1; i < data.length; i++) {
             int j = 0;
             boolean matches = true;
@@ -102,23 +100,21 @@ public class AdventOfCodeDay13 {
                 }
                 System.out.println("[" + rowIndex1 + ", " + rowIndex2 + "] dist " + dist);
                 if (dist == 1 && matches) {
-                    char[][] newData1 = copyOf(data, rowIndex1, colIdx);
-                    int hash1 = Arrays.deepHashCode(newData1);
-                    if (!visited.contains(hash1)) {
-                        queue.add(Pair.of(newData1, rowIndex1));
-                        visited.add(hash1);
-                        System.out.println("add data with change on [" + rowIndex1 + ", " + colIdx + "]");
-                    }
-                    inserted = true;
+                    smudges.add(Pair.of(rowIndex1, colIdx));
+                    System.out.println("add data with change on [" + rowIndex1 + ", " + colIdx + "]");
                 } else {
                     matches = matches && dist == 0;
                 }
                 j++;
             }
         }
-        if (!inserted) {
-            queue.add(0, Pair.of(data, null));
+
+        if (smudges.isEmpty()) {
+            return List.of();
         }
+
+        Comparator<Pair<Integer, Integer>> comparator = Comparator.comparing(Pair::first);
+        return smudges.stream().sorted(comparator.thenComparing(Pair::second)).toList();
     }
 
     private static char[][] copyOf(char[][] matrix, int x, int y) {

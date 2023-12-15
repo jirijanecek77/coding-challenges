@@ -6,7 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
 
 public class AdventOfCodeDay13 {
 
@@ -39,95 +39,9 @@ public class AdventOfCodeDay13 {
 
     private static int calcMirror(char[][] data, boolean withFix) {
         int rowCount = withFix ? calcRowsWithFix(data) : calcRows(data);
-        int colCount = withFix ? 0 : calcColumns(data);
+        int colCount = withFix ? calcColsWithFix(data) : calcColumns(data);
 
         return rowCount * 100 + colCount;
-    }
-
-    private static int calcRowsWithFix(char[][] data) {
-        Queue<char[][]> queue = new LinkedList<>();
-        List<Pair<Integer, Integer>> positions = calcFixPositions(data);
-
-        if (positions.isEmpty()) {
-            queue.add(data);
-        } else {
-            positions.forEach(e -> queue.add(copyOf(data, e.first(), e.second())));
-        }
-
-        while (!queue.isEmpty()) {
-            int result = calc(queue.poll());
-            if (result > 0) {
-                return result;
-            }
-        }
-        return 0;
-    }
-
-    private static int calc(char[][] data) {
-        boolean isMirror;
-        for (int i = 1; i < data.length; i++) {
-            isMirror = true;
-            int j = 0;
-            while (j < i && i + j < data.length) {
-                isMirror = isMirror && Arrays.compare(data[i - j - 1], data[i + j]) == 0;
-                j++;
-
-                if (isMirror) {
-                    System.out.println("found result for line " + i);
-                    return i;
-                }
-            }
-        }
-        return 0;
-    }
-
-    private static List<Pair<Integer, Integer>> calcFixPositions(char[][] data) {
-        List<Pair<Integer, Integer>> smudges = new ArrayList<>();
-
-        for (int i = 1; i < data.length; i++) {
-            int j = 0;
-            boolean matches = true;
-            while (j < i && i + j < data.length) {
-                int colIdx = -1;
-                int rowIndex1 = i - j - 1;
-                int rowIndex2 = i + j;
-                int dist = 0;
-                for (int col = 0; col < data[rowIndex1].length; col++) {
-                    if (data[rowIndex1][col] != data[rowIndex2][col]) {
-                        colIdx = col;
-                        dist++;
-                    }
-                }
-                System.out.println("[" + rowIndex1 + ", " + rowIndex2 + "] dist " + dist);
-                if (dist == 1 && matches) {
-                    smudges.add(Pair.of(rowIndex1, colIdx));
-                    System.out.println("add data with change on [" + rowIndex1 + ", " + colIdx + "]");
-                } else {
-                    matches = matches && dist == 0;
-                }
-                j++;
-            }
-        }
-
-        if (smudges.isEmpty()) {
-            return List.of();
-        }
-
-        Comparator<Pair<Integer, Integer>> comparator = Comparator.comparing(Pair::first);
-        return smudges.stream().sorted(comparator.thenComparing(Pair::second)).toList();
-    }
-
-    private static char[][] copyOf(char[][] matrix, int x, int y) {
-        char[][] matrixCopy = new char[matrix.length][];
-        for (int i = 0; i < matrix.length; i++) {
-            char[] aMatrix = matrix[i];
-            int aLength = aMatrix.length;
-            matrixCopy[i] = new char[aLength];
-            System.arraycopy(aMatrix, 0, matrixCopy[i], 0, aLength);
-        }
-
-        matrixCopy[x][y] = matrix[x][y] == '.' ? '#' : '.';
-        return matrixCopy;
     }
 
     private static int calcRows(char[][] data) {
@@ -153,18 +67,95 @@ public class AdventOfCodeDay13 {
 
     private static int calculate(int[] data) {
         int result = 0;
-        boolean isMirror;
         for (int i = 1; i < data.length; i++) {
-            isMirror = true;
-            int j = 0;
-            while (j < i && i + j < data.length) {
-                isMirror = isMirror && (data[i - j - 1] == data[i + j]);
-                j++;
-            }
-            if (isMirror) {
-                result += i;
+            int high = Math.min(2 * i, data.length) - 1;
+            int low = i - (high - i) - 1;
+
+            while (low < high) {
+                if (data[low] != data[high]) {
+                    break;
+                }
+
+                if (low == high - 1) {
+                    result += i;
+                    System.out.println("found result for " + i);
+                }
+                low++;
+                high--;
             }
         }
         return result;
+    }
+
+    private static int calcRowsWithFix(char[][] data) {
+        for (int i = 1; i < data.length; i++) {
+            int high = Math.min(2 * i, data.length) - 1;
+            int low = i - (high - i) - 1;
+
+            Pair<Integer, Integer> smudge = null;
+            while (low < high) {
+                int dist = 0;
+                int colIdx = -1;
+                for (int col = 0; col < data[low].length; col++) {
+                    char ch = smudge != null && smudge.first() == low && smudge.second() == col
+                            ? revert(data[low][col]) : data[low][col];
+                    if (ch != data[high][col]) {
+                        colIdx = col;
+                        dist++;
+                    }
+                }
+                if (dist == 1 && smudge == null) {
+                    smudge = Pair.of(low, colIdx);
+                } else if (dist != 0) {
+                    break;
+                }
+
+                if (low == high - 1 && smudge != null) {
+                    System.out.println("found result for row " + i);
+                    return i;
+                }
+                low++;
+                high--;
+            }
+        }
+        return 0;
+    }
+
+    private static int calcColsWithFix(char[][] data) {
+        for (int i = 1; i < data[0].length; i++) {
+            int high = Math.min(2 * i, data[0].length) - 1;
+            int low = i - (high - i) - 1;
+
+            Pair<Integer, Integer> smudge = null;
+            while (low < high) {
+                int dist = 0;
+                int rowIdx = -1;
+                for (int row = 0; row < data.length; row++) {
+                    char ch = smudge != null && smudge.first() == row && smudge.second() == low
+                            ? revert(data[row][low]) : data[row][low];
+                    if (ch != data[row][high]) {
+                        rowIdx = row;
+                        dist++;
+                    }
+                }
+                if (dist == 1 && smudge == null) {
+                    smudge = Pair.of(rowIdx, low);
+                } else if (dist != 0) {
+                    break;
+                }
+
+                if (low == high - 1 && smudge != null) {
+                    System.out.println("found result for column " + i);
+                    return i;
+                }
+                low++;
+                high--;
+            }
+        }
+        return 0;
+    }
+
+    private static char revert(char c) {
+        return c == '.' ? '#' : '.';
     }
 }

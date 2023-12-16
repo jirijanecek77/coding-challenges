@@ -45,25 +45,20 @@ public class AdventOfCodeDay16 {
 
     private static int calcFromPosition(char[][] data, Position start) {
         Set<Pair<Integer, Integer>> result = new HashSet<>();
-
-        Set<Position> visited = new HashSet<>();
-        Queue<Position> queue = new LinkedList<>();
-        queue.add(start);
-
-        while (!queue.isEmpty()) {
-            Position pos = queue.poll();
-            int row = pos.row();
-            int col = pos.col();
-
-            if (row >= 0 && row < data.length && col >= 0 && col < data[row].length && !visited.contains(pos)) {
-
-                visited.add(pos);
-                result.add(Pair.of(pos.row(), pos.col()));
-
-                queue.addAll(calcNextPositions(pos, data[row][col]));
-            }
-        }
+        dfs(start, data, result, new HashSet<>());
         return result.size();
+    }
+
+    private static void dfs(Position pos, char[][] data, Set<Pair<Integer, Integer>> result, Set<Position> visited) {
+        int row = pos.row();
+        int col = pos.col();
+
+        if (row >= 0 && row < data.length && col >= 0 && col < data[row].length && !visited.contains(pos)) {
+            visited.add(pos);
+            result.add(Pair.of(row, col));
+
+            calcNextPositions(pos, data[row][col]).forEach(nextPos -> dfs(nextPos, data, result, visited));
+        }
     }
 
     private static List<Position> calcNextPositions(Position pos, char ch) {

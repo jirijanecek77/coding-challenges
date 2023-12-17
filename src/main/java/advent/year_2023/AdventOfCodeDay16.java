@@ -12,7 +12,7 @@ import java.util.stream.IntStream;
 
 public class AdventOfCodeDay16 {
 
-    static long calcEnergizing(String inputFileName, boolean checkAll) throws IOException {
+    static int calcEnergizing(String inputFileName, boolean checkAll) throws IOException {
         final BufferedReader reader = Files.newBufferedReader(Paths.get(inputFileName));
 
         char[][] data = new char[][]{};
@@ -44,20 +44,18 @@ public class AdventOfCodeDay16 {
     }
 
     private static int calcFromPosition(char[][] data, Position start) {
-        Set<Pair<Integer, Integer>> result = new HashSet<>();
-        dfs(start, data, result, new HashSet<>());
-        return result.size();
+        Set<Position> visited = new HashSet<>();
+        dfs(start, data, visited);
+        return (int) visited.stream().map(e -> Pair.of(e.row, e.col)).distinct().count();
     }
 
-    private static void dfs(Position pos, char[][] data, Set<Pair<Integer, Integer>> result, Set<Position> visited) {
+    private static void dfs(Position pos, char[][] data, Set<Position> visited) {
         int row = pos.row();
         int col = pos.col();
 
         if (row >= 0 && row < data.length && col >= 0 && col < data[row].length && !visited.contains(pos)) {
             visited.add(pos);
-            result.add(Pair.of(row, col));
-
-            calcNextPositions(pos, data[row][col]).forEach(nextPos -> dfs(nextPos, data, result, visited));
+            calcNextPositions(pos, data[row][col]).forEach(nextPos -> dfs(nextPos, data, visited));
         }
     }
 

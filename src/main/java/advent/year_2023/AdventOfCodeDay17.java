@@ -15,7 +15,8 @@ public class AdventOfCodeDay17 {
             'v', '^',
             '^', 'v'
     );
-
+    private static final int MIN_STEPS_IN_DIRECTION = 4;
+    private static final int MAX_STEPS_IN_DIRECTION = 10;
 
     static int calcMinHeatLoss(String inputFileName, boolean isUltra) throws IOException {
         final BufferedReader reader = Files.newBufferedReader(Paths.get(inputFileName));
@@ -130,20 +131,20 @@ public class AdventOfCodeDay17 {
         }
         if (isUltra) {
             if (node.direction == direction) {
-                return node.stepsInDirection < 10;
+                return node.stepsInDirection < MAX_STEPS_IN_DIRECTION;
             } else {
-                if (node.stepsInDirection < 4) {
+                if (node.stepsInDirection < MIN_STEPS_IN_DIRECTION) {
                     return false;
                 } else {
                     switch (direction) {
                         case '^':
-                            return node.row > 4;
+                            return node.row >= MIN_STEPS_IN_DIRECTION;
                         case 'v':
-                            return node.row < n - 4;
+                            return node.row <= n - MIN_STEPS_IN_DIRECTION;
                         case '>':
-                            return node.col < n - 4;
+                            return node.col <= n - MIN_STEPS_IN_DIRECTION;
                         case '<':
-                            return node.col > 4;
+                            return node.col >= MIN_STEPS_IN_DIRECTION;
                     }
 
                 }

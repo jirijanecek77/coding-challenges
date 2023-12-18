@@ -17,6 +17,6 @@ class AdventOfCodeDay17Test {
     @Test
     void calcMinHeatLossUltra() throws IOException {
         assertEquals(94, AdventOfCodeDay17.calcMinHeatLoss("src/test/resources/advent/2023_17/input_test.in", true));
-//        assertEquals(915, AdventOfCodeDay17.calcMinHeatLoss("src/test/resources/advent/2023_17/input.in", true));
+        assertEquals(904, AdventOfCodeDay17.calcMinHeatLoss("src/test/resources/advent/2023_17/input.in", true));
     }
 }

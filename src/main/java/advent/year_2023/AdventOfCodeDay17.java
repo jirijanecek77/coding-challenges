@@ -9,128 +9,161 @@ import java.util.*;
 
 public class AdventOfCodeDay17 {
 
-    static int calcMinHeatLoss(String inputFileName, boolean checkAll) throws IOException {
+    private static final Map<Character, Character> RESTRICTED_DIRECTIONS = Map.of(
+            '<', '>',
+            '>', '<',
+            'v', '^',
+            '^', 'v'
+    );
+
+
+    static int calcMinHeatLoss(String inputFileName, boolean isUltra) throws IOException {
         final BufferedReader reader = Files.newBufferedReader(Paths.get(inputFileName));
 
         int[][] data = new int[][]{};
-        int rowIndex = 0;
+        int n = 0;
         try (reader) {
             String line = reader.readLine();
             while (line != null) {
-                data = Arrays.copyOf(data, rowIndex + 1);
-                data[rowIndex] = line.chars().map(ch -> ch - '0').toArray();
-                rowIndex++;
+                data = Arrays.copyOf(data, n + 1);
+                data[n] = line.chars().map(ch -> ch - '0').toArray();
+                n++;
 
                 // read next line
                 line = reader.readLine();
             }
         }
 
+        Map<Node, Integer> distances = new HashMap<>();
+        Comparator<Node> comparator = Comparator.comparing(distances::get);
+        Queue<Node> queue = new PriorityQueue<>(comparator);
+        Set<Node> visited = new HashSet<>();
 
-        return calculateShortestPath(data, new Node(0, 0), new Node(rowIndex - 1, rowIndex - 1));
-    }
+        Node startNode = new Node(0, 0, 'o', 0);
+        distances.put(startNode, 0);
+        queue.add(startNode);
 
-    private static int calculateShortestPath(int[][] data, Node start, Node target) {
-        Map<Node, Integer> visited = new HashMap<>();
-        visited.put(start, 0);
-        shortestPath(data, visited, 0, new Node(start.row, start.col + 1, Direction.RIGHT, 0));
-        shortestPath(data, visited, 0, new Node(start.row + 1, start.col, Direction.DOWN, 0));
-
-        printVisited(visited, data.length);
-        return visited.get(target);
-    }
-
-    private static void printVisited(Map<Node, Integer> visited, int n) {
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                System.out.printf("%3d,", visited.get(new Node(i, j)));
+        while (!queue.isEmpty()) {
+            Node node = queue.poll();
+            if (visited.contains(node)) {
+                continue;
             }
-            System.out.println();
-        }
-    }
 
-    private static void shortestPath(int[][] data, Map<Node, Integer> visited, int distance, Node node) {
-        int newDistance = distance + data[node.row][node.col];
-        if (visited.containsKey(node)) {
-            Integer oldDistance = visited.get(node);
-            distance = Math.min(newDistance, oldDistance);
-            visited.put(node, distance);
+            visited.add(node);
 
-            if (newDistance < oldDistance) {
-                calcNextSteps(node, data.length).forEach(step -> shortestPath(data, visited, newDistance, step));
-            }
-        } else {
-            visited.put(node, newDistance);
-            calcNextSteps(node, data.length).forEach(step -> shortestPath(data, visited, newDistance, step));
-        }
-    }
-
-    private static List<Node> calcNextSteps(Node node, int n) {
-        List<Node> steps = new ArrayList<>();
-
-        switch (node.direction) {
-            case DOWN: {
-                if (node.stepsInDirection < 2) {
-                    steps.add(new Node(node.row + 1, node.col, Direction.DOWN, node.stepsInDirection + 1));
+            // moving up
+            char direction = '^';
+            if (isValid(node.row - 1, node.col, n) && isValidDirection(node, direction, n, isUltra)) {
+                int edgeDistance = data[node.row - 1][node.col];
+                int newDistance = distances.get(node) + edgeDistance;
+                Node newNode = new Node(node.row - 1, node.col, direction, calcStepsInDirection(node, direction));
+                if (newDistance < Optional.ofNullable(distances.get(newNode)).orElse(Integer.MAX_VALUE)) {
+                    distances.put(newNode, newDistance);
                 }
-                steps.add(new Node(node.row, node.col + 1, Direction.RIGHT, 0));
-                steps.add(new Node(node.row, node.col - 1, Direction.LEFT, 0));
-                break;
-            }
-            case RIGHT: {
-                if (node.stepsInDirection < 2) {
-                    steps.add(new Node(node.row, node.col + 1, Direction.RIGHT, node.stepsInDirection + 1));
+                if (!visited.contains(newNode)) {
+                    queue.add(newNode);
                 }
-                steps.add(new Node(node.row + 1, node.col, Direction.DOWN, 0));
-                steps.add(new Node(node.row - 1, node.col, Direction.UP, 0));
-                break;
             }
-            case LEFT: {
-                steps.add(new Node(node.row + 1, node.col, Direction.DOWN, 0));
-                if (node.stepsInDirection < 2) {
-                    steps.add(new Node(node.row, node.col - 1, Direction.LEFT, node.stepsInDirection + 1));
+
+            // moving down
+            direction = 'v';
+            if (isValid(node.row + 1, node.col, n) && isValidDirection(node, direction, n, isUltra)) {
+                int edgeDistance = data[node.row + 1][node.col];
+                int newDistance = distances.get(node) + edgeDistance;
+                Node newNode = new Node(node.row + 1, node.col, direction, calcStepsInDirection(node, direction));
+                if (newDistance < Optional.ofNullable(distances.get(newNode)).orElse(Integer.MAX_VALUE)) {
+                    distances.put(newNode, newDistance);
                 }
-                steps.add(new Node(node.row - 1, node.col, Direction.UP, 0));
-                break;
+                if (!visited.contains(newNode)) {
+                    queue.add(newNode);
+                }
             }
-            case UP: {
-                steps.add(new Node(node.row, node.col + 1, Direction.RIGHT, 0));
-                if (node.stepsInDirection < 2) {
-                    steps.add(new Node(node.row - 1, node.col, Direction.UP, node.stepsInDirection + 1));
+
+            // moving left
+            direction = '<';
+            if (isValid(node.row, node.col - 1, n) && isValidDirection(node, direction, n, isUltra)) {
+                int edgeDistance = data[node.row][node.col - 1];
+                int newDistance = distances.get(node) + edgeDistance;
+                Node newNode = new Node(node.row, node.col - 1, direction, calcStepsInDirection(node, direction));
+                if (newDistance < Optional.ofNullable(distances.get(newNode)).orElse(Integer.MAX_VALUE)) {
+                    distances.put(newNode, newDistance);
                 }
-                steps.add(new Node(node.row, node.col - 1, Direction.LEFT, 0));
-                break;
+                if (!visited.contains(newNode)) {
+                    queue.add(newNode);
+                }
+            }
+
+            // moving right
+            direction = '>';
+            if (isValid(node.row, node.col + 1, n) && isValidDirection(node, direction, n, isUltra)) {
+                int edgeDistance = data[node.row][node.col + 1];
+                int newDistance = distances.get(node) + edgeDistance;
+                Node newNode = new Node(node.row, node.col + 1, direction, calcStepsInDirection(node, direction));
+                if (newDistance < Optional.ofNullable(distances.get(newNode)).orElse(Integer.MAX_VALUE)) {
+                    distances.put(newNode, newDistance);
+                }
+                if (!visited.contains(newNode)) {
+                    queue.add(newNode);
+                }
             }
         }
 
-        return steps.stream()
-                .filter(step -> step.row >= 0 && step.row < n && step.col >= 0 && step.col < n)
-                .toList();
+        distances.entrySet().stream()
+                .sorted(Comparator.<Map.Entry<Node, Integer>, Integer>comparing(e1 -> e1.getKey().row)
+                        .thenComparing(e -> e.getKey().col)
+                        .thenComparing(e -> e.getKey().direction)
+                        .thenComparing(e -> e.getKey().stepsInDirection)
+                )
+                .forEach(System.out::println);
+
+        int target = n - 1;
+        return distances.entrySet().stream().filter(e -> e.getKey().row == target && e.getKey().col == target)
+                .mapToInt(Map.Entry::getValue).min().orElseThrow();
     }
 
-    private record Node(int row, int col, Direction direction, int stepsInDirection) {
-        public Node(int row, int col) {
-            this(row, col, Direction.RIGHT, 0);
+    private static boolean isValidDirection(Node node, char direction, int n, boolean isUltra) {
+        if (node.direction == 'o') {
+            return true;
         }
+        if (RESTRICTED_DIRECTIONS.get(node.direction) == direction) {
+            return false;
+        }
+        if (isUltra) {
+            if (node.direction == direction) {
+                return node.stepsInDirection < 10;
+            } else {
+                if (node.stepsInDirection < 4) {
+                    return false;
+                } else {
+                    switch (direction) {
+                        case '^':
+                            return node.row > 4;
+                        case 'v':
+                            return node.row < n - 4;
+                        case '>':
+                            return node.col < n - 4;
+                        case '<':
+                            return node.col > 4;
+                    }
 
+                }
+            }
+        }
+        return node.direction != direction || node.stepsInDirection < 3;
+    }
+
+    private static int calcStepsInDirection(Node node, char direction) {
+        return node.direction == direction ? node.stepsInDirection + 1 : 1;
+    }
+
+    private static boolean isValid(int x, int y, int n) {
+        return x >= 0 && y >= 0 && x < n && y < n;
+    }
+
+    private record Node(int row, int col, char direction, int stepsInDirection) {
         @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Node node = (Node) o;
-            return row == node.row && col == node.col;
+        public String toString() {
+            return "[" + row + ", " + col + "] [" + stepsInDirection + direction + "]";
         }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(row, col);
-        }
-    }
-
-    private enum Direction {
-        LEFT,
-        RIGHT,
-        UP,
-        DOWN;
     }
 }

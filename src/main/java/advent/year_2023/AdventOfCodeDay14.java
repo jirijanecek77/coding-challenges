@@ -4,10 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 
 public class AdventOfCodeDay14 {
@@ -17,35 +14,70 @@ public class AdventOfCodeDay14 {
 
         List<Item> items = new ArrayList<>();
 
-        int row = 0;
+        int n = 0;
         try (reader) {
             String line = reader.readLine();
             while (line != null) {
                 for (int col = 0; col < line.length(); col++) {
                     if (line.charAt(col) == '#') {
-                        items.add(new Item(row, col, true));
+                        items.add(new Item(n, col, true));
                     } else if (line.charAt(col) == 'O') {
-                        items.add(new Item(row, col, false));
+                        items.add(new Item(n, col, false));
                     }
                 }
-                row++;
+                n++;
                 // read next line
                 line = reader.readLine();
             }
         }
         if (allDirections) {
-            for (int i = 0; i < 1000; i++) {
-                calculateNorth(items, row);
-                calculateWest(items, row);
-                calculateSouth(items, row);
-                calculateEast(items, row);
-            }
-
-            return calculateLoad(items, row);
+            iterateItems(items, n);
+            return calculateLoad(items, n);
         }
 
-        calculateNorth(items, row);
-        return calculateLoad(items, row);
+        calculateNorth(items, n);
+        return calculateLoad(items, n);
+    }
+
+    private static void iterateItems(List<Item> tortoiseState, int size) {
+        // Floyd’s Cycle Finding Algorithm
+
+        List<Item> hareState = new ArrayList<>();
+        tortoiseState.forEach(item -> hareState.add(new Item(item)));
+        makeStep(hareState, size);
+
+        int beforeCycleCounter = 0;
+        while (!hareState.equals(tortoiseState)) {
+            makeStep(tortoiseState, size);
+
+            makeStep(hareState, size);
+            makeStep(hareState, size);
+
+            beforeCycleCounter++;
+        }
+
+        List<Item> currentState = new ArrayList<>();
+        tortoiseState.forEach(item -> currentState.add(new Item(item)));
+
+        int cycleCounter = 1;
+        makeStep(tortoiseState, size);
+
+        while (!currentState.equals(tortoiseState)) {
+            makeStep(tortoiseState, size);
+            cycleCounter++;
+        }
+
+        int remainsSteps = (1000000000 - beforeCycleCounter) % cycleCounter;
+        for (int i = 0; i < remainsSteps; i++) {
+            makeStep(tortoiseState, size);
+        }
+    }
+
+    private static void makeStep(List<Item> turtleState, int n) {
+        calculateNorth(turtleState, n);
+        calculateWest(turtleState, n);
+        calculateSouth(turtleState, n);
+        calculateEast(turtleState, n);
     }
 
     private static void calculateNorth(List<Item> items, int n) {
@@ -60,7 +92,6 @@ public class AdventOfCodeDay14 {
                 minPos[item.col]++;
             }
         }
-
     }
 
     private static void calculateSouth(List<Item> items, int n) {
@@ -122,9 +153,28 @@ public class AdventOfCodeDay14 {
             this.col = col;
         }
 
+        public Item(Item item) {
+            this.isRock = item.isRock;
+            this.row = item.row;
+            this.col = item.col;
+        }
+
         @Override
         public String toString() {
             return "(" + row + ", " + col + "), type: " + (isRock ? "rock" : "ball");
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Item item = (Item) o;
+            return row == item.row && col == item.col && isRock == item.isRock;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(row, col, isRock);
         }
     }
 }

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Stream;
 
 
 public class AdventOfCodeDay17 {
@@ -35,82 +36,11 @@ public class AdventOfCodeDay17 {
             }
         }
 
-        Map<Node, Integer> distances = new HashMap<>();
-        Comparator<Node> comparator = Comparator.comparing(distances::get);
-        Queue<Node> queue = new PriorityQueue<>(comparator);
-        Set<Node> visited = new HashSet<>();
-
-        Node startNode = new Node(0, 0, 'o', 0);
-        distances.put(startNode, 0);
-        queue.add(startNode);
-
-        while (!queue.isEmpty()) {
-            Node node = queue.poll();
-            if (visited.contains(node)) {
-                continue;
-            }
-
-            visited.add(node);
-
-            // moving up
-            char direction = '^';
-            if (isValid(node.row - 1, node.col, n) && isValidDirection(node, direction, n, isUltra)) {
-                int edgeDistance = data[node.row - 1][node.col];
-                int newDistance = distances.get(node) + edgeDistance;
-                Node newNode = new Node(node.row - 1, node.col, direction, calcStepsInDirection(node, direction));
-                if (newDistance < Optional.ofNullable(distances.get(newNode)).orElse(Integer.MAX_VALUE)) {
-                    distances.put(newNode, newDistance);
-                }
-                if (!visited.contains(newNode)) {
-                    queue.add(newNode);
-                }
-            }
-
-            // moving down
-            direction = 'v';
-            if (isValid(node.row + 1, node.col, n) && isValidDirection(node, direction, n, isUltra)) {
-                int edgeDistance = data[node.row + 1][node.col];
-                int newDistance = distances.get(node) + edgeDistance;
-                Node newNode = new Node(node.row + 1, node.col, direction, calcStepsInDirection(node, direction));
-                if (newDistance < Optional.ofNullable(distances.get(newNode)).orElse(Integer.MAX_VALUE)) {
-                    distances.put(newNode, newDistance);
-                }
-                if (!visited.contains(newNode)) {
-                    queue.add(newNode);
-                }
-            }
-
-            // moving left
-            direction = '<';
-            if (isValid(node.row, node.col - 1, n) && isValidDirection(node, direction, n, isUltra)) {
-                int edgeDistance = data[node.row][node.col - 1];
-                int newDistance = distances.get(node) + edgeDistance;
-                Node newNode = new Node(node.row, node.col - 1, direction, calcStepsInDirection(node, direction));
-                if (newDistance < Optional.ofNullable(distances.get(newNode)).orElse(Integer.MAX_VALUE)) {
-                    distances.put(newNode, newDistance);
-                }
-                if (!visited.contains(newNode)) {
-                    queue.add(newNode);
-                }
-            }
-
-            // moving right
-            direction = '>';
-            if (isValid(node.row, node.col + 1, n) && isValidDirection(node, direction, n, isUltra)) {
-                int edgeDistance = data[node.row][node.col + 1];
-                int newDistance = distances.get(node) + edgeDistance;
-                Node newNode = new Node(node.row, node.col + 1, direction, calcStepsInDirection(node, direction));
-                if (newDistance < Optional.ofNullable(distances.get(newNode)).orElse(Integer.MAX_VALUE)) {
-                    distances.put(newNode, newDistance);
-                }
-                if (!visited.contains(newNode)) {
-                    queue.add(newNode);
-                }
-            }
-        }
+        Map<Vertex, Integer> distances = new HashMap<>();
+        dijkstraShortestPath(distances, data, isUltra);
 
         distances.entrySet().stream()
-                .sorted(Comparator.<Map.Entry<Node, Integer>, Integer>comparing(e1 -> e1.getKey().row)
+                .sorted(Comparator.<Map.Entry<Vertex, Integer>, Integer>comparing(e -> e.getKey().row)
                         .thenComparing(e -> e.getKey().col)
                         .thenComparing(e -> e.getKey().direction)
                         .thenComparing(e -> e.getKey().stepsInDirection)
@@ -118,50 +48,85 @@ public class AdventOfCodeDay17 {
                 .forEach(System.out::println);
 
         int target = n - 1;
-        return distances.entrySet().stream().filter(e -> e.getKey().row == target && e.getKey().col == target)
-                .mapToInt(Map.Entry::getValue).min().orElseThrow();
+        return distances.entrySet().stream()
+                .filter(e -> e.getKey().row == target && e.getKey().col == target)
+                .mapToInt(Map.Entry::getValue)
+                .min().orElseThrow();
     }
 
-    private static boolean isValidDirection(Node node, char direction, int n, boolean isUltra) {
-        if (node.direction == 'o') {
-            return true;
-        }
-        if (RESTRICTED_DIRECTIONS.get(node.direction) == direction) {
-            return false;
-        }
-        if (isUltra) {
-            if (node.direction == direction) {
-                return node.stepsInDirection < MAX_STEPS_IN_DIRECTION;
-            } else {
-                if (node.stepsInDirection < MIN_STEPS_IN_DIRECTION) {
-                    return false;
-                } else {
-                    switch (direction) {
-                        case '^':
-                            return node.row >= MIN_STEPS_IN_DIRECTION;
-                        case 'v':
-                            return node.row <= n - MIN_STEPS_IN_DIRECTION;
-                        case '>':
-                            return node.col <= n - MIN_STEPS_IN_DIRECTION;
-                        case '<':
-                            return node.col >= MIN_STEPS_IN_DIRECTION;
-                    }
+    private static void dijkstraShortestPath(Map<Vertex, Integer> distances, int[][] data, boolean isUltra) {
+        Queue<Vertex> queue = new PriorityQueue<>(Comparator.comparing(distances::get));
 
+        Vertex startVertex = new Vertex(0, 0, 'o', 0);
+        distances.put(startVertex, 0);
+        queue.add(startVertex);
+
+        while (!queue.isEmpty()) {
+            Vertex vertex = queue.poll();
+
+            for (Vertex adj : getAdjacent(vertex, data.length, isUltra)) {
+                int edgeDistance = data[adj.row][adj.col];
+                int newDistance = distances.get(vertex) + edgeDistance;
+                if (distances.containsKey(adj)) {
+                    distances.put(adj, Math.min(newDistance, distances.get(adj)));
+                } else {
+                    distances.put(adj, newDistance);
+                    queue.add(adj);
                 }
             }
         }
-        return node.direction != direction || node.stepsInDirection < 3;
     }
 
-    private static int calcStepsInDirection(Node node, char direction) {
-        return node.direction == direction ? node.stepsInDirection + 1 : 1;
+    private static List<Vertex> getAdjacent(Vertex vertex, int n, boolean isUltra) {
+        return Stream.of(
+                        new Vertex(vertex.row - 1, vertex.col, '^', nextStepsInDirection(vertex, '^')),
+                        new Vertex(vertex.row + 1, vertex.col, 'v', nextStepsInDirection(vertex, 'v')),
+                        new Vertex(vertex.row, vertex.col - 1, '<', nextStepsInDirection(vertex, '<')),
+                        new Vertex(vertex.row, vertex.col + 1, '>', nextStepsInDirection(vertex, '>'))
+                )
+                .filter(adj -> isValidVertex(adj, vertex.direction, vertex.stepsInDirection, n, isUltra))
+                .toList();
     }
 
-    private static boolean isValid(int x, int y, int n) {
-        return x >= 0 && y >= 0 && x < n && y < n;
+    private static boolean isValidVertex(Vertex vertex, char currentDirection, int currentSteps, int n, boolean isUltra) {
+        if (vertex.row < 0
+                || vertex.col < 0
+                || vertex.row >= n
+                || vertex.col >= n
+                || RESTRICTED_DIRECTIONS.get(vertex.direction) == currentDirection
+        ) {
+            return false;
+        }
+
+        if (!isUltra) {
+            return vertex.direction != currentDirection || vertex.stepsInDirection <= 3;
+        } else {
+            if (currentDirection == 'o') {
+                return true;
+            }
+            if (vertex.direction == currentDirection) {
+                return vertex.stepsInDirection <= MAX_STEPS_IN_DIRECTION;
+            } else {
+                if (currentSteps < MIN_STEPS_IN_DIRECTION) {
+                    return false;
+                } else {
+                    return switch (vertex.direction) {
+                        case '^' -> vertex.row >= (MIN_STEPS_IN_DIRECTION - 1);
+                        case 'v' -> vertex.row <= n - MIN_STEPS_IN_DIRECTION;
+                        case '<' -> vertex.col >= (MIN_STEPS_IN_DIRECTION - 1);
+                        case '>' -> vertex.col <= n - MIN_STEPS_IN_DIRECTION;
+                        default -> false;
+                    };
+                }
+            }
+        }
     }
 
-    private record Node(int row, int col, char direction, int stepsInDirection) {
+    private static int nextStepsInDirection(Vertex vertex, char direction) {
+        return vertex.direction == direction ? vertex.stepsInDirection + 1 : 1;
+    }
+
+    private record Vertex(int row, int col, char direction, int stepsInDirection) {
         @Override
         public String toString() {
             return "[" + row + ", " + col + "] [" + stepsInDirection + direction + "]";

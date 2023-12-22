@@ -67,14 +67,10 @@ public class AdventOfCodeDay12 {
     }
 
     private static long solve(String data, List<Integer> counts, String target) {
-//        System.out.println(data + counts);
         int first = data.indexOf('?');
         if (first < 0) {
-            int result = cleanData(data).equals(target) ? 1 : 0;
-//            System.out.println(result);
-            return result;
+            return cleanData(data).equals(target) ? 1 : 0;
         } else if (!(target + ".").startsWith(data.substring(0, first))) {
-//            System.out.println("cancel " + data + " not like " + target);
             return 0;
         }
         return solve(cleanData(data.replaceFirst("\\?", ".")), counts, target)

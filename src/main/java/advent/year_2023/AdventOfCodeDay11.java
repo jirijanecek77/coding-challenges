@@ -1,7 +1,5 @@
 package advent.year_2023;
 
-import domain.Pair;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,7 +15,7 @@ public class AdventOfCodeDay11 {
     static long shortestPaths(String inputFileName, int expansion) throws IOException {
         final BufferedReader reader = Files.newBufferedReader(Paths.get(inputFileName));
 
-        List<Pair<Integer, Integer>> positions = new ArrayList<>();
+        List<Point> positions = new ArrayList<>();
 
         try (reader) {
             int rowIndex = 0;
@@ -33,7 +31,7 @@ public class AdventOfCodeDay11 {
                     if (rowData[i] == '#') {
                         hasGalaxy = true;
                         emptyColumns.remove(i);
-                        positions.add(Pair.of(rowIndex, i));
+                        positions.add(new Point(rowIndex, i));
                     }
                 }
 
@@ -49,9 +47,9 @@ public class AdventOfCodeDay11 {
             int columnDiff = 0;
             for (int column : emptyColumns) {
                 for (int i = 0; i < positions.size(); i++) {
-                    Pair<Integer, Integer> p = positions.get(i);
-                    if (p.second() > (column + columnDiff)) {
-                        positions.set(i, Pair.of(p.first(), p.second() + expansion - 1));
+                    Point p = positions.get(i);
+                    if (p.col > (column + columnDiff)) {
+                        positions.set(i, new Point(p.row, p.col + expansion - 1));
                     }
                 }
                 columnDiff += expansion - 1;
@@ -61,11 +59,14 @@ public class AdventOfCodeDay11 {
         long sum = 0;
         for (int i = 0; i < positions.size(); i++) {
             for (int j = i + 1; j < positions.size(); j++) {
-                Pair<Integer, Integer> from = positions.get(i);
-                Pair<Integer, Integer> to = positions.get(j);
-                sum += Math.abs(from.first() - to.first()) + Math.abs(from.second() - to.second());
+                Point from = positions.get(i);
+                Point to = positions.get(j);
+                sum += Math.abs(from.row - to.row) + Math.abs(from.col - to.col);
             }
         }
         return sum;
+    }
+
+    private record Point(int row, int col) {
     }
 }

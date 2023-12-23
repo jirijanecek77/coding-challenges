@@ -1,9 +1,7 @@
 package advent.year_2023;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import utils.FileLineReader;
+
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -19,21 +17,15 @@ public class AdventOfCodeDay17 {
     private static final int MIN_STEPS_IN_DIRECTION = 4;
     private static final int MAX_STEPS_IN_DIRECTION = 10;
 
-    static int calcMinHeatLoss(String inputFileName, boolean isUltra) throws IOException {
-        final BufferedReader reader = Files.newBufferedReader(Paths.get(inputFileName));
+    static int calcMinHeatLoss(String inputFileName, boolean isUltra) {
 
         int[][] data = new int[][]{};
         int n = 0;
-        try (reader) {
-            String line = reader.readLine();
-            while (line != null) {
-                data = Arrays.copyOf(data, n + 1);
-                data[n] = line.chars().map(ch -> ch - '0').toArray();
-                n++;
 
-                // read next line
-                line = reader.readLine();
-            }
+        for (String line : FileLineReader.of(inputFileName)) {
+            data = Arrays.copyOf(data, n + 1);
+            data[n] = line.chars().map(ch -> ch - '0').toArray();
+            n++;
         }
 
         Map<Vertex, Integer> distances = new HashMap<>();

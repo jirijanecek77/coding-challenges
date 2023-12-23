@@ -1,9 +1,7 @@
 package advent.year_2023;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import utils.FileLineReader;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -14,36 +12,27 @@ public class AdventOfCodeDay18 {
 
     private static final Pattern LINE_PATTERN = Pattern.compile("^(R|L|U|D) (\\d+) \\(#(.+)\\)");
 
-    static long calcArea(String inputFileName, boolean task1) throws IOException {
-        final BufferedReader reader = Files.newBufferedReader(Paths.get(inputFileName));
-
+    static long calcArea(String inputFileName, boolean task1) {
         List<Vertex> vertices = new ArrayList<>();
 
-        try (reader) {
+        long x = 0, y = 0;
+        for (String line : FileLineReader.of(inputFileName)) {
 
-            String line = reader.readLine();
-            long x = 0, y = 0;
+            Matcher matcher = LINE_PATTERN.matcher(line);
+            if (matcher.find()) {
 
-            while (line != null) {
-                Matcher matcher = LINE_PATTERN.matcher(line);
-                if (matcher.find()) {
+                String code = matcher.group(3);
+                int steps = task1 ? Integer.parseInt(matcher.group(2)) : Integer.parseInt(code.substring(0, code.length() - 1), 16);
+                char direction = task1 ? matcher.group(1).charAt(0) : mapToDirection(code.charAt(5));
 
-                    String code = matcher.group(3);
-                    int steps = task1 ? Integer.parseInt(matcher.group(2)) : Integer.parseInt(code.substring(0, code.length() - 1), 16);
-                    char direction = task1 ? matcher.group(1).charAt(0) : mapToDirection(code.charAt(5));
-
-                    vertices.add(
-                            switch (direction) {
-                                case 'R' -> new Vertex(x += steps, y);
-                                case 'L' -> new Vertex(x -= steps, y);
-                                case 'U' -> new Vertex(x, y += steps);
-                                case 'D' -> new Vertex(x, y -= steps);
-                                default -> throw new IllegalStateException("Unexpected value: " + direction);
-                            });
-                }
-
-                // read next line
-                line = reader.readLine();
+                vertices.add(
+                        switch (direction) {
+                            case 'R' -> new Vertex(x += steps, y);
+                            case 'L' -> new Vertex(x -= steps, y);
+                            case 'U' -> new Vertex(x, y += steps);
+                            case 'D' -> new Vertex(x, y -= steps);
+                            default -> throw new IllegalStateException("Unexpected value: " + direction);
+                        });
             }
         }
 

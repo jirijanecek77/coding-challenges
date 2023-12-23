@@ -1,11 +1,8 @@
 package advent.year_2023;
 
 import domain.Pair;
+import utils.FileLineReader;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,28 +17,22 @@ public class AdventOfCodeDay19 {
     public static final String ACCEPTED_STATE = "A";
     private static final Set<String> TERMINALS = Set.of(ACCEPTED_STATE, "R");
 
-    static long task1(String inputFileName) throws IOException {
-        final BufferedReader reader = Files.newBufferedReader(Paths.get(inputFileName));
-
+    static long task1(String inputFileName) {
         Map<String, List<Instruction>> workflows = new HashMap<>();
         List<Map<Character, Integer>> parts = new ArrayList<>();
+        boolean readWorkflow = true;
 
-        try (reader) {
-            String line = reader.readLine();
-            while (!line.isBlank()) {
+        for (String line : FileLineReader.of(inputFileName)) {
+            if (readWorkflow) {
+                if (line.isBlank()) {
+                    readWorkflow = false;
+                    continue;
+                }
                 Matcher workflowMatcher = WORKFLOW_PATTERN.matcher(line);
                 if (workflowMatcher.find()) {
                     addWorkflow(workflowMatcher, workflows);
                 }
-
-                // read next line
-                line = reader.readLine();
-            }
-
-            // skip blank line
-            line = reader.readLine();
-
-            while (line != null) {
+            } else {
                 Map<Character, Integer> part = Arrays.stream(line.substring(1, line.length() - 1).split(","))
                         .map(e -> {
                             String[] strArr = e.split("=");
@@ -49,33 +40,26 @@ public class AdventOfCodeDay19 {
                         })
                         .collect(Collectors.toMap(Pair::first, Pair::second));
                 parts.add(part);
-
-                // read next line
-                line = reader.readLine();
             }
         }
 
         return parts.stream()
-                .mapToLong(part -> isAccepted(part, workflows) ? part.values().stream().mapToLong(e -> e).sum() : 0)
+                .mapToLong(part -> isAccepted("in", part, workflows) ? part.values().stream().mapToLong(e -> e).sum() : 0)
                 .sum();
     }
 
-    static long task2(String inputFileName) throws IOException {
-        final BufferedReader reader = Files.newBufferedReader(Paths.get(inputFileName));
+    static long task2(String inputFileName) {
 
         Map<String, List<Instruction>> workflows = new HashMap<>();
 
-        try (reader) {
-            String line = reader.readLine();
-            while (!line.isBlank()) {
-                Matcher workflowMatcher = WORKFLOW_PATTERN.matcher(line);
-                if (workflowMatcher.find()) {
+        for (String line : FileLineReader.of(inputFileName)) {
+            if (line.isBlank()) {
+                break;
+            }
+            Matcher workflowMatcher = WORKFLOW_PATTERN.matcher(line);
+            if (workflowMatcher.find()) {
 
-                    addWorkflow(workflowMatcher, workflows);
-                }
-
-                // read next line
-                line = reader.readLine();
+                addWorkflow(workflowMatcher, workflows);
             }
         }
 
@@ -106,22 +90,17 @@ public class AdventOfCodeDay19 {
         workflows.put(name, instructions);
     }
 
-    private static boolean isAccepted(Map<Character, Integer> part, Map<String, List<Instruction>> workflows) {
-        String state = "in";
+    private static boolean isAccepted(String state, Map<Character, Integer> part, Map<String, List<Instruction>> workflows) {
+        if (TERMINALS.contains(state)) {
+            return state.equals(ACCEPTED_STATE);
+        }
 
-        while (true) {
-            for (Instruction instruction : workflows.get(state)) {
-                int value = part.get(instruction.key);
-                if (instruction.isValid(value)) {
-                    if (TERMINALS.contains(instruction.nextState)) {
-                        return instruction.nextState.equals(ACCEPTED_STATE);
-                    } else {
-                        state = instruction.nextState;
-                        break;
-                    }
-                }
+        for (Instruction instruction : workflows.get(state)) {
+            if (instruction.isValid(part.get(instruction.key))) {
+                return isAccepted(instruction.nextState, part, workflows);
             }
         }
+        throw new IllegalStateException();
     }
 
     private static long dfs(String state, Map<Character, Interval> intervals, Map<String, List<Instruction>> workflows) {

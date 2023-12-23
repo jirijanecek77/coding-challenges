@@ -27,7 +27,7 @@ public class FileLineReader implements Iterable<String> {
         return new LineIterator(fileName);
     }
 
-    private static class LineIterator implements Iterator<String> {
+    private static class LineIterator implements Iterator<String>, AutoCloseable {
 
         private final BufferedReader reader;
         private String line;
@@ -37,7 +37,16 @@ public class FileLineReader implements Iterable<String> {
                 reader = Files.newBufferedReader(Paths.get(fileName));
                 line = reader.readLine();
             } catch (IOException e) {
-                throw new IllegalArgumentException(e);
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public void close() {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
 
@@ -53,7 +62,7 @@ public class FileLineReader implements Iterable<String> {
                 try {
                     this.line = reader.readLine();
                 } catch (IOException e) {
-                    throw new IllegalArgumentException(e);
+                    throw new RuntimeException(e);
                 }
                 return currentLine;
             }

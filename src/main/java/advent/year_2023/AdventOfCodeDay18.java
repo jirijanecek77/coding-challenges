@@ -4,8 +4,9 @@ import utils.FileLineReader;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static utils.RegexUtils.parseByPattern;
 
 
 public class AdventOfCodeDay18 {
@@ -18,22 +19,19 @@ public class AdventOfCodeDay18 {
         long x = 0, y = 0;
         for (String line : FileLineReader.of(inputFileName)) {
 
-            Matcher matcher = LINE_PATTERN.matcher(line);
-            if (matcher.find()) {
+            String[] parts = parseByPattern(line, LINE_PATTERN, 1, 2, 3);
+            String code = parts[2];
+            int steps = task1 ? Integer.parseInt(parts[1]) : Integer.parseInt(code.substring(0, code.length() - 1), 16);
+            char direction = task1 ? parts[0].charAt(0) : mapToDirection(code.charAt(5));
 
-                String code = matcher.group(3);
-                int steps = task1 ? Integer.parseInt(matcher.group(2)) : Integer.parseInt(code.substring(0, code.length() - 1), 16);
-                char direction = task1 ? matcher.group(1).charAt(0) : mapToDirection(code.charAt(5));
-
-                vertices.add(
-                        switch (direction) {
-                            case 'R' -> new Vertex(x += steps, y);
-                            case 'L' -> new Vertex(x -= steps, y);
-                            case 'U' -> new Vertex(x, y += steps);
-                            case 'D' -> new Vertex(x, y -= steps);
-                            default -> throw new IllegalStateException("Unexpected value: " + direction);
-                        });
-            }
+            vertices.add(
+                    switch (direction) {
+                        case 'R' -> new Vertex(x += steps, y);
+                        case 'L' -> new Vertex(x -= steps, y);
+                        case 'U' -> new Vertex(x, y += steps);
+                        case 'D' -> new Vertex(x, y -= steps);
+                        default -> throw new IllegalStateException("Unexpected value: " + direction);
+                    });
         }
 
         return shoelaceFormula(vertices);

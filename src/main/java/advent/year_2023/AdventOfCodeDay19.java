@@ -1,12 +1,14 @@
 package advent.year_2023;
 
+import domain.Interval;
 import domain.Pair;
 import utils.FileLineReader;
 
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static utils.RegexUtils.parseByPattern;
 
 
 public class AdventOfCodeDay19 {
@@ -28,10 +30,8 @@ public class AdventOfCodeDay19 {
                     readWorkflow = false;
                     continue;
                 }
-                Matcher workflowMatcher = WORKFLOW_PATTERN.matcher(line);
-                if (workflowMatcher.find()) {
-                    addWorkflow(workflowMatcher, workflows);
-                }
+                addWorkflow(parseByPattern(line, WORKFLOW_PATTERN, 1, 2), workflows);
+
             } else {
                 Map<Character, Integer> part = Arrays.stream(line.substring(1, line.length() - 1).split(","))
                         .map(e -> {
@@ -56,31 +56,27 @@ public class AdventOfCodeDay19 {
             if (line.isBlank()) {
                 break;
             }
-            Matcher workflowMatcher = WORKFLOW_PATTERN.matcher(line);
-            if (workflowMatcher.find()) {
-
-                addWorkflow(workflowMatcher, workflows);
-            }
+            addWorkflow(parseByPattern(line, WORKFLOW_PATTERN, 1, 2), workflows);
         }
 
         Interval interval = new Interval(1, 4000);
         return dfs("in", Map.of('x', interval, 'm', interval, 'a', interval, 's', interval), workflows);
     }
 
-    private static void addWorkflow(Matcher workflowMatcher, Map<String, List<Instruction>> workflows) {
-        String name = workflowMatcher.group(1);
-        List<Instruction> instructions = Arrays.stream(workflowMatcher.group(2).split(","))
+    private static void addWorkflow(String[] data, Map<String, List<Instruction>> workflows) {
+        String name = data[0];
+        List<Instruction> instructions = Arrays.stream(data[1].split(","))
                 .map(str -> {
-                    Matcher iMatcher = INSTRUCTION_PATTERN.matcher(str);
-                    if (iMatcher.find()) {
-                        char sign = iMatcher.group(2).charAt(0);
-                        int number = Integer.parseInt(iMatcher.group(3));
+                    if (str.contains(":")) {
+                        String[] instruction = parseByPattern(str, INSTRUCTION_PATTERN, 1, 2, 3, 4);
+                        char sign = instruction[1].charAt(0);
+                        int number = Integer.parseInt(instruction[2]);
 
                         return new Instruction(
-                                iMatcher.group(1).charAt(0),
+                                instruction[0].charAt(0),
                                 sign == '>',
                                 number,
-                                iMatcher.group(4)
+                                instruction[3]
                         );
                     }
                     return new Instruction('x', false, -1, str);
@@ -106,7 +102,7 @@ public class AdventOfCodeDay19 {
     private static long dfs(String state, Map<Character, Interval> intervals, Map<String, List<Instruction>> workflows) {
         if (TERMINALS.contains(state)) {
             return state.equals(ACCEPTED_STATE) ?
-                    intervals.values().stream().mapToLong(e -> e.high - e.low + 1).reduce(1, (a, b) -> a * b) : 0;
+                    intervals.values().stream().mapToLong(e -> e.high() - e.low() + 1).reduce(1, (a, b) -> a * b) : 0;
         }
 
         Map<Character, Interval> elseIntervals = new HashMap<>(intervals);
@@ -119,8 +115,8 @@ public class AdventOfCodeDay19 {
                         // next state
                         Interval elseInterval = elseIntervals.get(instruction.key);
                         Map<Character, Interval> newIntervals = new HashMap<>(elseIntervals);
-                        newIntervals.put(instruction.key, instruction.isHigher ? new Interval(instruction.value + 1, elseInterval.high) : new Interval(elseInterval.low, instruction.value - 1));
-                        elseIntervals.put(instruction.key, instruction.isHigher ? new Interval(elseInterval.low, instruction.value) : new Interval(instruction.value, elseInterval.high));
+                        newIntervals.put(instruction.key, instruction.isHigher ? new Interval(instruction.value + 1, elseInterval.high()) : new Interval(elseInterval.low(), instruction.value - 1));
+                        elseIntervals.put(instruction.key, instruction.isHigher ? new Interval(elseInterval.low(), instruction.value) : new Interval(instruction.value, elseInterval.high()));
 
                         return dfs(instruction.nextState, newIntervals, workflows);
                     }
@@ -128,12 +124,6 @@ public class AdventOfCodeDay19 {
                 .sum();
     }
 
-    private record Interval(int low, int high) {
-        @Override
-        public String toString() {
-            return "[" + low + "," + high + ']';
-        }
-    }
 
     private record Instruction(
             Character key,

@@ -1,32 +1,21 @@
 package advent.year_2023;
 
 import domain.Pair;
+import utils.FileLineReader;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.IntStream;
 
 
 public class AdventOfCodeDay16 {
 
-    static int calcEnergizing(String inputFileName, boolean checkAll) throws IOException {
-        final BufferedReader reader = Files.newBufferedReader(Paths.get(inputFileName));
-
+    static int calcEnergizing(String inputFileName, boolean checkAll) {
         char[][] data = new char[][]{};
         int rowIndex = 0;
-        try (reader) {
-            String line = reader.readLine();
-            while (line != null) {
-                data = Arrays.copyOf(data, rowIndex + 1);
-                data[rowIndex] = line.toCharArray();
-                rowIndex++;
-
-                // read next line
-                line = reader.readLine();
-            }
+        for (String line : FileLineReader.of(inputFileName)) {
+            data = Arrays.copyOf(data, rowIndex + 1);
+            data[rowIndex] = line.toCharArray();
+            rowIndex++;
         }
         if (!checkAll) {
             return calcFromPosition(data, new Position(0, 0, Direction.RIGHT));

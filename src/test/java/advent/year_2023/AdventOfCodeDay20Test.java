@@ -15,6 +15,6 @@ class AdventOfCodeDay20Test {
 
     @Test
     void task2() {
-//        assertEquals(124693661917133L, AdventOfCodeDay20.task1("advent/2023_20/input.in"));
+        assertEquals(228060006554227L, AdventOfCodeDay20.task2("advent/2023_20/input.in"));
     }
 }

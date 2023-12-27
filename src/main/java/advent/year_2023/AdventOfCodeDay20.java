@@ -13,12 +13,13 @@ import static utils.RegexUtils.parseByPattern;
 public class AdventOfCodeDay20 {
 
     private static final Pattern LINE_PATTERN = Pattern.compile("^((%|&)?)(\\w+) -> (((\\w+)(, )?)+)$");
+    public static final String TARGET_MODULE = "rx";
     private static int a;
 
     static int task1(String inputFileName) {
-        Map<String, Module> vertexMap = readFile(inputFileName);
+        Map<String, Module> modules = readFile(inputFileName);
 
-        Module start = vertexMap.get("broadcaster");
+        Module start = modules.get("broadcaster");
 
         int low = 0, high = 0;
         for (int i = 0; i < 1000; i++) {
@@ -40,68 +41,68 @@ public class AdventOfCodeDay20 {
     }
 
     public static long task2(String inputFileName) {
-        Map<String, Module> vertexMap = readFile(inputFileName);
-        Module start = vertexMap.get("broadcaster");
+        Map<String, Module> modules = readFile(inputFileName);
+        Module start = modules.get("broadcaster");
         Map<String, Long> result = new HashMap<>();
 
         long i = 1;
-        while (!result.containsKey("rx")) {
+        while (!result.containsKey(TARGET_MODULE)) {
             Queue<State> queue = new LinkedList<>();
             queue.add(new State(null, start, false));
             while (!queue.isEmpty()) {
                 State state = queue.poll();
                 queue.addAll(calcNextStates(state));
 
-                Module module = state.to;
-                if (module.type == Type.CON && state.from.type == Type.CON) {
-                    Set<String> parents = module.memory.keySet().stream().map(e -> e.name).collect(Collectors.toSet());
+                Module to = state.to;
+                Module from = state.from;
+                if (to.type == Type.CON && from.type == Type.CON) {
+                    Set<String> parents = to.memory.keySet().stream().map(e -> e.name).collect(Collectors.toSet());
                     if (parents.stream().allMatch(result::containsKey)) {
-                        result.put(module.name, lcm(result.entrySet().stream()
+                        result.put(to.name, lcm(result.entrySet().stream()
                                 .filter(e -> parents.contains(e.getKey()))
                                 .map(Map.Entry::getValue)
                                 .toList())
                         );
                     }
-                } else if (module.type == Type.CON && module.memory.values().stream().allMatch(e -> e)) {
-                    result.put(module.name, i);
-                } else if (module.type == Type.NO_ACTION) {
-                    if (result.containsKey(state.from.name)) {
-                        result.put(module.name, result.get(state.from.name));
+                } else if (to.type == Type.CON && to.memory.values().stream().reduce(true, (a, b) -> a && b)) {
+                    result.put(to.name, i);
+                } else if (to.type == Type.NO_ACTION) {
+                    if (result.containsKey(from.name)) {
+                        result.put(to.name, result.get(from.name));
                     }
-
                 }
             }
 
             i++;
         }
-        return result.get("rx");
+        return result.get(TARGET_MODULE);
     }
 
     private static Map<String, Module> readFile(String inputFileName) {
-        Map<String, Module> vertexMap = new HashMap<>();
+        Map<String, Module> modules = new HashMap<>();
         for (String line : FileLineReader.of(inputFileName)) {
             String[] lineParts = parseByPattern(line, LINE_PATTERN, 1, 3, 4);
 
             String name = lineParts[1];
-            Module module = vertexMap.containsKey(name) ? vertexMap.get(name) : new Module(name);
+            Module module = modules.containsKey(name) ? modules.get(name) : new Module(name);
             module.type = Type.getType(name, lineParts[0]);
 
-            vertexMap.put(name, module);
+            modules.put(name, module);
             Arrays.stream(lineParts[2].split(", ")).forEach(childName -> {
-                if (vertexMap.containsKey(childName)) {
-                    Module child = vertexMap.get(childName);
+                if (modules.containsKey(childName)) {
+                    Module child = modules.get(childName);
                     module.children.add(child);
                     child.memory.put(module, false);
                 } else {
                     Module child = new Module(childName);
-                    vertexMap.put(childName, child);
+                    modules.put(childName, child);
                     module.children.add(child);
                     child.memory.put(module, false);
                 }
             });
 
         }
-        return vertexMap;
+        return modules;
     }
 
     private static List<State> calcNextStates(State state) {

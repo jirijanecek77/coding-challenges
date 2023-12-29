@@ -20,4 +20,9 @@ class DynamicProgrammingChallengesTest {
     void test_targetSum() {
         assertEquals(5, DynamicProgrammingChallenges.targetSum(new int[]{1, 1, 1, 1, 1}, 3));
     }
+
+    @Test
+    void minDifficulty() {
+        assertEquals(9, DynamicProgrammingChallenges.minDifficulty(new int[]{6, 5, 4, 3, 2, 1}, 3));
+    }
 }

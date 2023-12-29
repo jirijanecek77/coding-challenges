@@ -104,4 +104,9 @@ public class ArraysChallengesTest {
         assertArrayEquals(new int[]{1, 2, 3, 4}, ArraysChallenges.findKthClosest(new int[]{1, 2, 3, 4, 5, 7}, 4, 3));
         assertArrayEquals(new int[]{2, 4, 4, 5}, ArraysChallenges.findKthClosest(new int[]{1, 2, 4, 4, 5, 7}, 4, 3));
     }
+
+    @Test
+    void minCost() {
+        assertEquals(2, ArraysChallenges.minCost("aabcaa", new int[]{1, 2, 3, 5, 4, 1}));
+    }
 }

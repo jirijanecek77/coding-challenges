@@ -238,4 +238,28 @@ public class ArraysChallenges {
 
         return Arrays.copyOfRange(nums, left, right);
     }
+
+    public static int minCost(String colors, int[] neededTime) {
+        // https://leetcode.com/problems/minimum-time-to-make-rope-colorful/description/?envType=daily-question&envId=2023-12-27
+        int minCost = 0;
+        int sum = 0, maxTime = 0;
+
+        for (int i = 0; i < colors.length(); i++) {
+            char ch = colors.charAt(i);
+
+            if (ch == colors.charAt(Math.max(0, i - 1))) {
+                sum += neededTime[i];
+                maxTime = Math.max(maxTime, neededTime[i]);
+            } else {
+                // sum all except, max
+                minCost += sum - maxTime;
+
+                sum = neededTime[i];
+                maxTime = neededTime[i];
+            }
+        }
+
+        minCost += sum - maxTime;
+        return minCost;
+    }
 }

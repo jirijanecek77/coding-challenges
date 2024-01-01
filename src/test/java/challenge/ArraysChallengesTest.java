@@ -109,4 +109,25 @@ public class ArraysChallengesTest {
     void minCost() {
         assertEquals(2, ArraysChallenges.minCost("aabcaa", new int[]{1, 2, 3, 5, 4, 1}));
     }
+
+    @Test
+    void makeEqual() {
+        assertTrue(ArraysChallenges.makeEqual(new String[]{"abc", "aabc", "bc"}));
+        assertFalse(ArraysChallenges.makeEqual(new String[]{"abc", "aabc", "bcc"}));
+    }
+
+    @Test
+    void minOperations() {
+        assertEquals(1, ArraysChallenges.minOperations("0100"));
+    }
+
+    @Test
+    void maxLengthBetweenEqualCharacters() {
+        assertEquals(18, ArraysChallenges.maxLengthBetweenEqualCharacters("mgntdygtxrvxjnwksqhxuxtrv"));
+    }
+
+    @Test
+    void findContentChildren() {
+        assertEquals(2, ArraysChallenges.findContentChildren(new int[]{10, 9, 8, 7}, new int[]{5, 6, 7, 8}));
+    }
 }

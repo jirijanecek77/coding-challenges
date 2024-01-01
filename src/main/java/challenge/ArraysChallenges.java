@@ -1,6 +1,8 @@
 package challenge;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class ArraysChallenges {
 
@@ -261,5 +263,66 @@ public class ArraysChallenges {
 
         minCost += sum - maxTime;
         return minCost;
+    }
+
+    public static boolean makeEqual(String[] words) {
+        return Arrays.stream(words)
+                .flatMapToInt(String::chars)
+                .mapToObj(ch -> (char) ch)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .values().stream()
+                .allMatch(e -> e % words.length == 0);
+    }
+
+    public static int minOperations(String s) {
+        int minStart1 = 0, minStart0 = 0;
+        for (int i = 0; i < s.length(); i++) {
+            if (i % 2 == 0) {
+                if (s.charAt(i) == '0') {
+                    minStart1++;
+                } else {
+                    minStart0++;
+                }
+            } else {
+                if (s.charAt(i) == '1') {
+                    minStart1++;
+                } else {
+                    minStart0++;
+                }
+            }
+        }
+        return Math.min(minStart0, minStart1);
+    }
+
+    public static int maxLengthBetweenEqualCharacters(String s) {
+        int maxLen = 0;
+        Map<Character, Integer> positions = new HashMap<>();
+
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+            if (positions.containsKey(ch)) {
+                maxLen = Math.max(maxLen, i - positions.get(ch));
+            } else {
+                positions.put(ch, i);
+            }
+        }
+
+        return maxLen - 1;
+    }
+
+    public static int findContentChildren(int[] g, int[] s) {
+        //https://leetcode.com/problems/assign-cookies/?envType=daily-question&envId=2024-01-01
+
+        Arrays.sort(g);
+        Arrays.sort(s);
+
+        int i = 0;
+        for (int j = 0; j < s.length && i < g.length; j++) {
+            if (s[j] >= g[i]) {
+                i++;
+            }
+        }
+
+        return i;
     }
 }

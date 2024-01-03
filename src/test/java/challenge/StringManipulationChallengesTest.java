@@ -83,4 +83,13 @@ class StringManipulationChallengesTest {
         assertEquals("bab", StringManipulationChallenges.longestPalindrome("babad"));
         assertEquals("bb", StringManipulationChallenges.longestPalindrome("bb"));
     }
+
+    @Test
+    void suggestedProducts() {
+        assertEquals(List.of(
+                        List.of("mobile", "moneypot", "monitor"), List.of("mobile", "moneypot", "monitor"),
+                        List.of("mouse", "mousepad"), List.of("mouse", "mousepad"), List.of("mouse", "mousepad")
+                ),
+                StringManipulationChallenges.suggestedProducts(new String[]{"mobile", "mouse", "moneypot", "monitor", "mousepad"}, "mouse"));
+    }
 }

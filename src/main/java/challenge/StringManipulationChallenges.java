@@ -1,5 +1,7 @@
 package challenge;
 
+import domain.Trie;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -124,8 +126,7 @@ public class StringManipulationChallenges {
                 if (unique.contains(ch)) {
                     unique.remove(ch);
                     duplicates.add(ch);
-                }
-                else {
+                } else {
                     unique.add(ch);
                 }
             }
@@ -141,7 +142,7 @@ public class StringManipulationChallenges {
             return s;
         }
         String maxPalindrome = "";
-        for (int i = 0; i < n; i ++) {
+        for (int i = 0; i < n; i++) {
             maxPalindrome = maxPalindromeForRange(i, i, s, maxPalindrome);
             maxPalindrome = maxPalindromeForRange(i, i + 1, s, maxPalindrome);
         }
@@ -159,5 +160,18 @@ public class StringManipulationChallenges {
             right++;
         }
         return maxPalindrome;
+    }
+
+
+    public static List<List<String>> suggestedProducts(String[] products, String searchWord) {
+        Trie trie = new Trie();
+        Arrays.stream(products).forEach(trie::insert);
+
+        List<List<String>> result = new ArrayList<>();
+        for (int i = 0; i < searchWord.length(); i++) {
+            result.add(trie.findByPrefix(searchWord.substring(0, i + 1), 3));
+        }
+
+        return result;
     }
 }

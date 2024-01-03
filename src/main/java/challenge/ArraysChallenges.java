@@ -76,8 +76,8 @@ public class ArraysChallenges {
     static boolean zeroSubarraySum(int[] arr) {
         Set<Integer> sums = new HashSet<>();
         int sum = 0;
-        for (int i = 0; i < arr.length; i++) {
-            sum += arr[i];
+        for (int j : arr) {
+            sum += j;
 
             // if prefix sum is zero or found same prefix sum before
             if (sum == 0 || sums.contains(sum)) {
@@ -111,7 +111,7 @@ public class ArraysChallenges {
 
     static int longestDecreasingSubarray(int[] arr) {
         int n = arr.length;
-        int lds[] = new int[n];
+        int[] lds = new int[n];
         int i, j, max = 0;
 
         for (i = 0; i < n; i++)

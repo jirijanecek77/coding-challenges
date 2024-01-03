@@ -2,6 +2,10 @@ package challenge;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ArraysChallengesTest {
@@ -129,5 +133,19 @@ public class ArraysChallengesTest {
     @Test
     void findContentChildren() {
         assertEquals(2, ArraysChallenges.findContentChildren(new int[]{10, 9, 8, 7}, new int[]{5, 6, 7, 8}));
+    }
+
+    @Test
+    void findMatrix() {
+        List<List<Integer>> matrix = ArraysChallenges.findMatrix(new int[]{1, 3, 4, 1, 2, 3, 1});
+        assertTrue(matrix.size() == 3
+                && Set.of(1, 3, 4, 2).equals(new HashSet<>(matrix.get(0)))
+                && Set.of(1, 3).equals(new HashSet<>(matrix.get(1)))
+                && Set.of(1).equals(new HashSet<>(matrix.get(2))));
+    }
+
+    @Test
+    void numberOfBeams() {
+        assertEquals(8, ArraysChallenges.numberOfBeams(new String[]{"011001", "000000", "010100", "001000"}));
     }
 }

@@ -3,6 +3,7 @@ package challenge;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class ArraysChallenges {
 
@@ -324,5 +325,33 @@ public class ArraysChallenges {
         }
 
         return i;
+    }
+
+    public static List<List<Integer>> findMatrix(int[] nums) {
+        //https://leetcode.com/problems/convert-an-array-into-a-2d-array-with-conditions/?envType=daily-question&envId=2024-01-02
+
+        Map<Integer, Long> counter = Arrays.stream(nums).boxed().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        int maxCount = (int) counter.values().stream().mapToLong(e -> e).max().orElse(0);
+
+        List<List<Integer>> result = new ArrayList<>();
+        IntStream.range(1, maxCount + 1)
+                .mapToObj(count -> counter.entrySet().stream().filter(e -> e.getValue() >= count).map(Map.Entry::getKey).toList())
+                .forEach(result::add);
+        return result;
+    }
+
+
+    public static int numberOfBeams(String[] bank) {
+        // https://leetcode.com/problems/number-of-laser-beams-in-a-bank/
+        int sum = 0, lastDevices = 0;
+        for (String row : bank) {
+            int devices = (int) row.chars().filter(ch -> ch == '1').count();
+            if (devices > 0) {
+                sum += devices * lastDevices;
+                lastDevices = devices;
+            }
+        }
+
+        return sum;
     }
 }

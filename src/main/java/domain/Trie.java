@@ -1,36 +1,34 @@
 package domain;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class Trie {
 
     private final TrieNode root;
 
     public Trie() {
-        this.root = new TrieNode(null);
+        this.root = new TrieNode();
     }
 
     public void insert(String word) {
-        TrieNode node = root;
+        TrieNode node = this.root;
         for (char ch : word.toCharArray()) {
-            node = insertChar(ch, node);
+            node = node.children.computeIfAbsent(ch, c -> new TrieNode());
         }
-        node.wordEnd = true;
+        node.endOfWord = true;
     }
 
     public boolean search(String word) {
-        return find(word, root).map(e -> e.wordEnd).orElse(false);
+        return find(word).map(e -> e.endOfWord).orElse(false);
     }
 
     public boolean startsWith(String prefix) {
-        return find(prefix, root).isPresent();
+        return find(prefix).isPresent();
     }
 
     public List<String> findByPrefix(String prefix, int limit) {
-        return find(prefix, root)
-                .map(node -> getSuffixes(node, prefix.substring(0, prefix.length() - 1)).stream()
+        return find(prefix)
+                .map(node -> getWordsWithPrefix(node, prefix).stream()
                         .sorted()
                         .limit(limit)
                         .toList()
@@ -38,48 +36,34 @@ public class Trie {
                 .orElseGet(List::of);
     }
 
-    private TrieNode insertChar(char ch, TrieNode root) {
-        return root.children.stream().filter(child -> child.ch == ch).findFirst()
-                .orElseGet(() -> {
-                    TrieNode node = new TrieNode(ch);
-                    root.children.add(node);
-                    return node;
-                });
-    }
-
-    private Optional<TrieNode> find(String word, TrieNode root) {
-        Optional<TrieNode> node = Optional.ofNullable(root);
+    private Optional<TrieNode> find(String word) {
+        TrieNode node = this.root;
         for (char ch : word.toCharArray()) {
-            if (node.isEmpty()) {
+            if (!node.children.containsKey(ch)) {
                 return Optional.empty();
             }
-            node = node.flatMap(e -> e.children.stream().filter(child -> child.ch == ch).findFirst());
+            node = node.children.get(ch);
         }
-        return node;
+        return Optional.of(node);
     }
 
-    private List<String> getSuffixes(TrieNode node, String str) {
-        String word = str + node.ch;
-        if (node.children.isEmpty()) {
-            return List.of(word);
-        } else if (node.wordEnd) {
-            return node.children.stream()
-                    .flatMap(child -> getSuffixes(child, word).stream())
-                    .collect(() -> new ArrayList<>(List.of(word)), ArrayList::add, ArrayList::addAll);
+    private List<String> getWordsWithPrefix(TrieNode node, String str) {
+        if (node.endOfWord) {
+            return node.children.entrySet().stream()
+                    .flatMap(e -> getWordsWithPrefix(e.getValue(), str + e.getKey()).stream())
+                    .collect(() -> new ArrayList<>(List.of(str)), ArrayList::add, ArrayList::addAll);
         }
-        return node.children.stream().flatMap(child -> getSuffixes(child, word).stream()).toList();
+        return node.children.entrySet().stream().flatMap(e -> getWordsWithPrefix(e.getValue(), str + e.getKey()).stream()).toList();
     }
 
     private static class TrieNode {
 
-        TrieNode(Character ch) {
-            this.ch = ch;
-            this.wordEnd = false;
-            this.children = new ArrayList<>();
+        TrieNode() {
+            this.endOfWord = false;
+            this.children = new HashMap<>();
         }
 
-        private final Character ch;
-        private boolean wordEnd;
-        private final List<TrieNode> children;
+        private final Map<Character, TrieNode> children;
+        private boolean endOfWord;
     }
 }

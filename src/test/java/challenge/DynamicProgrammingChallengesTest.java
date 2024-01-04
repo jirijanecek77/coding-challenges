@@ -25,4 +25,10 @@ class DynamicProgrammingChallengesTest {
     void minDifficulty() {
         assertEquals(9, DynamicProgrammingChallenges.minDifficulty(new int[]{6, 5, 4, 3, 2, 1}, 3));
     }
+
+    @Test
+    void minOperations() {
+        assertEquals(7, DynamicProgrammingChallenges.minOperations(new int[]{14, 12, 14, 14, 12, 14, 14, 12, 12, 12, 12, 14, 14, 12, 14, 14, 14, 12, 12}));
+        assertEquals(-1, DynamicProgrammingChallenges.minOperations(new int[]{2, 1, 2, 2, 3, 3}));
+    }
 }

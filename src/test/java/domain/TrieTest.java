@@ -10,6 +10,8 @@ class TrieTest {
     @Test
     void testTrieInsert() {
         var trie = new Trie();
+        assertFalse(trie.search("app"));
+        assertFalse(trie.startsWith("app"));
         trie.insert("apple");
 
         assertTrue(trie.search("apple"));
@@ -18,6 +20,9 @@ class TrieTest {
 
         trie.insert("app");
         assertTrue(trie.search("app"));
+        assertFalse(trie.search("a"));
+        assertFalse(trie.search("apb"));
+        assertFalse(trie.startsWith("apb"));
     }
 
 }

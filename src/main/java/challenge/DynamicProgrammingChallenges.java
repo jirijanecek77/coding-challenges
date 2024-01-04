@@ -2,8 +2,11 @@ package challenge;
 
 import domain.Pair;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class DynamicProgrammingChallenges {
 
@@ -68,5 +71,28 @@ public class DynamicProgrammingChallenges {
             if (temp != Integer.MAX_VALUE) res = Math.min(res, maxDiff + temp);
         }
         return dp[curr][days] = res;
+    }
+
+    public static int minOperations(int[] nums) {
+        //https://leetcode.com/problems/minimum-number-of-operations-to-make-array-empty/?envType=daily-question&envId=2024-01-04
+
+        Map<Integer, Long> freq = Arrays.stream(nums).boxed().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        int maxFreq = (int) Math.max(freq.values().stream().mapToLong(e -> e).max().orElse(0), 4);
+
+        int[] dp = new int[maxFreq + 1];
+        dp[0] = 0;
+        dp[1] = -1;
+        dp[2] = 1;
+        dp[3] = 1;
+        dp[4] = 2;
+        dp(dp);
+
+        return freq.values().stream().map(Long::intValue).mapToInt(e -> dp[e]).reduce((a, b) -> (a == -1 || b == -1) ? -1 : a + b).orElse(-1);
+    }
+
+    private static void dp(int[] dp) {
+        for (int i = 5; i < dp.length; i++) {
+            dp[i] = Math.min(dp[i - 2], dp[i - 3]) + 1;
+        }
     }
 }

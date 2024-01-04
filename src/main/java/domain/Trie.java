@@ -37,14 +37,20 @@ public class Trie {
     }
 
     private Optional<TrieNode> find(String word) {
-        TrieNode node = this.root;
-        for (char ch : word.toCharArray()) {
-            if (!node.children.containsKey(ch)) {
-                return Optional.empty();
-            }
-            node = node.children.get(ch);
+        return dfs(this.root, word.chars().mapToObj(e -> (char) e).iterator());
+    }
+
+    private Optional<TrieNode> dfs(TrieNode node, Iterator<Character> it) {
+        if (!it.hasNext()) {
+            return Optional.of(node);
         }
-        return Optional.of(node);
+
+        char ch = it.next();
+        if (!node.children.containsKey(ch)) {
+            return Optional.empty();
+        }
+
+        return dfs(node.children.get(ch), it);
     }
 
     private List<String> getWordsWithPrefix(TrieNode node, String str) {

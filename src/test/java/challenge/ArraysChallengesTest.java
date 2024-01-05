@@ -67,13 +67,6 @@ public class ArraysChallengesTest {
     }
 
     @Test
-    void longestDecreasingSubarray() {
-        int[] arr = {-2, 1, 3, -4, 5};
-
-        assertEquals(2, ArraysChallenges.longestDecreasingSubarray(arr));
-    }
-
-    @Test
     void findLocalMaximum() {
         int[] arr = {1, 3, 4, 5, 6, 5, 4, 3};
         assertEquals(6, ArraysChallenges.findLocalMaximum(arr));

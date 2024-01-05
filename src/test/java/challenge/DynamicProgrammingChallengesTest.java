@@ -31,4 +31,11 @@ class DynamicProgrammingChallengesTest {
         assertEquals(7, DynamicProgrammingChallenges.minOperations(new int[]{14, 12, 14, 14, 12, 14, 14, 12, 12, 12, 12, 14, 14, 12, 14, 14, 14, 12, 12}));
         assertEquals(-1, DynamicProgrammingChallenges.minOperations(new int[]{2, 1, 2, 2, 3, 3}));
     }
+
+    @Test
+    void lengthOfLIS() {
+        assertEquals(3, DynamicProgrammingChallenges.lengthOfLIS(new int[]{4, 10, 4, 3, 8, 9}));
+        assertEquals(1, DynamicProgrammingChallenges.lengthOfLIS(new int[]{4, 4, 4, 4, 4, 4}));
+        assertEquals(4, DynamicProgrammingChallenges.lengthOfLIS(new int[]{-2, 1, 3, -4, 5}));
+    }
 }

@@ -109,31 +109,6 @@ public class ArraysChallenges {
         return Math.max(incl, excl);
     }
 
-    static int longestDecreasingSubarray(int[] arr) {
-        int n = arr.length;
-        int[] lds = new int[n];
-        int i, j, max = 0;
-
-        for (i = 0; i < n; i++)
-            lds[i] = 1;
-
-        for (i = 1; i < n; i++) {
-            for (j = 0; j < i; j++) {
-                if (arr[i] < arr[j] && lds[i] < lds[j] + 1) {
-                    lds[i] = lds[j] + 1;
-                }
-            }
-        }
-
-        for (i = 0; i < n; i++) {
-            if (max < lds[i]) {
-                max = lds[i];
-            }
-        }
-
-        return max;
-    }
-
     static int findLocalMaximum(int[] arr) {
         int x = -1;
         int N = arr.length;

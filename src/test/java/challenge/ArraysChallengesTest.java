@@ -141,4 +141,11 @@ public class ArraysChallengesTest {
     void numberOfBeams() {
         assertEquals(8, ArraysChallenges.numberOfBeams(new String[]{"011001", "000000", "010100", "001000"}));
     }
+
+    @Test
+    void increasingTriplet() {
+        assertTrue(ArraysChallenges.increasingTriplet(new int[]{2, 1, 5, 0, 4, 6}));
+        assertFalse(ArraysChallenges.increasingTriplet(new int[]{1, 1, 1, 1, 1, 1}));
+        assertFalse(ArraysChallenges.increasingTriplet(new int[]{1, 1, -6, 9}));
+    }
 }

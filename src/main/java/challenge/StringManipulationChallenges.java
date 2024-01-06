@@ -1,6 +1,7 @@
 package challenge;
 
 import domain.Trie;
+import utils.MathUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -174,4 +175,38 @@ public class StringManipulationChallenges {
 
         return result;
     }
+
+    public static String gcdOfStrings(String str1, String str2) {
+        if (!(str1 + str2).equals(str2 + str1)) {
+            return "";
+        }
+        return str1.substring(0, (int) MathUtils.gcd(str1.length(), str2.length()));
+    }
+
+    public static int compress(char[] chars) {
+        int index = 0, left = 0, right = 1;
+
+        while (right <= chars.length) {
+            if (right == chars.length || chars[left] != chars[right]) {
+                chars[index++] = chars[left];
+
+                int length = right - left;
+                if (length > 1) {
+                    Stack<Integer> stack = new Stack<>();
+                    while (length > 0) {
+                        stack.push(length % 10);
+                        length /= 10;
+                    }
+
+                    while (!stack.isEmpty()) {
+                        chars[index++] = (char) (stack.pop() + '0');
+                    }
+                }
+                left = right;
+            }
+            right++;
+        }
+        return index;
+    }
+
 }

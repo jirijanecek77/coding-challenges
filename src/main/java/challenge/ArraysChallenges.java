@@ -329,4 +329,25 @@ public class ArraysChallenges {
 
         return sum;
     }
+
+    public static boolean increasingTriplet(int[] nums) {
+        // https://leetcode.com/problems/increasing-triplet-subsequence/description/
+        int min1 = Integer.MAX_VALUE;
+        int min2 = Integer.MAX_VALUE;
+
+        if (nums.length < 3) {
+            return false;
+        }
+
+        for (int num : nums) {
+            if (num <= min1) {
+                min1 = num;
+            } else if (num <= min2) {
+                min2 = num;
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -2,9 +2,7 @@ package challenge;
 
 import domain.Pair;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -111,4 +109,48 @@ public class DynamicProgrammingChallenges {
 
         return Arrays.stream(dp).max().orElse(0);
     }
+
+    public static int jobScheduling(int[] startTime, int[] endTime, int[] profit) {
+        // https://leetcode.com/problems/maximum-profit-in-job-scheduling/?envType=daily-question&envId=2024-01-06
+
+        int n = startTime.length;
+        List<Job> jobs = new ArrayList<>(n);
+        for (int i = 0; i < n; i++) {
+            jobs.add(new Job(startTime[i], endTime[i], profit[i]));
+        }
+        jobs.sort(Comparator.comparing(e -> e.endTime));
+
+        int[] dp = new int[n + 1];
+
+        for (int i = 0; i < n; i++) {
+            Job job = jobs.get(i);
+            int startTimeValue = job.startTime;
+            int profitValue = job.profit;
+
+            int latestNonConflictJobIndex = upperBound(jobs, i, startTimeValue);
+            dp[i + 1] = Math.max(dp[i], dp[latestNonConflictJobIndex] + profitValue);
+        }
+
+        return dp[n];
+    }
+
+    private static int upperBound(List<Job> jobs, int endIndex, int targetTime) {
+        int low = 0;
+        int high = endIndex;
+
+        while (low < high) {
+            int mid = (low + high) / 2;
+            if (jobs.get(mid).endTime <= targetTime) {
+                low = mid + 1;
+            } else {
+                high = mid;
+            }
+        }
+
+        return low;
+    }
+
+    record Job(int startTime, int endTime, int profit) {
+    }
+
 }

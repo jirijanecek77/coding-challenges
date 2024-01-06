@@ -38,4 +38,9 @@ class DynamicProgrammingChallengesTest {
         assertEquals(1, DynamicProgrammingChallenges.lengthOfLIS(new int[]{4, 4, 4, 4, 4, 4}));
         assertEquals(4, DynamicProgrammingChallenges.lengthOfLIS(new int[]{-2, 1, 3, -4, 5}));
     }
+
+    @Test
+    void jobScheduling() {
+        assertEquals(18, DynamicProgrammingChallenges.jobScheduling(new int[]{4, 2, 4, 8, 2}, new int[]{5, 5, 5, 10, 8}, new int[]{1, 2, 8, 10, 4}));
+    }
 }

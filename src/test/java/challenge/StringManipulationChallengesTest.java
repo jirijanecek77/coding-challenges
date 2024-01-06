@@ -92,4 +92,20 @@ class StringManipulationChallengesTest {
                 ),
                 StringManipulationChallenges.suggestedProducts(new String[]{"mobile", "mouse", "moneypot", "monitor", "mousepad"}, "mouse"));
     }
+
+    @Test
+    void gcdOfStrings() {
+        assertEquals("ABC", StringManipulationChallenges.gcdOfStrings("ABCABC", "ABC"));
+        assertEquals("AB", StringManipulationChallenges.gcdOfStrings("ABABAB", "ABAB"));
+        assertEquals("", StringManipulationChallenges.gcdOfStrings("ABCDEF", "ABC"));
+    }
+
+    @Test
+    void compress() {
+        assertEquals(6, StringManipulationChallenges.compress(new char[]{'a', 'a', 'b', 'b', 'c', 'c', 'c'}));
+        assertEquals(4, StringManipulationChallenges.compress(new char[]{'a', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b'}));
+        assertEquals(1, StringManipulationChallenges.compress(new char[]{'a'}));
+        assertEquals(3, StringManipulationChallenges.compress(new char[]{'a', 'b', 'c'}));
+        assertEquals(4, StringManipulationChallenges.compress(new char[]{'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'}));
+    }
 }

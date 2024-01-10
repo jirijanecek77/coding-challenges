@@ -33,4 +33,33 @@ public class BinaryTreeChallengesTest {
         return new Node(rootVal, leftNode, rightNode);
     }
 
+    @Test
+    void goodNodes() {
+        Node root = new Node(3,
+                new Node(1, new Node(3), null),
+                new Node(4, new Node(1), new Node(5))
+        );
+
+        assertEquals(4, BinaryTreeChallenges.goodNodes(root));
+    }
+
+    @Test
+    void levelOrder() {
+        Node root = new Node(3,
+                new Node(9),
+                new Node(20, new Node(15), new Node(7))
+        );
+
+        assertEquals(3, BinaryTreeChallenges.levelOrder(root).size());
+    }
+
+    @Test
+    void amountOfTime() {
+        Node root = new Node(1,
+                new Node(5, null, new Node(4, new Node(9), new Node(2))),
+                new Node(3, new Node(10), new Node(6))
+        );
+
+        assertEquals(4, BinaryTreeChallenges.amountOfTime(root, 3));
+    }
 }

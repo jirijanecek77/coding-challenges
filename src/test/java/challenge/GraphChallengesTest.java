@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class GraphChallengesTest {
 
@@ -23,5 +23,11 @@ class GraphChallengesTest {
                         List.of(List.of("x1", "x5"), List.of("x5", "x2"), List.of("x2", "x4"), List.of("x2", "x2"), List.of("x2", "x9"), List.of("x9", "x9"))
                 )
         );
+    }
+
+    @Test
+    void canVisitAllRooms() {
+        assertTrue(GraphChallenges.canVisitAllRooms(List.of(List.of(1), List.of(2), List.of(3), List.of(2))));
+        assertFalse(GraphChallenges.canVisitAllRooms(List.of(List.of(1, 3), List.of(3, 0, 1), List.of(2), List.of(0))));
     }
 }

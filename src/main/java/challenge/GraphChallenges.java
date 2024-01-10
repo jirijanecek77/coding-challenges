@@ -49,4 +49,22 @@ public class GraphChallenges {
                 .findFirst()
                 .orElse(-1.0);
     }
+
+    public static boolean canVisitAllRooms(List<List<Integer>> rooms) {
+        if (rooms.isEmpty()) {
+            return true;
+        }
+        Set<Integer> visited = new HashSet<>();
+        dfsRooms(rooms, 0, visited);
+        return visited.size() == rooms.size();
+    }
+
+    private static void dfsRooms(List<List<Integer>> rooms, int room, Set<Integer> visited) {
+        if (visited.contains(room)) {
+            return;
+        }
+        visited.add(room);
+
+        rooms.get(room).forEach(e -> dfsRooms(rooms, e, visited));
+    }
 }

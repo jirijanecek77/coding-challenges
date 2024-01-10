@@ -121,32 +121,31 @@ public class ArraysChallenges {
     }
 
     static int secondLargest(int[] arr) {
-        Arrays.sort(arr);
-
-        int i;
-        for (i = arr.length - 2; i >= 0 && arr[i + 1] == arr[i]; i--) ;
-
-        if (i < 0) {
-            return -1;
+        int first = -1, second = first;
+        for (int num : arr) {
+            if (num > first) {
+                second = first;
+                first = num;
+            } else if (num < first && num > second) {
+                second = num;
+            }
         }
-        return arr[i];
+        return second;
     }
 
     public static int kThLargest(int[] data, int k) {
-        var dataSet = Arrays.stream(data)
-                .collect(() -> new TreeSet<Integer>(), TreeSet::add, TreeSet::addAll);
-        var it = dataSet.iterator();
-
-        for (int i = 1; i <= k; i++) {
-            if (!it.hasNext()) {
-                return 0;
-            }
-            if (i == k) {
-                return it.next();
-            }
-            it.next();
+        if (k > data.length) {
+            return -1;
         }
-        return 0;
+
+        var queue = Arrays.stream(data)
+                .collect(() -> new PriorityQueue<Integer>(), PriorityQueue::add, PriorityQueue::addAll);
+
+        int num = 0;
+        while (k-- > 0 && !queue.isEmpty()) {
+            num = queue.poll();
+        }
+        return num;
     }
 
     public static int oneInteger(int[] data) {

@@ -53,21 +53,10 @@ public class ArtinChallengesTest {
     }
 
     @Test
-    void testAmazonFindMax2DigitNumberInString() {
-        int result = ArtinChallenges.amazonFindMax2DigitNumberInString("54326254610");
-        assertEquals(62, result);
-    }
-
-    @Test
-    void testAmazonFindMax2DigitNumberInString_empty() {
-        int result = ArtinChallenges.amazonFindMax2DigitNumberInString("");
-        assertEquals(0, result);
-    }
-
-    @Test
-    void testAmazonFindMax2DigitNumberInString_one() {
-        int result = ArtinChallenges.amazonFindMax2DigitNumberInString("1");
-        assertEquals(1, result);
+    void testAmazonFindMax2DigitNumber() {
+        assertEquals(62, ArtinChallenges.amazonFindMax2DigitNumberInString("5604326254610"));
+        assertEquals(0, ArtinChallenges.amazonFindMax2DigitNumberInString(""));
+        assertEquals(1, ArtinChallenges.amazonFindMax2DigitNumberInString("1"));
     }
 
     @Test

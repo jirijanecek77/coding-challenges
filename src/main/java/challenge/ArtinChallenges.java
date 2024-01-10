@@ -147,20 +147,20 @@ public class ArtinChallenges {
     }
 
 
-    public static int amazonFindMax2DigitNumberInString(String S) {
-        int max = 0;
-        int lastDigit = 0;
-        for (int i = 0; i < S.length(); i++) {
-            int digit = Character.getNumericValue(S.charAt(i));
-
-            final int currentNr = lastDigit * 10 + digit;
-            if (currentNr > max) {
-                max = currentNr;
+    public static int amazonFindMax2DigitNumberInString(String str) {
+        int first = 0, second = 0, last = 0;
+        for (int i = 0; i < str.length(); i++) {
+            int num = str.charAt(i) - '0';
+            if (last > first) {
+                first = last;
+                second = num;
+            } else if (last == first) {
+                second = Math.max(second, num);
             }
-            lastDigit = digit;
+            last = num;
         }
 
-        return max;
+        return first * 10 + second;
     }
 
     public static boolean amazonGraph(int[] A, int[] B) {

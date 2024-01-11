@@ -62,4 +62,22 @@ public class BinaryTreeChallengesTest {
 
         assertEquals(4, BinaryTreeChallenges.amountOfTime(root, 3));
     }
+
+    @Test
+    void maxAncestorDiff() {
+        Node root1 = new Node(8,
+                new Node(3, new Node(1), new Node(6, new Node(4), new Node(7))),
+                new Node(10, null, new Node(14, new Node(13), null))
+        );
+
+        assertEquals(7, BinaryTreeChallenges.maxAncestorDiff(root1));
+
+        Node root2 = new Node(8, null,
+                new Node(1, new Node(5, new Node(2, new Node(7), new Node(3)), new Node(4)), new Node(6, new Node(0), null))
+        );
+
+        assertEquals(8, BinaryTreeChallenges.maxAncestorDiff(root2));
+
+        assertEquals(0, BinaryTreeChallenges.maxAncestorDiff(null));
+    }
 }

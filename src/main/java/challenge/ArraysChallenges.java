@@ -349,4 +349,17 @@ public class ArraysChallenges {
         }
         return false;
     }
+
+
+    public static int kthFactor(int n, int k) {
+        List<Integer> factors = new ArrayList<>();
+
+        for (int i = 1; i <= n && factors.size() < k; i++) {
+            int factor = n % i;
+            if (factor == 0) {
+                factors.add(i);
+            }
+        }
+        return factors.size() == k ? factors.get(factors.size() - 1) : -1;
+    }
 }

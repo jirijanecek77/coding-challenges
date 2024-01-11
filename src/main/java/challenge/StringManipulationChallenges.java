@@ -209,4 +209,21 @@ public class StringManipulationChallenges {
         return index;
     }
 
+
+    public static int partitionString(String s) {
+        // abacaba
+
+        int result = 1;
+        Set<Character> mem = new HashSet<>();
+        for (char ch : s.toCharArray()) {
+            if (mem.contains(ch)) {
+                result++;
+                mem.clear();
+            }
+            mem.add(ch);
+        }
+
+        return result;
+    }
+
 }

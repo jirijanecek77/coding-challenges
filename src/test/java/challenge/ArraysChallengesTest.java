@@ -148,4 +148,9 @@ public class ArraysChallengesTest {
         assertFalse(ArraysChallenges.increasingTriplet(new int[]{1, 1, 1, 1, 1, 1}));
         assertFalse(ArraysChallenges.increasingTriplet(new int[]{1, 1, -6, 9}));
     }
+
+    @Test
+    void kthFactor() {
+        assertEquals(3, ArraysChallenges.kthFactor(12, 3));
+    }
 }

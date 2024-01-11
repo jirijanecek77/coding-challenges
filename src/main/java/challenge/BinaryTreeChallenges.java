@@ -154,4 +154,22 @@ public class BinaryTreeChallenges {
         createGraph(node.left(), adjacencyList);
         createGraph(node.right(), adjacencyList);
     }
+
+    public static int maxAncestorDiff(Node root) {
+        // https://leetcode.com/problems/maximum-difference-between-node-and-ancestor/description/?envType=daily-question&envId=2024-01-11
+
+        if (root == null) {
+            return 0;
+        }
+        return dfsMaxDiff(root, root.data(), root.data());
+    }
+
+    private static int dfsMaxDiff(Node node, int min, int max) {
+        if (node == null) {
+            return Math.abs(max - min);
+        }
+        min = Math.min(min, node.data());
+        max = Math.max(max, node.data());
+        return Math.max(dfsMaxDiff(node.left(), min, max), dfsMaxDiff(node.right(), min, max));
+    }
 }

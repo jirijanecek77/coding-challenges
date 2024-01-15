@@ -1,5 +1,7 @@
 package challenge;
 
+import domain.Pair;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -361,5 +363,72 @@ public class ArraysChallenges {
             }
         }
         return factors.size() == k ? factors.get(factors.size() - 1) : -1;
+    }
+
+    public static int largestAltitude(int[] gain) {
+        int sum = 0, max = Integer.MIN_VALUE;
+        for (int i : gain) {
+            max = Math.max(max, sum);
+            sum += i;
+        }
+        return Math.max(max, sum);
+    }
+
+    public static int pivotIndex(int[] nums) {
+        int left = 0, right = 0;
+        for (int num : nums) {
+            right += num;
+        }
+
+        for (int i = 0; i < nums.length; i++) {
+            left += i == 0 ? 0 : nums[i - 1];
+            right -= nums[i];
+            if (left == right) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    public static boolean find132pattern(int[] nums) {
+        int min = Integer.MAX_VALUE;
+        Stack<Pair<Integer, Integer>> stack = new Stack<>();
+
+        for (int num : nums) {
+            while (!stack.isEmpty() && num >= stack.peek().first()) {
+                stack.pop();
+            }
+            if (!stack.isEmpty() && num > stack.peek().second()) {
+                return true;
+            }
+            stack.push(Pair.of(num, min));
+            min = Math.min(min, num);
+        }
+
+        return false;
+    }
+
+
+    public static List<List<Integer>> findWinners(int[][] matches) {
+        // https://leetcode.com/problems/find-players-with-zero-or-one-losses/description/?envType=daily-question&envId=2024-01-15
+        Set<Integer> winners = new HashSet<>();
+        Map<Integer, Integer> losers = new HashMap<>();
+        for (int[] match : matches) {
+            int winner = match[0];
+            int loser = match[1];
+
+            if (!losers.containsKey(winner)) {
+                winners.add(winner);
+            }
+            winners.remove(loser);
+
+            losers.put(loser, losers.getOrDefault(loser, 0) + 1);
+        }
+
+        return List.of(
+                winners.stream().sorted().toList(),
+                losers.entrySet().stream().filter(e -> e.getValue() == 1).map(Map.Entry::getKey).sorted().toList()
+        );
     }
 }

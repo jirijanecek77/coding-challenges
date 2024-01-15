@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class CheckPassword {
+public class AoC2020Day02 {
 
-    public int checkPasswords(String inputFileName) throws IOException {
+    public int solve(String inputFileName) throws IOException {
         final BufferedReader reader = Files.newBufferedReader(Paths.get(inputFileName));
         int counter = 0;
 

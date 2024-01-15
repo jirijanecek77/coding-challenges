@@ -7,11 +7,11 @@ import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
-public class PassportReader {
+public class AoC2020Day04 {
 
     public static final Set<String> PASSPORT_CODES = Set.of("byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid");
 
-    public long readData(String inputFileName) throws IOException {
+    public long solve(String inputFileName) throws IOException {
         final BufferedReader reader = Files.newBufferedReader(Paths.get(inputFileName));
         int counter = 0;
         Set<String> expectedCodes = new HashSet<>(PASSPORT_CODES);

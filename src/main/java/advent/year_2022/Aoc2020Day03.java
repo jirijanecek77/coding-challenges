@@ -8,9 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TreeCounter {
+public class Aoc2020Day03 {
 
-    public long countTrees(String inputFileName) throws IOException {
+    public long solve(String inputFileName) throws IOException {
         final BufferedReader reader = Files.newBufferedReader(Paths.get(inputFileName));
         int rowCounter = 0;
         Map<Integer, Long> results = new HashMap<>(Map.of(0, 0L, 1, 0L, 2, 0L, 3, 0L, 4, 0L));

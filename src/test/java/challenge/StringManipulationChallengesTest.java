@@ -113,4 +113,15 @@ class StringManipulationChallengesTest {
     void partitionString() {
         assertEquals(4, StringManipulationChallenges.partitionString("abacaba"));
     }
+
+    @Test
+    void removeStars() {
+        // https://leetcode.com/problems/removing-stars-from-a-string/?envType=study-plan-v2&envId=leetcode-75
+        assertEquals("lecoe", StringManipulationChallenges.removeStars("leet**cod*e"));
+    }
+
+    @Test
+    void minSteps() {
+        assertEquals(5, StringManipulationChallenges.minSteps("leetcode", "practice"));
+    }
 }

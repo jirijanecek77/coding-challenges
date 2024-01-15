@@ -9,22 +9,23 @@ class AdventTests {
 
     @Test
     void testCheckPasswords() throws IOException {
-        Assertions.assertEquals(396, new CheckPassword().checkPasswords("src/test/resources/advent/2/input_big.in"));
+        Assertions.assertEquals(396, new AoC2020Day02().solve("src/test/resources/advent/2020_02/input.in"));
     }
 
     @Test
     void testTreeCounter() throws IOException {
-        Assertions.assertEquals(336L, new TreeCounter().countTrees("src/test/resources/advent/3/input.in"));
+        Assertions.assertEquals(336L, new Aoc2020Day03().solve("src/test/resources/advent/2020_03/input.in"));
     }
 
     @Test
     void testPassportReader() throws IOException {
-        Assertions.assertEquals(114, new PassportReader().readData("src/test/resources/advent/4/input.in"));
+        Assertions.assertEquals(114, new AoC2020Day04().solve("src/test/resources/advent/2020_04/input.in"));
     }
 
     @Test
     void testSeatDecoder() throws IOException {
-        Assertions.assertEquals(894, new SeatDecoder().decodeSeat("src/test/resources/advent/5/input.in"));
+        Assertions.assertEquals(894, new Aoc2020Day05().solve1("advent/2020_05/input.in"));
+        Assertions.assertEquals(579, new Aoc2020Day05().solve2("advent/2020_05/input.in"));
     }
 
 }

@@ -153,4 +153,28 @@ public class ArraysChallengesTest {
     void kthFactor() {
         assertEquals(3, ArraysChallenges.kthFactor(12, 3));
     }
+
+    @Test
+    void largestAltitude() {
+        assertEquals(1, ArraysChallenges.largestAltitude(new int[]{-5, 1, 5, 0, -7}));
+    }
+
+    @Test
+    void pivotIndex() {
+        assertEquals(3, ArraysChallenges.pivotIndex(new int[]{1, 7, 3, 6, 5, 6}));
+        assertEquals(0, ArraysChallenges.pivotIndex(new int[]{2, 1, -1}));
+    }
+
+    @Test
+    void find132pattern() {
+        assertTrue(ArraysChallenges.find132pattern(new int[]{3, 5, 0, 3, 4}));
+        assertFalse(ArraysChallenges.find132pattern(new int[]{1, 0, 1, -4, -3}));
+        assertFalse(ArraysChallenges.find132pattern(new int[]{-2, 1, 1, -2, 1, 1}));
+    }
+
+    @Test
+    void findWinners() {
+        assertEquals(List.of(List.of(1, 2, 10), List.of(4, 5, 7, 8)),
+                ArraysChallenges.findWinners(new int[][]{{1, 3}, {2, 3}, {3, 6}, {5, 6}, {5, 7}, {4, 5}, {4, 8}, {4, 9}, {10, 4}, {10, 9}}));
+    }
 }

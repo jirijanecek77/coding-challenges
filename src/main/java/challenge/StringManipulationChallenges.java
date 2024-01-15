@@ -4,6 +4,7 @@ import domain.Trie;
 import utils.MathUtils;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class StringManipulationChallenges {
@@ -226,4 +227,35 @@ public class StringManipulationChallenges {
         return result;
     }
 
+
+    public static String removeStars(String s) {
+        Stack<Character> stack = new Stack<>();
+        for (char ch : s.toCharArray()) {
+            if (ch == '*' && !stack.isEmpty()) {
+                stack.pop();
+            } else {
+                stack.push(ch);
+            }
+        }
+        StringBuilder result = new StringBuilder();
+        while (!stack.isEmpty()) {
+            char ch = stack.pop();
+            result.insert(0, ch);
+        }
+        return result.toString();
+    }
+
+    public static int minSteps(String s, String t) {
+        // https://leetcode.com/problems/minimum-number-of-steps-to-make-two-strings-anagram/description/?envType=daily-question&envId=2024-01-13
+
+        Map<Integer, Long> counterS = s.chars().boxed().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        Map<Integer, Long> counterT = t.chars().boxed().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        return counterT.entrySet().stream()
+                .mapToInt(target -> {
+                    long source = counterS.getOrDefault(target.getKey(), 0L);
+                    return target.getValue() > source ? (int) (target.getValue() - source) : 0;
+                })
+                .sum();
+    }
 }

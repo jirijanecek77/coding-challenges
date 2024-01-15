@@ -28,4 +28,10 @@ class AdventTests {
         Assertions.assertEquals(579, new Aoc2020Day05().solve2("advent/2020_05/input.in"));
     }
 
+    @Test
+    void testDay06() throws IOException {
+        Assertions.assertEquals(6583, new Aoc2020Day06().solve1("advent/2020_06/input.in"));
+        Assertions.assertEquals(3290, new Aoc2020Day06().solve2("advent/2020_06/input.in"));
+    }
+
 }

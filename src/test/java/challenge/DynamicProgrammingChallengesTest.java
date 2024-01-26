@@ -43,4 +43,10 @@ class DynamicProgrammingChallengesTest {
     void jobScheduling() {
         assertEquals(18, DynamicProgrammingChallenges.jobScheduling(new int[]{4, 2, 4, 8, 2}, new int[]{5, 5, 5, 10, 8}, new int[]{1, 2, 8, 10, 4}));
     }
+
+    @Test
+    void minFallingPathSum() {
+        assertEquals(13, DynamicProgrammingChallenges.minFallingPathSum(new int[][]{{2, 1, 3}, {6, 5, 4}, {7, 8, 9}}));
+        assertEquals(-36, DynamicProgrammingChallenges.minFallingPathSum(new int[][]{{100, -42, -46, -41}, {31, 97, 10, -10}, {-58, -51, 82, 89}, {51, 81, 69, -51}}));
+    }
 }

@@ -5,6 +5,7 @@ import domain.Pair;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class DynamicProgrammingChallenges {
 
@@ -151,6 +152,35 @@ public class DynamicProgrammingChallenges {
     }
 
     record Job(int startTime, int endTime, int profit) {
+    }
+
+    public static int minFallingPathSum(int[][] matrix) {
+        int[][] dp = new int[matrix.length][matrix[0].length];
+        for (int[] row : dp) {
+            Arrays.fill(row, Integer.MAX_VALUE);
+        }
+
+        int result = Integer.MAX_VALUE;
+        for (int i = 0; i < matrix.length; i++) {
+            result = Math.min(result, dpMinFallingPathSum(0, i, matrix, dp));
+        }
+        return result;
+    }
+
+    private static int dpMinFallingPathSum(int row, int col, int[][] matrix, int[][] dp) {
+        if (row == matrix.length) {
+            return 0;
+        }
+        if (dp[row][col] != Integer.MAX_VALUE) {
+            return dp[row][col];
+        }
+
+        IntStream.range(-1, 2)
+                .map(c -> c + col)
+                .filter(nextCol -> nextCol >= 0 && nextCol < matrix[0].length)
+                .forEach(nextCol -> dp[row][col] = Math.min(dp[row][col], matrix[row][col] + dpMinFallingPathSum(row + 1, nextCol, matrix, dp)));
+
+        return dp[row][col];
     }
 
 }

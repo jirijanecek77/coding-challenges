@@ -1,5 +1,3 @@
-import pandas as pd
-
 from utils import line_generator
 
 filename = "data/test.txt"

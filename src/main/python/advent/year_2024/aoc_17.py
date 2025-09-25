@@ -25,7 +25,7 @@ def combo(operand: int, a: int, b: int, c: int) -> int:
         return b
     elif operand == 6:
         return c
-    ValueError("Invalid operand")
+    raise ValueError("Invalid operand")
 
 
 def calculate(a: int, b: int, c: int, program: list[int], pointer: int = 0):
@@ -35,7 +35,7 @@ def calculate(a: int, b: int, c: int, program: list[int], pointer: int = 0):
 
         match opcode:
             case 0:
-                a //= (1 << combo(operand, a, b, c))
+                a //= 1 << combo(operand, a, b, c)
                 pointer += 2
             case 1:
                 b ^= operand
@@ -60,7 +60,7 @@ def calculate(a: int, b: int, c: int, program: list[int], pointer: int = 0):
 
 
 def solve_01():
-    with (open(filename) as file):
+    with open(filename) as file:
         generator = line_generator(file.readlines())
         register_a = parse_register(next(generator))
         register_b = parse_register(next(generator))
@@ -69,7 +69,9 @@ def solve_01():
         program = [int(e.strip()) for e in next(generator)[9:].split(",")]
 
         result = []
-        for index, out in enumerate(calculate(register_a, register_b, register_c, program)):
+        for index, out in enumerate(
+            calculate(register_a, register_b, register_c, program)
+        ):
             result.append(str(out))
         print(",".join(result))
 

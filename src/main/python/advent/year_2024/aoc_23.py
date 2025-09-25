@@ -1,5 +1,4 @@
-import heapq
-from collections import Counter, defaultdict
+from collections import defaultdict
 
 from utils import line_generator
 
@@ -17,7 +16,7 @@ def find_triplets_with_repeating_items(edges):
     nodes = list(graph.keys())
     for index, a in enumerate(graph):
         for b in graph[a]:
-            for c in nodes[index + 1:]:
+            for c in nodes[index + 1 :]:
                 if {a, b} <= graph[c]:
                     triples.add(frozenset((a, b, c)))
 
@@ -25,13 +24,23 @@ def find_triplets_with_repeating_items(edges):
 
 
 def solve_01():
-    with (open(filename) as file):
-        pairs = list(map(lambda line: tuple(line.split("-")), line_generator(file.readlines())))
+    with open(filename) as file:
+        pairs = list(
+            map(lambda line: tuple(line.split("-")), line_generator(file.readlines()))
+        )
 
         result = find_triplets_with_repeating_items(pairs)
         for triplet in result:
             print(triplet, end="\n")
-        print(len(list(filter(lambda triplet: any(e.startswith("t") for e in triplet), result))))
+        print(
+            len(
+                list(
+                    filter(
+                        lambda triplet: any(e.startswith("t") for e in triplet), result
+                    )
+                )
+            )
+        )
 
 
 if __name__ == "__main__":

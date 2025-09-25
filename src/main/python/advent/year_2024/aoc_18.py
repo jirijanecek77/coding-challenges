@@ -1,5 +1,3 @@
-import copy
-
 from utils import line_generator
 
 filename = "data/aoc_18.txt"
@@ -31,7 +29,10 @@ def shortest_path(obstacles: list[tuple[int, int]], n: int) -> int:
 
             # Check bounds and if the cell is not blocked/visited
             if 0 <= next_row < n and 0 <= next_col < n:
-                if (next_row, next_col) not in obstacles and (next_row, next_col) not in visited:
+                if (next_row, next_col) not in obstacles and (
+                    next_row,
+                    next_col,
+                ) not in visited:
                     queue.append(((next_row, next_col), steps + 1))
                     visited.add((next_row, next_col))
 
@@ -40,7 +41,7 @@ def shortest_path(obstacles: list[tuple[int, int]], n: int) -> int:
 
 
 def solve_01():
-    with (open(filename) as file):
+    with open(filename) as file:
         obstacles = list()
         n = 70
         for index, line in enumerate(line_generator(file.readlines())):

@@ -12,10 +12,14 @@ MIN_SAVE = 100
 
 def plot(data: list[list[int]]):
     for row in data:
-        print("|".join(map(lambda i: "##" if i == STONE else str(i).rjust(2, ' '), row)))
+        print(
+            "|".join(map(lambda i: "##" if i == STONE else str(i).rjust(2, " "), row))
+        )
 
 
-def find_shortest_distances_for_path_part(playground: list[list[int]], start: Position) -> dict[Position, int]:
+def find_shortest_distances_for_path_part(
+    playground: list[list[int]], start: Position
+) -> dict[Position, int]:
     distances = {}
     priority_queue = []
     heapq.heappush(priority_queue, (0, start))
@@ -27,11 +31,19 @@ def find_shortest_distances_for_path_part(playground: list[list[int]], start: Po
             continue
 
         if playground[pos.row][pos.col] - playground[start.row][start.col] > 0:
-            new_distance = playground[pos.row][pos.col] - playground[start.row][start.col] - current_distance
-            result[pos] = min(result[pos], new_distance) if pos in result else new_distance
+            new_distance = (
+                playground[pos.row][pos.col]
+                - playground[start.row][start.col]
+                - current_distance
+            )
+            result[pos] = (
+                min(result[pos], new_distance) if pos in result else new_distance
+            )
 
         for neighbor in [move_up(pos), move_down(pos), move_left(pos), move_right(pos)]:
-            if 0 <= neighbor.row < len(playground) and 0 <= neighbor.col < len(playground[neighbor.row]):
+            if 0 <= neighbor.row < len(playground) and 0 <= neighbor.col < len(
+                playground[neighbor.row]
+            ):
                 new_distance = current_distance + 1
                 if neighbor in distances:
                     distances[neighbor] = min(new_distance, distances[neighbor])
@@ -43,7 +55,7 @@ def find_shortest_distances_for_path_part(playground: list[list[int]], start: Po
 
 
 def solve_01():
-    with (open(filename) as file):
+    with open(filename) as file:
         playground = []
         generator = line_generator(file.readlines())
         start = None
@@ -61,7 +73,19 @@ def solve_01():
         i = 1
         while pos != end:
             playground[pos.row][pos.col] = i
-            pos = next((p for p in [move_up(pos), move_down(pos), move_left(pos), move_right(pos)] if playground[p.row][p.col] == 0), None)
+            pos = next(
+                (
+                    p
+                    for p in [
+                        move_up(pos),
+                        move_down(pos),
+                        move_left(pos),
+                        move_right(pos),
+                    ]
+                    if playground[p.row][p.col] == 0
+                ),
+                None,
+            )
             i += 1
         playground[pos.row][pos.col] = i
 
@@ -74,7 +98,11 @@ def solve_01():
                     pos = Position(row_index, col_index)
                     # print(f"Checking {pos}")
                     distances = find_shortest_distances_for_path_part(playground, pos)
-                    distances = {p: distance for p, distance in distances.items() if playground[p.row][p.col] != STONE}
+                    distances = {
+                        p: distance
+                        for p, distance in distances.items()
+                        if playground[p.row][p.col] != STONE
+                    }
                     # print(distances)
                     result.extend(filter(lambda d: d >= MIN_SAVE, distances.values()))
 

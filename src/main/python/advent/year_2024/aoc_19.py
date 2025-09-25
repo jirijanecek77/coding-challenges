@@ -22,7 +22,7 @@ def check_pattern(towel: str) -> int:
 
 
 def solve_01():
-    with (open(filename) as file):
+    with open(filename) as file:
         generator = line_generator(file.readlines())
         for line in generator:
             if line.strip() == "":

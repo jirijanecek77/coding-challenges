@@ -10,11 +10,18 @@ def calculate_ranking(pos: Position, data: dict[Position, int]) -> list[Position
     if val == 9:
         return [pos]
 
-    return list(chain.from_iterable(
-        calculate_ranking(new_pos, data)
-        for new_pos in [move_up(pos), move_down(pos), move_left(pos), move_right(pos)]
-        if new_pos in data.keys() and data[new_pos] == val + 1
-    ))
+    return list(
+        chain.from_iterable(
+            calculate_ranking(new_pos, data)
+            for new_pos in [
+                move_up(pos),
+                move_down(pos),
+                move_left(pos),
+                move_right(pos),
+            ]
+            if new_pos in data.keys() and data[new_pos] == val + 1
+        )
+    )
 
 
 def solve_01():

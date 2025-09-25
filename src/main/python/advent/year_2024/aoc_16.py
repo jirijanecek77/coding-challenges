@@ -9,7 +9,18 @@ STONE = -1
 
 def plot(data: list[list[int]], paths: set[Position]):
     for row_index, row in enumerate(data):
-        print("".join(map(lambda i: "#" if i[1] == STONE else ("O" if Position(row_index, i[0]) in paths else "."), enumerate(row))))
+        print(
+            "".join(
+                map(
+                    lambda i: (
+                        "#"
+                        if i[1] == STONE
+                        else ("O" if Position(row_index, i[0]) in paths else ".")
+                    ),
+                    enumerate(row),
+                )
+            )
+        )
 
 
 def backtrack_path(start: OrientedPosition, current: OrientedPosition, path, parents):
@@ -33,10 +44,16 @@ def find_shortest_distance(playground: list[list[int]], start: OrientedPosition)
 
         for direction in Direction:
             neighbor = move(current_oriented_pos.position, Direction(direction))
-            if 0 <= neighbor.row < len(playground) and 0 <= neighbor.col < len(playground[neighbor.row]) and playground[neighbor.row][neighbor.col] != STONE:
+            if (
+                0 <= neighbor.row < len(playground)
+                and 0 <= neighbor.col < len(playground[neighbor.row])
+                and playground[neighbor.row][neighbor.col] != STONE
+            ):
                 if direction != current_oriented_pos.direction:
                     new_distance = current_distance + 1000
-                    neighbor = OrientedPosition(current_oriented_pos.position, direction)
+                    neighbor = OrientedPosition(
+                        current_oriented_pos.position, direction
+                    )
                 else:
                     new_distance = current_distance + 1
                     neighbor = OrientedPosition(neighbor, direction)
@@ -57,7 +74,7 @@ def find_shortest_distance(playground: list[list[int]], start: OrientedPosition)
 
 
 def solve_01():
-    with (open(filename) as file):
+    with open(filename) as file:
         playground = []
         generator = line_generator(file.readlines())
         start = None
@@ -65,14 +82,26 @@ def solve_01():
         for row_index, line in enumerate(generator):
             line_data = list(line)
             if "S" in line_data:
-                start = OrientedPosition(Position(row_index, line_data.index("S")), Direction.RIGHT)
+                start = OrientedPosition(
+                    Position(row_index, line_data.index("S")), Direction.RIGHT
+                )
             if "E" in line_data:
                 end = Position(row_index, line_data.index("E"))
             playground.append([STONE if col == "#" else 0 for col in line_data])
 
         distances, parents = find_shortest_distance(playground, start)
-        print(min([(distance, orient_pos.direction) for orient_pos, distance in distances.items() if orient_pos.position == end]))
-        path = backtrack_path(start, OrientedPosition(end, Direction.RIGHT), [], parents)
+        print(
+            min(
+                [
+                    (distance, orient_pos.direction)
+                    for orient_pos, distance in distances.items()
+                    if orient_pos.position == end
+                ]
+            )
+        )
+        path = backtrack_path(
+            start, OrientedPosition(end, Direction.RIGHT), [], parents
+        )
         shortest_paths = set(map(lambda p: p.position, path))
         print(len(shortest_paths))
 

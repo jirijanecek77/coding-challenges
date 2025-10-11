@@ -28,9 +28,33 @@ def swap_nodes(head: Optional[ListNode], k: int) -> Optional[ListNode]:
     return head
 
 
+# https://leetcode.com/problems/remove-nth-node-from-end-of-list/
+def removeNthFromEnd(head: Optional[ListNode], n: int) -> Optional[ListNode]:
+    # Input: head = [1,2,3,4,5], n = 2
+    # Output: [1,2,3,5]
+    if not head:
+        return None
+
+    node = head
+    for _ in range(n):
+        node = node.next
+
+    target = head
+    while node and node.next:
+        node = node.next
+        target = target.next
+
+    if not node:
+        head = head.next
+    else:
+        target.next = target.next.next
+
+    return head
+
+
 if __name__ == "__main__":
     head = ListNode(1, ListNode(2, ListNode(3, ListNode(4, ListNode(5)))))
-    swap_nodes(head, 2)
+    removeNthFromEnd(head, 2)
 
     node = head
     while node:

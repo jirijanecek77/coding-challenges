@@ -53,3 +53,48 @@ def test_maxIncreasingSubarrays():
     assert maxIncreasingSubarrays(nums=[1, 2, 3, 4, 4, 4, 4, 5, 6, 7]) == 2
     assert maxIncreasingSubarrays(nums=[-15, 19]) == 1
     assert maxIncreasingSubarrays(nums=[2, 5, 7, 8, 9, 2, 3, 4, 3, 1]) == 3
+
+
+# https://leetcode.com/problems/smallest-missing-non-negative-integer-after-operations/?envType=daily-question&envId=2025-10-16
+def findSmallestInteger(nums: list[int], value: int) -> int:
+    arr = list(range(value))
+    for num in nums:
+        arr[num % value] += value
+    return min(arr)
+
+
+def test_findSmallestInteger():
+    assert (
+        findSmallestInteger(
+            nums=[0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1], value=2
+        )
+        == 15
+    )
+    assert findSmallestInteger(nums=[3, 0, 3, 2, 4, 2, 1, 1, 0, 4], value=5) == 10
+    assert findSmallestInteger(nums=[1, 3, 5, 7], value=2) == 0
+    assert findSmallestInteger(nums=[1, -10, 7, 13, 6, 8], value=5) == 4
+    assert findSmallestInteger(nums=[1, -10, 7, 13, 6, 8], value=7) == 2
+
+
+# https://leetcode.com/problems/maximum-number-of-distinct-elements-after-operations/description/?envType=daily-question&envId=2025-10-18
+def maxDistinctElements(nums: list[int], k: int) -> int:
+    nums.sort()
+    result = 0
+    last_picked = nums[0] - k - 1
+    for num in nums:
+        lower_bound = num - k
+        upper_bound = num + k
+        if last_picked < lower_bound:
+            last_picked = lower_bound
+        else:
+            last_picked += 1
+        if last_picked <= upper_bound:
+            result += 1
+        else:
+            last_picked -= 1
+    return result
+
+
+def test_maxDistinctElements():
+    assert maxDistinctElements(nums=[4, 4, 4, 4], k=1) == 3
+    assert maxDistinctElements(nums=[1, 2, 2, 3, 3, 4], k=2) == 6

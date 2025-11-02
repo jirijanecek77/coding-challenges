@@ -50,3 +50,32 @@ def test_find_target():
         )
         == True
     )
+
+
+def largestValues(root: Optional[TreeNode]) -> list[int]:
+    results = []
+
+    def dfs(node: Optional[TreeNode], level: int):
+        if not node:
+            return
+
+        if level > len(results) - 1:
+            results.append(node.val)
+        else:
+            results[level] = max(results[level], node.val)
+
+        dfs(node.right, level + 1)
+        dfs(node.left, level + 1)
+
+    dfs(root, 0)
+    return results
+
+
+def test_largest_values():
+    assert largestValues(
+        root=TreeNode(
+            val=1,
+            left=TreeNode(3, TreeNode(5), TreeNode(3)),
+            right=TreeNode(val=2, right=TreeNode(9)),
+        )
+    ) == [1, 3, 9]

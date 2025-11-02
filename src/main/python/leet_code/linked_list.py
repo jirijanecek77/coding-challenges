@@ -52,6 +52,22 @@ def removeNthFromEnd(head: Optional[ListNode], n: int) -> Optional[ListNode]:
     return head
 
 
+# https://leetcode.com/problems/delete-nodes-from-linked-list-present-in-array/?envType=daily-question&envId=2025-11-01
+def modifiedList(nums: list[int], head: Optional[ListNode]) -> Optional[ListNode]:
+    dummy_node = ListNode(0, head)
+    last = dummy_node
+    node = head
+    to_delete = set(nums)
+    while node:
+        if node.val in to_delete:
+            last.next = node.next
+        else:
+            last = node
+        node = last.next
+
+    return dummy_node.next
+
+
 if __name__ == "__main__":
     head = ListNode(1, ListNode(2, ListNode(3, ListNode(4, ListNode(5)))))
     removeNthFromEnd(head, 2)

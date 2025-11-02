@@ -73,3 +73,120 @@ def test_missingMultiple():
         )
         == 28
     )
+
+
+def reverseVowels(s: str) -> str:
+    left = 0
+    right = len(s) - 1
+    vowels = {"a", "e", "i", "o", "u", "A", "E", "I", "O", "U"}
+    s = list(s)
+    while left < right:
+        if s[left] not in vowels:
+            left += 1
+        elif s[right] not in vowels:
+            right -= 1
+        else:
+            s[left], s[right] = s[right], s[left]
+            left += 1
+            right -= 1
+
+    return "".join(s)
+
+
+def test_reverseVowels():
+    assert reverseVowels("hello") == "holle"
+    assert reverseVowels("leetcode") == "leotcede"
+
+
+# https://leetcode.com/problems/minimum-number-of-increments-on-subarrays-to-form-a-target-array/?envType=daily-question&envId=2025-10-30
+def minNumberOperations(target: list[int]) -> int:
+    last = 0
+    res = 0
+    for curr in target:
+        if curr > last:
+            res += curr - last
+        last = curr
+    return res
+
+
+def test_minNumberOperations():
+    assert minNumberOperations([2, 4, 1, 9, 10, 9, 1, 7, 1, 2, 9, 1]) == 27
+    assert minNumberOperations([3, 1, 5, 4, 2]) == 7
+    assert minNumberOperations([3, 1, 1, 2]) == 4
+
+
+def numberOfBeams(bank: list[str]) -> int:
+    beams = 0
+    last = 0
+    for row in bank:
+        curr = row.count("1")
+        if curr:
+            beams += last * curr
+            last = curr
+    return beams
+
+
+def test_numberOfBeams():
+    assert numberOfBeams(["011001", "000000", "010100", "001000"]) == 8
+
+
+def setZeroes(matrix: list[list[int]]) -> None:
+    rows = set()
+    cols = set()
+    for i in range(len(matrix)):
+        for j in range(len(matrix[0])):
+            if matrix[i][j] == 0:
+                rows.add(i)
+                cols.add(j)
+    for i in range(len(matrix)):
+        for j in range(len(matrix[0])):
+            if i in rows or j in cols:
+                matrix[i][j] = 0
+
+
+def countUnguarded(
+    m: int, n: int, guards: list[list[int]], walls: list[list[int]]
+) -> int:
+    # Create grid
+    grid = [[0] * n for _ in range(m)]
+
+    # Mark guards and walls
+    for r, c in guards:
+        grid[r][c] = "G"
+    for r, c in walls:
+        grid[r][c] = "W"
+
+    # Directions: left, right, up, down
+    directions = [(0, -1), (0, 1), (-1, 0), (1, 0)]
+
+    # For each guard, mark all cells it can see
+    for gr, gc in guards:
+        for dr, dc in directions:
+            r, c = gr + dr, gc + dc
+
+            # Keep going in this direction until hitting wall/guard/boundary
+            while 0 <= r < m and 0 <= c < n:
+                if grid[r][c] == "W" or grid[r][c] == "G":
+                    break  # Hit wall or another guard
+
+                grid[r][c] = "V"  # Mark as visible/guarded
+                r += dr
+                c += dc
+
+    # Count unguarded cells
+    unguarded = 0
+    for i in range(m):
+        for j in range(n):
+            if grid[i][j] == 0:  # Not guarded, not wall, not guard
+                unguarded += 1
+
+    return unguarded
+
+
+def test_countUnguarded():
+    assert (
+        countUnguarded(
+            m=4, n=6, guards=[[0, 0], [1, 1], [2, 3]], walls=[[0, 1], [2, 2], [1, 4]]
+        )
+        == 7
+    )

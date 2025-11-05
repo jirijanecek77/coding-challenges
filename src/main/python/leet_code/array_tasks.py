@@ -1,3 +1,4 @@
+from collections import Counter
 from math import comb, gcd
 
 
@@ -190,3 +191,20 @@ def test_countUnguarded():
         )
         == 7
     )
+
+
+def sumOfUnique(nums: list[int]) -> int:
+    c = Counter(nums)
+    return sum(a for a, b in c.items() if b == 1)
+
+
+def test_sumOfUnique():
+    assert sumOfUnique([1, 2, 3, 2]) == 4
+
+
+def kClosest(points: list[list[int]], k: int) -> list[list[int]]:
+    return sorted(points, key=lambda p: p[0] ** 2 + p[1] ** 2)[:k]
+
+
+def test_kClosest():
+    assert kClosest([[1, 3], [-2, 2]], 1) == [[-2, 2]]

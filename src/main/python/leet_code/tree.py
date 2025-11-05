@@ -79,3 +79,31 @@ def test_largest_values():
             right=TreeNode(val=2, right=TreeNode(9)),
         )
     ) == [1, 3, 9]
+
+
+def permute(nums: list[int]) -> list[list[int]]:
+    def recursive(
+        arr: list[int], perm: list[int], res: list[list[int]]
+    ) -> list[list[int]]:
+        if not arr:
+            res.append(perm.copy())
+            return res
+
+        for i in range(len(arr)):
+            perm.append(arr[i])
+            recursive(arr[:i] + arr[i + 1 :], perm, res)
+            perm.pop()
+        return res
+
+    return recursive(nums, [], [])
+
+
+def test_permute():
+    assert permute([1, 2, 3]) == [
+        [1, 2, 3],
+        [1, 3, 2],
+        [2, 1, 3],
+        [2, 3, 1],
+        [3, 1, 2],
+        [3, 2, 1],
+    ]

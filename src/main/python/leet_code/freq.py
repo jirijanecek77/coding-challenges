@@ -98,3 +98,31 @@ def maxDistinctElements(nums: list[int], k: int) -> int:
 def test_maxDistinctElements():
     assert maxDistinctElements(nums=[4, 4, 4, 4], k=1) == 3
     assert maxDistinctElements(nums=[1, 2, 2, 3, 3, 4], k=2) == 6
+
+
+def findXSum(nums: list[int], k: int, x: int) -> list[int]:
+    return [
+        sum(
+            k * v
+            for k, v in sorted(
+                Counter(nums[i : i + k]).items(),
+                key=lambda x: (x[1], x[0]),
+                reverse=True,
+            )[:x]
+        )
+        for i in range(len(nums) - k + 1)
+    ]
+
+
+def test_findXSum():
+    assert findXSum(nums=[3, 8, 7, 8, 7, 5], k=2, x=2) == [11, 15, 15, 15, 12]
+    assert findXSum(nums=[1, 1, 2, 2, 3, 4, 2, 3], k=6, x=2) == [6, 10, 12]
+
+
+def frequencySort(s: str) -> str:
+    freq = sorted(Counter(s).items(), key=lambda x: (x[1], x[0]), reverse=True)
+    return "".join(ch * f for ch, f in freq)
+
+
+def test_frequencySort():
+    assert frequencySort("tree") == "eetr"

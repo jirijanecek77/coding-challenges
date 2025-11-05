@@ -79,3 +79,20 @@ def test_coins():
 
     assert dp_coins([1, 3, 4], 6) == 2
     assert dp_coins([1, 3, 5, 10, 20, 50, 100, 200], 520) == 4
+
+
+# https://leetcode.com/problems/minimum-time-to-make-rope-colorful/?envType=daily-question&envId=2025-11-03
+def minCost(colors: str, neededTime: list[int]) -> int:
+    result = 0
+    curr_max = 0
+    for i, time in enumerate(neededTime):
+        if i > 0 and colors[i] != colors[i - 1]:
+            curr_max = 0
+        result += min(curr_max, time)
+        curr_max = max(curr_max, time)
+
+    return result
+
+
+def test_minCost():
+    assert minCost(colors="abaac", neededTime=[1, 2, 3, 4, 5]) == 3

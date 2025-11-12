@@ -1,5 +1,6 @@
 # https://leetcode.com/problems/taking-maximum-energy-from-the-mystic-dungeon/description/?envType=daily-question&envId=2025-10-10
 from collections import Counter
+from functools import lru_cache
 
 
 def maximum_energy(energy: list[int], k: int) -> int:
@@ -83,3 +84,93 @@ def test_longestPalindrome():
     assert longestPalindrome("babad") == "bab"
     assert longestPalindrome("cbbd") == "bb"
     assert longestPalindrome("ahoj") == "a"
+
+
+def findMaxForm(strs: list[str], m: int, n: int) -> int:
+    dp = {(0, 0): 0}
+
+    for s in strs:
+        ones = s.count("1")
+        zeroes = s.count("0")
+        newdp = {}
+
+        for (prevZeroes, prevOnes), val in dp.items():
+            newZeroes, newOnes = prevZeroes + zeroes, prevOnes + ones
+            if newZeroes <= m and newOnes <= n:
+                if (newZeroes, newOnes) not in dp or dp[(newZeroes, newOnes)] < val + 1:
+                    newdp[(newZeroes, newOnes)] = val + 1
+
+        dp.update(newdp)
+
+    return max(dp.values())
+
+
+def test_findMaxForm():
+    assert findMaxForm(["10", "0001", "111001", "1", "0"], 5, 3) == 4
+
+
+@lru_cache
+def knapsack_recursive(
+    w: int, weights: tuple[int, ...], prices: tuple[int, ...], i: int
+):
+    # Base Case
+    if i == 0 or w == 0:
+        return 0
+
+    # If weight of the nth item is
+    # more than Knapsack of capacity W,
+    # then this item cannot be included
+    if weights[i - 1] > w:
+        return knapsack_recursive(w, weights, prices, i - 1)
+
+    # return the maximum of two cases:
+    # (1) nth item included
+    # (2) not included
+    return max(
+        prices[i - 1] + knapsack_recursive(w - weights[i - 1], weights, prices, i - 1),
+        knapsack_recursive(w, weights, prices, i - 1),
+    )
+
+
+def knapsack_2d_dp(
+    capacity: int, weights: tuple[int, ...], prices: tuple[int, ...], n: int
+) -> int:
+    dp = [[0 for _ in range(capacity + 1)] for _ in range(n + 1)]
+
+    for i in range(1, n + 1):
+        for w in range(1, capacity + 1):
+            if weights[i - 1] > w:
+                dp[i][w] = dp[i - 1][w]
+            else:
+                dp[i][w] = max(
+                    prices[i - 1] + dp[i - 1][w - weights[i - 1]], dp[i - 1][w]
+                )
+
+    return dp[-1][-1]
+
+
+def knapsack_1d_dp(
+    capacity: int, weights: tuple[int, ...], prices: tuple[int, ...], n: int
+) -> int:
+    dp = [0 for i in range(capacity + 1)]
+
+    for i in range(1, n + 1):
+
+        # Starting from back,
+        # so that we also have data of
+        # previous computation when taking i-1 items
+        for w in range(capacity, 0, -1):
+            if weights[i - 1] <= w:
+                # Finding the maximum value
+                dp[w] = max(dp[w], dp[w - weights[i - 1]] + prices[i - 1])
+    return dp[-1]
+
+
+def knapsack_problem(capacity: int, weights: list[int], prices: list[int]) -> int:
+    return knapsack_1d_dp(capacity, tuple(weights), tuple(prices), len(prices))
+
+
+def test_knapsack_problem():
+    # assert knapsack_problem(50, [10, 20, 30], [60, 100, 120]) == 220
+    assert knapsack_problem(5, [1, 2, 3, 4], [5, 2, 3, 2]) == 8
+    # assert knapsack_problem(10, [1, 2, 3, 4], [1, 2, 3, 5]) == 11

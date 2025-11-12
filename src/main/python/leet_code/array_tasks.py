@@ -208,3 +208,90 @@ def kClosest(points: list[list[int]], k: int) -> list[list[int]]:
 
 def test_kClosest():
     assert kClosest([[1, 3], [-2, 2]], 1) == [[-2, 2]]
+
+
+def canFormArray(arr: list[int], pieces: list[list[int]]) -> bool:
+    def remove_item(l: list, item) -> list:
+        l.remove(item)
+        return l
+
+    def search(acc: list[int], remains: list[int], available: list[list[int]]) -> bool:
+        if not remains:
+            if not available:
+                return acc == arr
+            else:
+                return False
+
+        return any(
+            search(acc + piece, remains[len(piece) :], remove_item(available, piece))
+            for piece in available
+            if piece[0] == remains[0]
+        )
+
+    return search([], arr, list(pieces))
+
+
+def test_canFormArray():
+    assert canFormArray(arr=[91, 4, 64, 78], pieces=[[78], [4, 64], [91]]) == True
+    assert canFormArray(arr=[49, 18, 16], pieces=[[16, 18, 49]]) == False
+
+
+def numPairsDivisibleBy60(time: list[int]) -> int:
+    result = 0
+    counter = [0] * 60
+
+    for t in time:
+        r = t % 60
+        result += counter[((60 - (r)) % 60)]
+        counter[r] += 1
+    return result
+
+
+def test_numPairsDivisibleBy60():
+    assert (
+        numPairsDivisibleBy60(
+            [418, 204, 77, 278, 239, 457, 284, 263, 372, 279, 476, 416, 360, 18]
+        )
+        == 1
+    )
+    assert numPairsDivisibleBy60([18, 18, 71, 471, 121, 362, 467, 107, 138, 254]) == 0
+    assert numPairsDivisibleBy60([20, 40]) == 1
+    assert numPairsDivisibleBy60([60, 60, 60]) == 3
+    assert numPairsDivisibleBy60([30, 20, 150, 100, 40]) == 3
+
+
+# https://leetcode.com/problems/minimum-number-of-operations-to-make-all-array-elements-equal-to-1/description/?envType=daily-question&envId=2025-11-12
+def minOperations(nums: list[int]) -> int:
+    n = len(nums)
+    if q := nums.count(1):
+        return n - q
+    return next(
+        (
+            w + n - 2
+            for w in range(n + 1)
+            for i in range(n - w + 1)
+            if gcd(*nums[i : i + w]) == 1
+        ),
+        -1,
+    )
+
+
+def test_minOperations():
+    assert minOperations([6, 10, 15]) == 4
+
+
+def isRectangleOverlap(rec1: list[int], rec2: list[int]) -> bool:
+    x1 = (rec1[0], rec1[2])
+    x2 = (rec2[0], rec2[2])
+    x = sorted([x1, x2])
+
+    y1 = (rec1[1], rec1[3])
+    y2 = (rec2[1], rec2[3])
+    y = sorted([y1, y2])
+
+    return x[0][1] > x[1][0] and y[0][1] > y[1][0]
+
+
+def test_isRectangleOverlap():
+    assert isRectangleOverlap(rec1=[0, 0, 1, 1], rec2=[1, 0, 2, 1]) == False
+    assert isRectangleOverlap([0, 0, 2, 2], [1, 1, 3, 3]) == True

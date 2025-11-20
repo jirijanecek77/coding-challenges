@@ -108,3 +108,43 @@ def countOperations(num1: int, num2: int) -> int:
 
 def test_countOperations():
     assert countOperations(num1=2, num2=3) == 3
+
+
+def findPeakElement(nums: list[int]) -> int:
+    left = 0
+    right = len(nums) - 1
+    while left < right:
+        mid = (left + right) // 2
+        if nums[mid] > nums[mid + 1]:
+            return mid
+        else:
+            left = mid + 1
+    return left
+
+
+def test_findPeakElement():
+    assert findPeakElement([4, 1, 2, 3]) == 3
+    assert findPeakElement([1, 2, 3, 1]) == 2
+    assert findPeakElement([1, 2, 3, 4]) == 3
+
+
+def find_first_true(arr: list[bool]) -> int:
+    left = 0
+    right = len(arr) - 1
+    result = -1
+
+    while left <= right:
+        mid = (left + right) // 2
+        if arr[mid]:
+            result = mid
+            right = mid - 1
+        else:
+            left = mid + 1
+    return result
+
+
+def test_find_first_true():
+    assert find_first_true([True, True, True, True]) == 0
+    assert find_first_true([False, True, True, True]) == 1
+    assert find_first_true([False, False]) == -1
+    assert find_first_true([]) == -1

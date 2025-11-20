@@ -174,3 +174,27 @@ def test_knapsack_problem():
     # assert knapsack_problem(50, [10, 20, 30], [60, 100, 120]) == 220
     assert knapsack_problem(5, [1, 2, 3, 4], [5, 2, 3, 2]) == 8
     # assert knapsack_problem(10, [1, 2, 3, 4], [1, 2, 3, 5]) == 11
+
+
+# https://leetcode.com/problems/number-of-dice-rolls-with-target-sum/description/
+def numRollsToTarget(n: int, k: int, target: int) -> int:
+    mod = 10**9 + 7
+
+    prev = [0] * (target + 1)
+    curr = [0] * (target + 1)
+
+    prev[0] = 1
+
+    for i in range(1, n + 1):
+        for j in range(1, target + 1):
+            ans = 0
+            for x in range(1, k + 1):
+                if j - x >= 0:
+                    ans += prev[j - x] % mod
+            curr[j] = ans
+        prev = curr[:]
+    return int(prev[-1] % mod)
+
+
+def test_numRollsToTarget():
+    assert numRollsToTarget(n=30, k=30, target=500) == 222616187

@@ -1,5 +1,6 @@
 # https://leetcode.com/problems/maximum-units-on-a-truck/description/
 from functools import lru_cache
+from itertools import accumulate
 
 
 def maximum_units(boxTypes: list[list[int]], truckSize: int) -> int:
@@ -96,3 +97,16 @@ def minCost(colors: str, neededTime: list[int]) -> int:
 
 def test_minCost():
     assert minCost(colors="abaac", neededTime=[1, 2, 3, 4, 5]) == 3
+
+
+def maxOperations(s: str) -> int:
+    prefix_sum = list(accumulate(int(c) for c in s))
+    return sum(
+        prefix_sum[i] for i, c in enumerate(s) if c == "0" and i > 0 and s[i - 1] == "1"
+    )
+
+
+def test_maxOperations():
+    assert maxOperations(s="1001101") == 4
+    assert maxOperations(s="00111") == 0
+    assert maxOperations(s="1011001010") == 13

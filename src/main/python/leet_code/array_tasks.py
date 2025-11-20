@@ -1,4 +1,5 @@
 from collections import Counter
+from itertools import accumulate
 from math import comb, gcd
 
 
@@ -295,3 +296,120 @@ def isRectangleOverlap(rec1: list[int], rec2: list[int]) -> bool:
 def test_isRectangleOverlap():
     assert isRectangleOverlap(rec1=[0, 0, 1, 1], rec2=[1, 0, 2, 1]) == False
     assert isRectangleOverlap([0, 0, 2, 2], [1, 1, 3, 3]) == True
+
+
+def relativeSortArray(arr1: list[int], arr2: list[int]) -> list[int]:
+    key = {v: i for i, v in enumerate(arr2)}
+    return sorted(arr1, key=lambda x: key.get(x, len(key) + x))
+
+
+def test_relativeSortArray():
+    assert relativeSortArray(
+        arr1=[2, 3, 1, 3, 2, 4, 6, 7, 9, 2, 19], arr2=[2, 1, 4, 3, 9, 6]
+    ) == [2, 2, 2, 1, 4, 3, 3, 9, 6, 7, 19]
+
+
+def rangeAddQueries(n: int, queries: list[list[int]]) -> list[list[int]]:
+    prefix_sum = [[0] * n for _ in range(n)]
+    for query in queries:
+        row1, col1, row2, col2 = query
+        for row in range(row1, row2 + 1):
+            prefix_sum[row][col1] += 1
+            if col2 + 1 < n:
+                prefix_sum[row][col2 + 1] -= 1
+
+    return [list(accumulate(row)) for row in prefix_sum]
+
+
+def test_rangeAddQueries():
+    assert rangeAddQueries(n=3, queries=[[1, 1, 2, 2], [0, 0, 1, 1]]) == [
+        [1, 1, 0],
+        [1, 2, 1],
+        [0, 1, 1],
+    ]
+
+
+def longestValidParentheses(s: str) -> int:
+    stack = [-1]  # Base index
+    max_length = 0
+
+    for i, char in enumerate(s):
+        if char == "(":
+            stack.append(i)
+        else:
+            stack.pop()
+            if not stack:
+                stack.append(i)
+            else:
+                max_length = max(max_length, i - stack[-1])
+
+    return max_length
+
+
+def test_longestValidParentheses():
+    assert longestValidParentheses(s=")()())") == 4
+    assert longestValidParentheses(s="()(()") == 2
+    assert longestValidParentheses(s="(()") == 2
+
+
+def prisonAfterNDays(cells: list[int], n: int) -> list[int]:
+
+    def calc(arr: list[int]) -> list[int]:
+        new_state = [0] * len(arr)
+        for i in range(1, len(arr) - 1):
+            new_state[i] = 1 if arr[i - 1] == arr[i + 1] else 0
+        return new_state
+
+    tortoise = cells
+    hare = calc(tortoise)
+
+    before_cycle_counter = 0
+    while hare != tortoise:
+        tortoise = calc(tortoise)
+        hare = calc(calc(hare))
+        before_cycle_counter += 1
+
+    cycle_counter = 1
+    tortoise = calc(tortoise)
+
+    while hare != tortoise:
+        tortoise = calc(tortoise)
+        cycle_counter += 1
+
+    remains = (n - before_cycle_counter) % cycle_counter
+    for i in range(remains):
+        tortoise = calc(tortoise)
+
+    return tortoise
+
+
+def test_prisonAfterNDays():
+    assert prisonAfterNDays(cells=[0, 1, 0, 1, 1, 0, 0, 1], n=7) == [
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+    ]
+    assert prisonAfterNDays(cells=[1, 0, 0, 1, 0, 0, 1, 0], n=1000000000) == [
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+    ]
+
+
+def balancedStringSplit(s: str) -> int:
+    prefix_sum = list(accumulate(map(lambda x: 1 if x == "L" else -1, s)))
+    return prefix_sum.count(0)
+
+
+def test_balancedStringSplit():
+    assert balancedStringSplit(s="RLRRLLRLRL") == 4

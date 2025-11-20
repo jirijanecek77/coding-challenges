@@ -1,3 +1,7 @@
+import re
+from collections import Counter
+
+
 def isPalindrome(x: int) -> bool:
     if x < 0:
         return False
@@ -40,3 +44,70 @@ def addStrings(num1: str, num2: str) -> str:
 
 def test_addStrings():
     assert addStrings(num1="123", num2="10") == "133"
+
+
+def repeatedSubstringPattern(s: str) -> bool:
+    if len(s) <= 1:
+        return False
+    k = ""
+    for i in range(len(s) // 2):
+        k = k + s[i]
+        m = len(s) // len(k)
+        if k * m == s:
+            return True
+    return False
+
+
+def test_repeatedSubstringPattern():
+    assert repeatedSubstringPattern(s="aba") == False
+    assert repeatedSubstringPattern(s="abcabcabc") == True
+    assert repeatedSubstringPattern(s="abab") == True
+    assert repeatedSubstringPattern(s="abaaabaaabaa") == True
+    assert repeatedSubstringPattern(s="blablab") == False
+
+
+def numSub(s: str) -> int:
+    return sum(
+        map(
+            lambda n: ((n + 1) * n // 2) % 1000000007,
+            (len(e) for e in s.split("0")),
+        )
+    )
+
+
+def test_numSub():
+    assert numSub(s="1111") == 10
+    assert numSub(s="0110") == 3
+    assert numSub(s="0000") == 0
+    assert numSub(s="01100111") == 9
+    assert numSub(s="101") == 2
+
+
+def commonChars(words: list[str]) -> list[str]:
+    min_freq = Counter(words[0])
+    for word in words:
+        min_freq &= Counter(word)
+    return list(min_freq.elements())
+
+
+def test_commonChars():
+    assert commonChars(words=["bellla", "label", "roller"]) == ["e", "l", "l"]
+
+
+def mostCommonWord(paragraph: str, banned: list[str]) -> str:
+    pattern = re.compile(r"[!?',;.]")
+    words = pattern.sub("", paragraph).lower().split(" ")
+    counter = Counter(words)
+    for word in banned:
+        counter.pop(word, None)
+    return counter.most_common(1)[0][0]
+
+
+def test_mostCommonWord():
+    assert (
+        mostCommonWord(
+            paragraph="Bob hit a ball, the hit BALL flew far after it was hit.",
+            banned=["hit"],
+        )
+        == "ball"
+    )

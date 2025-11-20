@@ -1,7 +1,7 @@
 import heapq
 
 
-class DisjointUnionSets:
+class UnionSet:
     def __init__(self, n: int):
         self.parent = list(range(n))
         self.rank = [1] * n
@@ -32,7 +32,7 @@ class DisjointUnionSets:
 # https://leetcode.com/problems/number-of-provinces/description/
 def findCircleNum(is_connected: list[list[int]]) -> int:
     n = len(is_connected)
-    disjoint_sets = DisjointUnionSets(n)
+    disjoint_sets = UnionSet(n)
 
     for i in range(n):
         for j in range(i + 1, n):
@@ -66,7 +66,7 @@ def test_findCircleNum():
 def processQueries(
     c: int, connections: list[list[int]], queries: list[list[int]]
 ) -> list[int]:
-    disjoint_sets = DisjointUnionSets(c + 1)
+    disjoint_sets = UnionSet(c + 1)
 
     for conn in connections:
         disjoint_sets.union(conn[0], conn[1])

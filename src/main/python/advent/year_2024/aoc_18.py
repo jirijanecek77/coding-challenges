@@ -54,14 +54,16 @@ def solve_01():
 
 def find_by_bisection(n: int, obstacles: list[tuple[int, int]]) -> int:
     left = 0
-    right = len(obstacles)
-    while left < right - 1:
-        mid = (left + right) // 2 + 1
+    right = len(obstacles) - 1
+    result = -1
+    while left <= right:
+        mid = (left + right) // 2
         if shortest_path(obstacles[0:mid], n + 1) == 0:
-            right = (left + right) // 2
+            result = mid - 1
+            right = mid - 1
         else:
-            left = (left + right) // 2
-    return right
+            left = mid + 1
+    return result
 
 
 if __name__ == "__main__":

@@ -110,3 +110,16 @@ def test_maxOperations():
     assert maxOperations(s="1001101") == 4
     assert maxOperations(s="00111") == 0
     assert maxOperations(s="1011001010") == 13
+
+
+def maxSumDivThree(nums: list[int]) -> int:
+    dp = [0] * (len(nums) + 1)
+    for num in nums:
+        dp[num % 3 + 1] = max(dp[num % 3 + 1], dp[num % 3] + num)
+    return dp[-1]
+
+
+def test_maxSumDivThree():
+    assert maxSumDivThree(nums=[1, 2, 3, 4, 4]) == 12
+    assert maxSumDivThree(nums=[3, 6, 5, 1, 8]) == 18
+    assert maxSumDivThree(nums=[1, 1, 1]) == 3

@@ -1,5 +1,5 @@
+import itertools
 from collections import Counter
-from itertools import accumulate
 from math import comb, gcd
 
 
@@ -75,29 +75,6 @@ def test_missingMultiple():
         )
         == 28
     )
-
-
-def reverseVowels(s: str) -> str:
-    left = 0
-    right = len(s) - 1
-    vowels = {"a", "e", "i", "o", "u", "A", "E", "I", "O", "U"}
-    s = list(s)
-    while left < right:
-        if s[left] not in vowels:
-            left += 1
-        elif s[right] not in vowels:
-            right -= 1
-        else:
-            s[left], s[right] = s[right], s[left]
-            left += 1
-            right -= 1
-
-    return "".join(s)
-
-
-def test_reverseVowels():
-    assert reverseVowels("hello") == "holle"
-    assert reverseVowels("leetcode") == "leotcede"
 
 
 # https://leetcode.com/problems/minimum-number-of-increments-on-subarrays-to-form-a-target-array/?envType=daily-question&envId=2025-10-30
@@ -309,26 +286,6 @@ def test_relativeSortArray():
     ) == [2, 2, 2, 1, 4, 3, 3, 9, 6, 7, 19]
 
 
-def rangeAddQueries(n: int, queries: list[list[int]]) -> list[list[int]]:
-    prefix_sum = [[0] * n for _ in range(n)]
-    for query in queries:
-        row1, col1, row2, col2 = query
-        for row in range(row1, row2 + 1):
-            prefix_sum[row][col1] += 1
-            if col2 + 1 < n:
-                prefix_sum[row][col2 + 1] -= 1
-
-    return [list(accumulate(row)) for row in prefix_sum]
-
-
-def test_rangeAddQueries():
-    assert rangeAddQueries(n=3, queries=[[1, 1, 2, 2], [0, 0, 1, 1]]) == [
-        [1, 1, 0],
-        [1, 2, 1],
-        [0, 1, 1],
-    ]
-
-
 def longestValidParentheses(s: str) -> int:
     stack = [-1]  # Base index
     max_length = 0
@@ -352,64 +309,69 @@ def test_longestValidParentheses():
     assert longestValidParentheses(s="(()") == 2
 
 
-def prisonAfterNDays(cells: list[int], n: int) -> list[int]:
-
-    def calc(arr: list[int]) -> list[int]:
-        new_state = [0] * len(arr)
-        for i in range(1, len(arr) - 1):
-            new_state[i] = 1 if arr[i - 1] == arr[i + 1] else 0
-        return new_state
-
-    tortoise = cells
-    hare = calc(tortoise)
-
-    before_cycle_counter = 0
-    while hare != tortoise:
-        tortoise = calc(tortoise)
-        hare = calc(calc(hare))
-        before_cycle_counter += 1
-
-    cycle_counter = 1
-    tortoise = calc(tortoise)
-
-    while hare != tortoise:
-        tortoise = calc(tortoise)
-        cycle_counter += 1
-
-    remains = (n - before_cycle_counter) % cycle_counter
-    for i in range(remains):
-        tortoise = calc(tortoise)
-
-    return tortoise
+def largestTimeFromDigits(arr: list[int]) -> str:
+    permutations = list(
+        filter(lambda x: x <= (2, 3, 5, 9), itertools.permutations(arr))
+    )
+    if not permutations:
+        return ""
+    result = max(permutations)
+    return f"{result[0]}{result[1]}:{result[2]}{result[3]}"
 
 
-def test_prisonAfterNDays():
-    assert prisonAfterNDays(cells=[0, 1, 0, 1, 1, 0, 0, 1], n=7) == [
-        0,
-        0,
-        1,
-        1,
-        0,
-        0,
-        0,
-        0,
+def test_largestTimeFromDigits():
+    assert largestTimeFromDigits([1, 2, 3, 4]) == "23:41"
+
+
+# https://leetcode.com/problems/buddy-strings/description/
+def buddyStrings(s: str, goal: str) -> bool:
+    if len(s) != len(goal):
+        return False
+
+    if s == goal and len(set(s)) < len(s):
+        return True
+
+    diffs = [(a, b) for a, b in zip(s, goal) if a != b]
+    if len(diffs) == 2:
+        first, second = diffs
+        return first == second[::-1]
+
+    return False
+
+
+def test_buddyStrings():
+    assert buddyStrings("acccccb", "bccccca") == True
+    assert buddyStrings("ab", "ba") == True
+    assert buddyStrings("aa", "aa") == True
+    assert buddyStrings("ab", "ab") == False
+
+
+# https://leetcode.com/problems/sort-the-matrix-diagonally/description/
+def diagonalSort(mat: list[list[int]]) -> list[list[int]]:
+    n = len(mat)
+    m = len(mat[0])
+
+    def traverse(row: int, col: int, arr: list[int]):
+        if row >= n or col >= m:
+            arr.sort()
+            return
+
+        arr.append(mat[row][col])
+        traverse(row + 1, col + 1, arr)
+        mat[row][col] = arr.pop()
+
+    for i in range(n):
+        traverse(i, 0, [])
+
+    for i in range(m):
+        traverse(0, i, [])
+
+    return mat
+
+
+def test_diagonalSort():
+    assert diagonalSort(mat=[[3, 3, 1, 1], [2, 2, 1, 2], [1, 1, 1, 2]]) == [
+        [1, 1, 1, 1],
+        [1, 2, 2, 2],
+        [1, 2, 3, 3],
     ]
-    assert prisonAfterNDays(cells=[1, 0, 0, 1, 0, 0, 1, 0], n=1000000000) == [
-        0,
-        0,
-        1,
-        1,
-        1,
-        1,
-        1,
-        0,
-    ]
-
-
-def balancedStringSplit(s: str) -> int:
-    prefix_sum = list(accumulate(map(lambda x: 1 if x == "L" else -1, s)))
-    return prefix_sum.count(0)
-
-
-def test_balancedStringSplit():
-    assert balancedStringSplit(s="RLRRLLRLRL") == 4

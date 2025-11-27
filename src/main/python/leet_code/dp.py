@@ -198,3 +198,52 @@ def numRollsToTarget(n: int, k: int, target: int) -> int:
 
 def test_numRollsToTarget():
     assert numRollsToTarget(n=30, k=30, target=500) == 222616187
+
+
+# https://leetcode.com/problems/paths-in-matrix-whose-sum-is-divisible-by-k/description/?envType=daily-question&envId=2025-11-26
+def numberOfPaths(grid: list[list[int]], k: int) -> int:
+    memo = {}
+
+    def dfs(row: int, col: int, reminder: int) -> int:
+        rows = len(grid)
+        cols = len(grid[0])
+        if row > rows - 1 or col > cols - 1:
+            return 0
+
+        if (row, col, reminder) in memo:
+            return memo[(row, col, reminder)]
+
+        curr_reminder = (reminder + grid[row][col]) % k
+        if row == rows - 1 and col == cols - 1:
+            res = 1 if curr_reminder == 0 else 0
+            memo[(row, col, reminder)] = res
+            return res
+
+        res = (dfs(row + 1, col, curr_reminder) + dfs(row, col + 1, curr_reminder)) % (
+            10**9 + 7
+        )
+        memo[(row, col, reminder)] = res
+        return res
+
+    return dfs(0, 0, 0)
+
+
+def numberOfPaths_dp(grid: list[list[int]], k: int) -> int:
+    rows, cols = len(grid), len(grid[0])
+
+    dp = [[[0] * k for _ in range(cols + 1)] for _ in range(rows + 1)]
+    dp[1][1][grid[0][0] % k] = 1
+    for row in range(rows):
+        for col in range(cols):
+            if row == 0 and col == 0:
+                continue
+            val = grid[row][col] % k
+            for idx in range(k):
+                k_idx = (k + idx - val) % k
+                res = dp[row + 1][col][k_idx] + dp[row][col + 1][k_idx]
+                dp[row + 1][col + 1][idx] = res % 1000000007
+    return dp[-1][-1][0]
+
+
+def test_numberOfPaths():
+    assert numberOfPaths_dp(grid=[[5, 2, 4], [3, 0, 5], [0, 7, 2]], k=3) == 2

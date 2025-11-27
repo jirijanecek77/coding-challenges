@@ -1,3 +1,6 @@
+import math
+
+
 def calculate_prefix_sum(nums: list[int]) -> list[int]:
     n = len(nums)
     if n == 0:
@@ -38,3 +41,21 @@ def sum_odd_length_subarrays(arr: list[int]) -> int:
 
 if __name__ == "__main__":
     print(sum_odd_length_subarrays([1, 4, 2, 5, 3]))
+
+
+def maxSubarraySum(nums: list[int], k: int) -> int:
+    prefix_sum = 0
+    sub_max = -math.inf
+    min_so_far = [math.inf] * k
+    min_so_far[-1] = 0
+
+    for i, num in enumerate(nums):
+        prefix_sum += num
+        sub_max = max(sub_max, prefix_sum - min_so_far[i % k])
+        min_so_far[i % k] = min(min_so_far[i % k], prefix_sum)
+
+    return sub_max
+
+
+def test_maxSubarraySum():
+    assert maxSubarraySum(nums=[-1, -2, -3, -4, -5], k=4) == -10

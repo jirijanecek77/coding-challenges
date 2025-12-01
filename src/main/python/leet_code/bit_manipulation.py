@@ -43,3 +43,17 @@ def test_prefixesDivBy5():
         False,
         False,
     ]
+
+
+# https://leetcode.com/problems/number-of-1-bits/description/
+def hammingWeight(n: int) -> int:
+    res = 0
+    while n > 0:
+        n &= n - 1
+        res += 1
+
+    return res
+
+
+def test_hammingWeight():
+    assert hammingWeight(11) == 3

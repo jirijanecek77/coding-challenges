@@ -65,14 +65,37 @@ def modifiedList(nums: list[int], head: Optional[ListNode]) -> Optional[ListNode
             last = node
         node = last.next
 
-    return dummy_node.next
+    return
+
+
+def addTwoNumbers(l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+    carry = 0
+    head = last_node = None
+    while l1 or l2:
+        val = carry
+        if l1:
+            val += l1.val
+            l1 = l1.next
+        if l2:
+            val += l2.val
+            l2 = l2.next
+        carry, val = divmod(val, 10)
+        node = ListNode(val)
+        if not head:
+            head = last_node = node
+        else:
+            last_node.next = node
+            last_node = last_node.next
+    if carry:
+        last_node.next = ListNode(carry)
+    return head
 
 
 if __name__ == "__main__":
-    head = ListNode(1, ListNode(2, ListNode(3, ListNode(4, ListNode(5)))))
-    removeNthFromEnd(head, 2)
+    l1 = ListNode(2, ListNode(4, ListNode(3)))
+    l2 = ListNode(5, ListNode(6, ListNode(4)))
+    node = addTwoNumbers(l1, l2)
 
-    node = head
     while node:
         print(node.val)
         node = node.next

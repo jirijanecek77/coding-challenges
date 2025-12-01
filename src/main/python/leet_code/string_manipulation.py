@@ -111,3 +111,23 @@ def test_mostCommonWord():
         )
         == "ball"
     )
+
+
+# https://leetcode.com/problems/roman-to-integer/description/
+def romanToInt(s: str) -> int:
+    roman_to_int = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
+
+    n = len(s)
+    result = 0
+    for i in range(n):
+        value = roman_to_int[s[i]]
+        if i + 1 < n and value < roman_to_int[s[i + 1]]:
+            result -= value
+        else:
+            result += value
+    return result
+
+
+def test_romanToInt():
+    assert romanToInt(s="MCMIV") == 1904
+    assert romanToInt(s="LVIII") == 58

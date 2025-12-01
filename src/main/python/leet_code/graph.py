@@ -1,5 +1,5 @@
 import heapq
-from collections import defaultdict
+from collections import defaultdict, deque
 
 
 # https://leetcode.com/problems/lexicographically-smallest-string-after-applying-operations/description/?envType=daily-question&envId=2025-10-19
@@ -557,3 +557,34 @@ def minReorder(n: int, connections: list[list[int]]) -> int:
 
 def test_minReorder():
     assert minReorder(n=6, connections=[[0, 1], [1, 3], [2, 3], [4, 0], [4, 5]]) == 3
+
+
+def orangesRotting(grid: list[list[int]]) -> int:
+    if all(cell == 0 for row in grid for cell in row):
+        return 0
+    rotten = []
+    for i, row in enumerate(grid):
+        for j, cell in enumerate(row):
+            if cell == 2:
+                rotten.append((i, j))
+
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    minutes = -1
+    queue = deque(rotten)
+    while queue:
+        minutes += 1
+        n = len(queue)
+        for _ in range(n):
+            i, j = queue.popleft()
+            for dr, dc in directions:
+                ni, nj = i + dr, j + dc
+                if 0 <= ni < len(grid) and 0 <= nj < len(grid[0]) and grid[ni][nj] == 1:
+                    grid[ni][nj] = 2
+                    queue.append((ni, nj))
+
+    return minutes if not any(cell == 1 for row in grid for cell in row) else -1
+
+
+def test_orangesRotting():
+    assert orangesRotting([[0]]) == 0
+    assert orangesRotting([[2, 1, 1], [1, 1, 0], [0, 1, 1]]) == 4

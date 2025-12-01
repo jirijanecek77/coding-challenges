@@ -375,3 +375,15 @@ def test_diagonalSort():
         [1, 2, 2, 2],
         [1, 2, 3, 3],
     ]
+
+
+def generateSpiralMatrix(n: int) -> list[list[int]]:
+    result = [[0] * n for _ in range(n)]
+    while matrix:
+        result += matrix.pop(0)
+        matrix = (list(zip(*matrix)))[::-1]
+    return result
+
+
+def test_generateSpiralMatrix():
+    assert generateSpiralMatrix(3) == [[1, 2, 3], [8, 9, 4], [7, 6, 5]]

@@ -131,3 +131,52 @@ def romanToInt(s: str) -> int:
 def test_romanToInt():
     assert romanToInt(s="MCMIV") == 1904
     assert romanToInt(s="LVIII") == 58
+
+
+def validateCoupons(
+    code: list[str], businessLine: list[str], isActive: list[bool]
+) -> list[str]:
+
+    def is_valid_code(code: str) -> bool:
+        if not code:
+            return False
+
+        for ch in code:
+            i = ord(ch)
+            if not (
+                ord("a") <= i <= ord("z")
+                or ord("A") <= i <= ord("Z")
+                or ord("0") <= i <= ord("9")
+                or i == ord("_")
+            ):
+                return False
+        return True
+
+    valid_lines = ["electronics", "grocery", "pharmacy", "restaurant"]
+
+    return list(
+        map(
+            lambda x: x[0],
+            sorted(
+                (
+                    (c, valid_lines.index(line))
+                    for c, line, active in zip(code, businessLine, isActive)
+                    if active and line in valid_lines and is_valid_code(c)
+                ),
+                key=lambda x: (x[1], x[0]),
+            ),
+        )
+    )
+
+
+def test_validateCoupons():
+    assert validateCoupons(
+        code=["GROCERY15", "ELECTRONICS_50", "DISCOUNT10"],
+        businessLine=["grocery", "electronics", "invalid"],
+        isActive=[False, True, True],
+    ) == ["ELECTRONICS_50"]
+
+
+def heightChecker(heights: list[int]) -> int:
+    expected = sorted(heights)
+    return [i for i, (e, h) in enumerate(zip(expected, heights)) if e != h]

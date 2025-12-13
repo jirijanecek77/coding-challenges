@@ -11,15 +11,14 @@ class Direction(str, Enum):
     RIGHT = ">"
 
 
-Position = namedtuple(
-    "Position",
-    ["row", "col"],
-    defaults=(0, 0))
+Position = namedtuple("Position", ["row", "col"], defaults=(0, 0))
+Point = namedtuple("Point", ["x", "y"], defaults=(0, 0))
 
 OrientedPosition = namedtuple(
     "OrientedPosition",
     ["position", "direction"],
-    defaults=(Position(0, 0), Direction.RIGHT))
+    defaults=(Position(0, 0), Direction.RIGHT),
+)
 
 
 def vector_sum(a: Vector, b: Vector) -> Vector:
@@ -65,5 +64,5 @@ def move_right(position: Position) -> Position:
     return Position(position.row, position.col + 1)
 
 
-def is_in_playground(position: Position, playground_size: int) -> bool:
+def is_in_matrix(position: Position, playground_size: int) -> bool:
     return 0 <= position.row < playground_size and 0 <= position.col < playground_size

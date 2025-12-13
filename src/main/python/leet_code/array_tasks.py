@@ -1,5 +1,5 @@
 import itertools
-from collections import Counter
+from collections import Counter, defaultdict
 from math import comb, gcd
 
 
@@ -387,3 +387,65 @@ def generateSpiralMatrix(n: int) -> list[list[int]]:
 
 def test_generateSpiralMatrix():
     assert generateSpiralMatrix(3) == [[1, 2, 3], [8, 9, 4], [7, 6, 5]]
+
+
+def countCoveredBuildings(n: int, buildings: list[list[int]]) -> int:
+    row_map = defaultdict(list)
+    col_map = defaultdict(list)
+
+    for building in buildings:
+        row_map[building[0]].append(building[1])
+        col_map[building[1]].append(building[0])
+
+    for row in row_map:
+        row_map[row].sort()
+    for col in col_map:
+        col_map[col].sort()
+
+    res = 0
+    for building in buildings:
+        row = building[0]
+        col = building[1]
+
+        row_neighbs = row_map[row]
+        col_neighbs = col_map[col]
+
+        if (
+            0 < row_neighbs.index(col) < len(row_neighbs) - 1
+            and 0 < col_neighbs.index(row) < len(col_neighbs) - 1
+        ):
+            res += 1
+    return res
+
+
+def test_countCoveredBuildings():
+    assert (
+        countCoveredBuildings(n=5, buildings=[[1, 3], [3, 2], [3, 3], [3, 5], [5, 3]])
+        == 1
+    )
+
+
+# https://leetcode.com/problems/count-special-triplets/?envType=daily-question&envId=2025-12-12
+def specialTriplets(nums: list[int]) -> int:
+    MOD = 10**9 + 7
+    freqPrev = defaultdict(int)
+    freqNext = defaultdict(int)
+
+    for num in nums:
+        freqNext[num] += 1
+
+    res = 0
+    for num in nums:
+        freqNext[num] -= 1
+        t = num * 2
+        res += freqPrev[t] * freqNext[t]
+        res %= MOD
+        freqPrev[num] += 1
+
+    return res
+
+
+def test_specialTriplets():
+    assert specialTriplets(nums=[8, 4, 2, 8, 4]) == 2
+    assert specialTriplets(nums=[0, 1, 0, 0]) == 1
+    assert specialTriplets(nums=[37, 9, 24, 12, 12, 24, 52, 35]) == 2

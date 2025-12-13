@@ -1,11 +1,11 @@
 from itertools import permutations
 
-from utils import (
+from advent.utils import (
     line_generator,
     get_vector,
     Position,
     move_to_position,
-    is_in_playground,
+    is_in_matrix,
 )
 
 filename = "data/aoc_08.txt"
@@ -21,7 +21,7 @@ def calculate_for_frequency(
     for pos_pair in position_pairs:
         direction_vector = get_vector(pos_pair[0], pos_pair[1])
         new_position = pos_pair[1]
-        while is_in_playground(
+        while is_in_matrix(
             (new_position := move_to_position(new_position, direction_vector)),
             playground_size,
         ):

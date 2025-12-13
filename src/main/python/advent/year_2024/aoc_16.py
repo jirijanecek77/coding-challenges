@@ -1,6 +1,6 @@
 import heapq
 
-from utils import line_generator, Position, Direction, move, OrientedPosition
+from advent.utils import line_generator, Position, Direction, move, OrientedPosition
 
 filename = "data/aoc_16.txt"
 

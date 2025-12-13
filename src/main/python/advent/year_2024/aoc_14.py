@@ -1,6 +1,6 @@
 import re
 
-from utils import line_generator, Position, Vector
+from advent.utils import line_generator, Position, Vector
 
 filename = "data/aoc_14.txt"
 max_x = 101

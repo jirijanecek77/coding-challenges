@@ -1,6 +1,6 @@
 import copy
 
-from utils import (
+from advent.utils import (
     line_generator,
     Position,
     move_up,

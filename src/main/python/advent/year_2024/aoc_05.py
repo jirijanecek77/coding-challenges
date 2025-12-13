@@ -1,4 +1,4 @@
-from utils import line_generator
+from advent.utils import line_generator
 
 filename = "data/aoc_05.txt"
 
@@ -8,7 +8,7 @@ def check(values: list[str], edges: dict[str, list[str]]):
         if values[i] in edges.keys():
             for j in range(len(values[:i])):
                 if values[j] in edges[values[i]]:
-                    values = values[:j] + [values[i]] + values[j:i] + values[i + 1:]
+                    values = values[:j] + [values[i]] + values[j:i] + values[i + 1 :]
                     break
 
     return values

@@ -1,6 +1,6 @@
 from functools import cache
 
-from utils import line_generator
+from advent.utils import line_generator
 
 filename = "data/test.txt"
 

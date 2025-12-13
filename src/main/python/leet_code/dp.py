@@ -247,3 +247,35 @@ def numberOfPaths_dp(grid: list[list[int]], k: int) -> int:
 
 def test_numberOfPaths():
     assert numberOfPaths_dp(grid=[[5, 2, 4], [3, 0, 5], [0, 7, 2]], k=3) == 2
+
+
+def uniquePaths(m: int, n: int) -> int:
+    memo = {}
+
+    def dfs(x, y) -> int:
+        if (x, y) in memo:
+            return memo[(x, y)]
+        if x >= m or y >= n:
+            memo[(x, y)] = 0
+        elif x == m - 1 and y == n - 1:
+            memo[(x, y)] = 1
+        else:
+            memo[(x, y)] = dfs(x + 1, y) + dfs(x, y + 1)
+        return memo[(x, y)]
+
+    return dfs(0, 0)
+
+
+def uniquePaths_bottom_up(m: int, n: int) -> int:
+    dp = [[1] * n for _ in range(m)]
+
+    for i in range(1, m):
+        for j in range(1, n):
+            dp[i][j] = dp[i - 1][j] + dp[i][j - 1]
+        print(dp)
+
+    return dp[-1][-1]
+
+
+def test_uniquePaths():
+    assert uniquePaths(3, 7) == 28

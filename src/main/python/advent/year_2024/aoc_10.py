@@ -1,6 +1,13 @@
 from itertools import chain
 
-from utils import line_generator, Position, move_up, move_down, move_left, move_right
+from advent.utils import (
+    line_generator,
+    Position,
+    move_up,
+    move_down,
+    move_left,
+    move_right,
+)
 
 filename = "data/aoc_10.txt"
 

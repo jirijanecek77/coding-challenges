@@ -1,7 +1,14 @@
 import heapq
 from collections import Counter
 
-from utils import line_generator, Position, move_up, move_down, move_right, move_left
+from advent.utils import (
+    line_generator,
+    Position,
+    move_up,
+    move_down,
+    move_right,
+    move_left,
+)
 
 filename = "data/aoc_20.txt"
 

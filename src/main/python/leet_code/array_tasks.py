@@ -1,5 +1,6 @@
 import itertools
 from collections import Counter, defaultdict
+from functools import lru_cache
 from math import comb, gcd
 
 
@@ -449,3 +450,68 @@ def test_specialTriplets():
     assert specialTriplets(nums=[8, 4, 2, 8, 4]) == 2
     assert specialTriplets(nums=[0, 1, 0, 0]) == 1
     assert specialTriplets(nums=[37, 9, 24, 12, 12, 24, 52, 35]) == 2
+
+
+def getDescentPeriods(prices: list[int]) -> int:
+    n = len(prices)
+    res = 1
+    cnt = 1
+    for i in range(1, n):
+        if prices[i - 1] - prices[i] == 1:
+            cnt += 1
+        else:
+            cnt = 1
+        res += cnt
+
+    return res
+
+
+def test_getDescentPeriods():
+    assert getDescentPeriods(prices=[8, 6, 7, 7]) == 4
+    assert getDescentPeriods(prices=[3, 2, 1, 4]) == 7
+
+
+# https://leetcode.com/problems/count-square-submatrices-with-all-ones/description/
+def countSquares(matrix: list[list[int]]) -> int:
+    rows = len(matrix)
+    cols = len(matrix[0])
+
+    def solve_from_position(row: int, col: int) -> int:
+        n = min(rows - row, cols - col)
+        res = 0
+        for square_size in range(n):
+            if all(
+                matrix[r][c]
+                for r in range(row, row + square_size + 1)
+                for c in range(col, col + square_size + 1)
+            ):
+                res += 1
+            else:
+                return res
+        return res
+
+    return sum(
+        solve_from_position(row, col)
+        for row in range(rows)
+        for col in range(cols)
+        if matrix[row][col]
+    )
+
+
+def countSquares_dfs(matrix: list[list[int]]) -> int:
+    rows = len(matrix)
+    cols = len(matrix[0])
+
+    @lru_cache
+    def dfs(row: int, col: int) -> int:
+        if matrix[row][col] == 0:
+            return 0
+        if row == 0 or col == 0:
+            return matrix[row][col]
+        return 1 + min(dfs(row - 1, col), dfs(row, col - 1), dfs(row - 1, col - 1))
+
+    return sum(dfs(row, col) for row in range(rows) for col in range(cols))
+
+
+def test_countSquares():
+    assert countSquares_dfs(matrix=[[0, 1, 1, 1], [1, 1, 1, 1], [0, 1, 1, 1]]) == 15

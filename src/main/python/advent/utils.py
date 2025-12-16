@@ -13,6 +13,7 @@ class Direction(str, Enum):
 
 Position = namedtuple("Position", ["row", "col"], defaults=(0, 0))
 Point = namedtuple("Point", ["x", "y"], defaults=(0, 0))
+Point3D = namedtuple("Point3D", ["x", "y", "z"], defaults=(0, 0, 0))
 
 OrientedPosition = namedtuple(
     "OrientedPosition",
@@ -62,6 +63,18 @@ def move_left(position: Position) -> Position:
 
 def move_right(position: Position) -> Position:
     return Position(position.row, position.col + 1)
+
+
+def turn_right(direction: Direction) -> Direction:
+    match direction:
+        case Direction.UP:
+            return Direction.RIGHT
+        case Direction.RIGHT:
+            return Direction.DOWN
+        case Direction.DOWN:
+            return Direction.LEFT
+        case Direction.LEFT:
+            return Direction.UP
 
 
 def is_in_matrix(position: Position, playground_size: int) -> bool:

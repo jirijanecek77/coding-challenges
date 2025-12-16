@@ -1,110 +1,192 @@
-from advent.utils import line_generator
+import time
 
-filename = "data/test.txt"
+from advent.utils import (
+    Position,
+    Direction,
+    move,
+    turn_right,
+    is_in_matrix,
+    OrientedPosition,
+)
 
-n = 0
+filename = "data/aoc_06.txt"
 
-
-def print_data(position, direction, y):
-    if direction == 0:
-        dir_chr = "^"
-    elif direction == 1:
-        dir_chr = ">"
-    elif direction == 2:
-        dir_chr = "v"
-    else:
-        dir_chr = ","
-
-    for i in range(n):
-        for j in range(n):
-            if (i, j) == position:
-                print(dir_chr)
-            if j in y and i in y[j]:
-                print("#")
-            else:
-                print(".")
-        print()
-
-
-def can_put_obstacle_up(j, i, x, y) -> bool:
-    # print_data((i,j), 0, y)
-    # possible = list(filter(lambda e: e > j, x[j - 1]))
-    # if not possible:
-    #     return False
-    # if i in x[j]:
-    #     return False
-    # if j in y[i]:
-    #     return False
-    return True
+test_data = [
+    "....#.....",
+    ".........#",
+    "..........",
+    "..#.......",
+    ".......#..",
+    "..........",
+    ".#..^.....",
+    "........#.",
+    "#.........",
+    "......#...",
+]
 
 
-def visit(position, x, y) -> int:
-    obstructions = set()
-    direction = 0
-    while True:
-        match direction:
-            case 0:
-                # up
-                possible = list(filter(lambda e: e < position[0], y[position[1]]))
-                if not possible:
-                    return len(obstructions)
-                new_pos = max(possible)
+def read_data(lines):
+    obstacles = set()
+    position = None
+    n = len(lines)
+    for row, line in enumerate(lines):
+        for col, ch in enumerate(line):
+            if ch == "#":
+                obstacles.add(Position(row, col))
+            elif ch == "^":
+                position = Position(row, col)
+    return obstacles, position, n
 
-                for j in range(new_pos + 1, position[0]):
-                    if can_put_obstacle_up(j, position[1], x, y):
-                        obstructions.add((j, position[1]))
 
-                direction = 1
-                position = (new_pos + 1, position[1])
+def check(position, direction, visited, obstacles) -> bool:
+    match direction:
+        case Direction.UP:
+            candidates = sorted(
+                map(
+                    lambda v: v.position,
+                    filter(
+                        lambda v: v.position.col == position.col
+                        and v.position.row < position.row
+                        and v.direction == direction,
+                        visited,
+                    ),
+                ),
+                reverse=True,
+            )
+            return (
+                not any(
+                    filter(
+                        lambda o: position.row > o.row > candidates[0].row
+                        and o.col == position.col,
+                        obstacles,
+                    )
+                )
+                if candidates
+                else False
+            )
+        case Direction.DOWN:
+            candidates = sorted(
+                map(
+                    lambda v: v.position,
+                    filter(
+                        lambda v: v.position.col == position.col
+                        and v.position.row > position.row
+                        and v.direction == direction,
+                        visited,
+                    ),
+                ),
+            )
+            return (
+                not any(
+                    filter(
+                        lambda o: position.row < o.row < candidates[0].row
+                        and o.col == position.col,
+                        obstacles,
+                    )
+                )
+                if candidates
+                else False
+            )
+        case Direction.LEFT:
+            candidates = sorted(
+                map(
+                    lambda v: v.position,
+                    filter(
+                        lambda v: v.position.col < position.col
+                        and v.position.row == position.row
+                        and v.direction == direction,
+                        visited,
+                    ),
+                ),
+                reverse=True,
+            )
+            return (
+                not any(
+                    filter(
+                        lambda o: position.col > o.col > candidates[0].col
+                        and o.row == position.row,
+                        obstacles,
+                    )
+                )
+                if candidates
+                else False
+            )
+        case Direction.RIGHT:
+            candidates = sorted(
+                map(
+                    lambda v: v.position,
+                    filter(
+                        lambda v: v.position.col > position.col
+                        and v.position.row == position.row
+                        and v.direction == direction,
+                        visited,
+                    ),
+                )
+            )
+            return (
+                not any(
+                    filter(
+                        lambda o: position.col < o.col < candidates[0].col
+                        and o.row == position.row,
+                        obstacles,
+                    )
+                )
+                if candidates
+                else False
+            )
+    return False
 
-            case 1:
-                # right
-                possible = list(filter(lambda e: e > position[1], x[position[0]]))
-                if not possible:
-                    return len(obstructions)
-                new_pos = min(possible)
-                direction = 2
-                position = (position[0], new_pos - 1)
 
-            case 2:
-                # down
-                possible = list(filter(lambda e: e > position[0], y[position[1]]))
-                if not possible:
-                    return len(obstructions)
-                new_pos = min(possible)
-                direction = 3
-                position = (new_pos - 1, position[1])
-            case 3:
-                # left
-                possible = list(filter(lambda e: e < position[1], x[position[0]]))
-                if not possible:
-                    return len(obstructions)
-                new_pos = max(possible)
-                direction = 0
-                position = (position[0], new_pos + 1)
+def calculate1(obstacles, position, n) -> int:
+    direction = Direction.UP
+    visited = set()
+    while is_in_matrix(position, n):
+        visited.add(position)
+
+        new_position = move(position, direction)
+        while new_position in obstacles:
+            direction = turn_right(direction)
+            new_position = move(position, direction)
+        position = new_position
+
+    return len(visited)
+
+
+def calculate2(obstacles, position, n) -> int:
+    direction = Direction.UP
+    visited = set()
+    new_obstacles = set()
+    while is_in_matrix(position, n):
+        new_position = move(position, direction)
+        if (
+            is_in_matrix(new_position, n)
+            and new_position not in obstacles
+            and check(position, turn_right(direction), visited, obstacles)
+        ):
+            new_obstacles.add(new_position)
+
+        visited.add(OrientedPosition(position, direction))
+
+        while new_position in obstacles:
+            direction = turn_right(direction)
+            new_position = move(position, direction)
+
+        position = new_position
+
+    return len(new_obstacles)
 
 
 def solve_01():
-    x = {}
-    y = {}
-    with open(filename) as file:
-        data = [list(line) for line in line_generator(file.readlines())]
-        n = len(data)
-        for i in range(n):
-            for j in range(n):
-                if "#" in data[i][j]:
-                    if i in x:
-                        x[i].append(j)
-                    else:
-                        x[i] = [j]
-                    if j in y:
-                        y[j].append(i)
-                    else:
-                        y[j] = [i]
-                elif "^" in data[i][j]:
-                    position = (i, j)
+    # assert calculate1(*read_data(test_data)) == 41
+    assert calculate2(*read_data(test_data)) == 6
 
-        print(visit(position, x, y))
+    with open(filename) as file:
+        start = time.perf_counter()
+
+        # print(calculate1(*read_data(file.readlines())))
+        print(calculate2(*read_data(file.readlines())))
+
+        print(f"Elapsed time: {time.perf_counter() - start}")
 
 
 if __name__ == "__main__":

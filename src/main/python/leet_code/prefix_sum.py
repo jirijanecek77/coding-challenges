@@ -59,3 +59,28 @@ def maxSubarraySum(nums: list[int], k: int) -> int:
 
 def test_maxSubarraySum():
     assert maxSubarraySum(nums=[-1, -2, -3, -4, -5], k=4) == -10
+
+
+def minOperations(boxes: str) -> list[int]:
+    n = len(boxes)
+    boxes = list(map(int, boxes))
+    res = [0] * n
+
+    acc = prefix_sum = 0
+    for i in range(n):
+        res[i] = acc
+        prefix_sum += boxes[i]
+        acc += prefix_sum
+
+    acc = sufix_sum = 0
+    for i in reversed(range(n)):
+        res[i] += acc
+        sufix_sum += boxes[i]
+        acc += sufix_sum
+
+    return res
+
+
+def test_minOperations():
+    assert minOperations(boxes="001011") == [11, 8, 5, 4, 3, 4]
+    assert minOperations(boxes="110") == [1, 1, 3]

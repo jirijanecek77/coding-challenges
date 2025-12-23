@@ -515,3 +515,52 @@ def countSquares_dfs(matrix: list[list[int]]) -> int:
 
 def test_countSquares():
     assert countSquares_dfs(matrix=[[0, 1, 1, 1], [1, 1, 1, 1], [0, 1, 1, 1]]) == 15
+
+
+def threeSum(nums: list[int]) -> list[list[int]]:
+    nums = sorted(nums)
+    result = []
+    n = len(nums)
+    for i in range(n - 2):
+        if i > 0 and nums[i] == nums[i - 1]:
+            continue
+
+        target = -nums[i]
+        left, right = i + 1, n - 1
+        while left < right:
+            temp_sum = nums[left] + nums[right]
+            if temp_sum == target:
+                result.append([nums[i], nums[left], nums[right]])
+                left += 1
+                right -= 1
+
+                # Skip duplicates for left
+                while left < right and nums[left] == nums[left - 1]:
+                    left += 1
+                # Skip duplicates for right
+                while left < right and nums[right] == nums[right + 1]:
+                    right -= 1
+            elif temp_sum < target:
+                left += 1
+            else:
+                right -= 1
+
+    return result
+
+
+def test_threeSum():
+    assert threeSum([-1, 0, 1, 2, -1, -4]) == [[-1, -1, 2], [-1, 0, 1]]
+
+
+def findDisappearedNumbers(nums: list[int]) -> list[int]:
+    n = len(nums)
+    for i in range(n):
+        index = abs(nums[i]) - 1
+        nums[index] = -abs(nums[index])
+
+    return [i + 1 for i, num in enumerate(nums) if num > 0]
+
+
+def test_findDisappearedNumbers():
+    assert findDisappearedNumbers([2, 3, 4, 5, 6, 7, 8, 1]) == []
+    assert findDisappearedNumbers([4, 3, 2, 7, 8, 2, 3, 1]) == [5, 6]

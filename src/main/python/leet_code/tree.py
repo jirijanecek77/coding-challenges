@@ -1,3 +1,4 @@
+from collections import deque
 from typing import Optional
 
 
@@ -138,3 +139,92 @@ def calculate(s: str) -> int:
 
 def test_calculate():
     assert calculate("1+2 *3") == 7
+
+
+def find_cousins(root: Optional[TreeNode], x: int, y: int) -> bool:
+    def dfs(
+        node: Optional[TreeNode], parent: Optional[TreeNode], level: int, target: int
+    ):
+        if not node:
+            return None
+
+        if node.val == target:
+            return level, parent
+
+        return dfs(node.left, node, level + 1, target) or dfs(
+            node.right, node, level + 1, target
+        )
+
+    level_x, parent_x = dfs(root, None, 0, x)
+    level_y, parent_y = dfs(root, None, 0, y)
+
+    return parent_x and parent_y and parent_x != parent_y and level_x == level_y
+
+
+def find_cousins_bfs(root: Optional[TreeNode], x: int, y: int) -> bool:
+    queue = deque([(root, None)])
+    while queue:
+        parent_x = parent_y = None
+        n = len(queue)
+        for _ in range(n):
+            node, parent = queue.popleft()
+            if not node:
+                continue
+            if node.val == x:
+                parent_x = parent
+            elif node.val == y:
+                parent_y = parent
+            if parent_x and parent_y:
+                return parent_x != parent_y
+            queue.append((node.left, node))
+            queue.append((node.right, node))
+    return False
+
+
+def test_find_cousins():
+    assert find_cousins_bfs(
+        TreeNode(1, TreeNode(2, TreeNode(4)), TreeNode(3, TreeNode(5), TreeNode(6))),
+        4,
+        5,
+    )
+    assert not find_cousins_bfs(
+        TreeNode(1, TreeNode(2, TreeNode(4)), TreeNode(3, TreeNode(5), TreeNode(6))),
+        2,
+        5,
+    )
+    assert not find_cousins_bfs(
+        TreeNode(1, TreeNode(2), TreeNode(3, TreeNode(4), TreeNode(5))), 4, 5
+    )
+
+
+def maxOverlappingEvents(events: list[list[int]]) -> int:
+    events.sort()
+    n = len(events)
+
+    def dfs(idx: int) -> int:
+        if idx == n:
+            return 0
+
+        start_time, end_time, value = events[idx]
+
+        parallel_events = []
+        next_idx = idx + 1
+        while next_idx < n and events[next_idx][0] <= end_time:
+            parallel_events.append(next_idx)
+            next_idx += 1
+
+        if not parallel_events:
+            return value + dfs(next_idx)
+        return max(value + dfs(next_idx), max(dfs(i) for i in parallel_events))
+
+    return dfs(0)
+
+
+def test_maxOverlappingEvents():
+    assert (
+        maxOverlappingEvents(
+            events=[[10, 83, 53], [63, 87, 45], [97, 100, 32], [51, 61, 16]]
+        )
+        == 93
+    )
+    assert maxOverlappingEvents(events=[[1, 3, 2], [4, 5, 2], [2, 4, 3]]) == 4

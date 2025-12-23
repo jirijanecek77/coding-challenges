@@ -588,3 +588,133 @@ def orangesRotting(grid: list[list[int]]) -> int:
 def test_orangesRotting():
     assert orangesRotting([[0]]) == 0
     assert orangesRotting([[2, 1, 1], [1, 1, 0], [0, 1, 1]]) == 4
+
+
+def findAllPeople(n: int, meetings: list[list[int]], firstPerson: int) -> list[int]:
+    result = {0}
+
+    current_time = 0
+    queue = sorted(
+        [(0, 0, firstPerson), *((m[2], m[0], m[1]) for m in meetings)], reverse=True
+    )
+    while queue:
+        time, person_from, person_to = queue.pop()
+
+        if time >= current_time:
+            if person_from in result or person_to in result:
+                result.add(person_from)
+                result.add(person_to)
+
+        current_time = time
+
+    return list(result)
+
+
+def test_findAllPeople():
+    assert findAllPeople(
+        n=12,
+        meetings=[
+            [10, 8, 6],
+            [9, 5, 11],
+            [0, 5, 18],
+            [4, 5, 13],
+            [11, 6, 17],
+            [0, 11, 10],
+            [10, 11, 7],
+            [5, 8, 3],
+            [7, 6, 16],
+            [3, 6, 10],
+            [3, 11, 1],
+            [8, 3, 2],
+            [5, 0, 7],
+            [3, 8, 20],
+            [11, 0, 20],
+            [8, 3, 4],
+            [1, 9, 4],
+            [10, 7, 11],
+            [8, 10, 18],
+        ],
+        firstPerson=9,
+    ) == [0, 1, 4, 5, 6, 9, 11]
+
+    assert findAllPeople(
+        n=6, meetings=[[1, 2, 5], [2, 3, 8], [1, 5, 10]], firstPerson=1
+    ) == [0, 1, 2, 3, 5]
+
+
+def sliding_puzzle(board: list[list[int]]) -> int:
+    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+    n = len(board)
+    m = len(board[0])
+    queue = deque([tuple(tuple(line) for line in board)])
+    visited = set()
+
+    nums = list(range(1, n * m)) + [0]
+    target = tuple(tuple(nums[i * m : (i + 1) * m]) for i in range(n))
+
+    res = 0
+    while queue:
+        q_len = len(queue)
+
+        for _ in range(q_len):
+            cur_board = queue.popleft()
+            visited.add(cur_board)
+            (i, j) = next(
+                (i, j) for i in range(n) for j in range(m) if cur_board[i][j] == 0
+            )
+
+            if cur_board == target:
+                return res
+
+            for di, dj in directions:
+                ni, nj = i + di, j + dj
+                if 0 <= ni < n and 0 <= nj < m:
+                    new_board = list(list(line) for line in cur_board)
+                    new_board[ni][nj], new_board[i][j] = (
+                        new_board[i][j],
+                        new_board[ni][nj],
+                    )
+                    new_state = tuple(tuple(line) for line in new_board)
+                    if new_state not in visited:
+                        queue.append(new_state)
+        res += 1
+    return -1
+
+
+def test_sliding_puzzle():
+    assert sliding_puzzle(board=[[4, 1, 3], [2, 0, 5]]) == 5
+
+
+def task_scheduling(tasks: list[str], requirements: list[list[str]]) -> list[str]:
+    # topological sorting
+
+    graph = {node: [] for node in tasks}
+    for pre, post in requirements:
+        graph[pre].append(post)
+
+    res = []
+    queue = deque()
+
+    indegree = {node: 0 for node in graph}
+    for neighbors in graph.values():
+        for neighbor in neighbors:
+            indegree[neighbor] += 1
+    for node, degree in indegree.items():
+        if degree == 0:
+            queue.append(node)
+
+    while queue:
+        node = queue.popleft()
+        res.append(node)
+        for neighbor in graph[node]:
+            indegree[neighbor] -= 1
+            if indegree[neighbor] == 0:
+                queue.append(neighbor)
+
+    return res if len(res) == len(tasks) else None
+
+
+def test_task_scheduling():
+    assert task_scheduling(
+        tasks=["a", "b", "c", "d"], requirements=[["a", "b"], ["c", "b"], ["b", "d"]]
+    ) == ["a", "c", "b", "d"]

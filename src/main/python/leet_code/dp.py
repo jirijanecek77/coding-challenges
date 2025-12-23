@@ -1,4 +1,6 @@
 # https://leetcode.com/problems/taking-maximum-energy-from-the-mystic-dungeon/description/?envType=daily-question&envId=2025-10-10
+import math
+from bisect import bisect_left
 from collections import Counter
 from functools import lru_cache
 
@@ -109,27 +111,19 @@ def test_findMaxForm():
     assert findMaxForm(["10", "0001", "111001", "1", "0"], 5, 3) == 4
 
 
-@lru_cache
-def knapsack_recursive(
-    w: int, weights: tuple[int, ...], prices: tuple[int, ...], i: int
-):
-    # Base Case
-    if i == 0 or w == 0:
-        return 0
+def knapsack_recursive(w: int, weights: list[int], prices: list[int]):
+    @lru_cache
+    def dfs(weight: int, index: int) -> int:
+        # Base Case
+        if weight <= 0 or index == 0:
+            return 0
 
-    # If weight of the nth item is
-    # more than Knapsack of capacity W,
-    # then this item cannot be included
-    if weights[i - 1] > w:
-        return knapsack_recursive(w, weights, prices, i - 1)
+        return max(
+            dfs(weight, index - 1),
+            prices[index - 1] + dfs(weight - weights[index - 1], index - 1),
+        )
 
-    # return the maximum of two cases:
-    # (1) nth item included
-    # (2) not included
-    return max(
-        prices[i - 1] + knapsack_recursive(w - weights[i - 1], weights, prices, i - 1),
-        knapsack_recursive(w, weights, prices, i - 1),
-    )
+    return dfs(w, len(weights))
 
 
 def knapsack_2d_dp(
@@ -167,7 +161,8 @@ def knapsack_1d_dp(
 
 
 def knapsack_problem(capacity: int, weights: list[int], prices: list[int]) -> int:
-    return knapsack_1d_dp(capacity, tuple(weights), tuple(prices), len(prices))
+    # return knapsack_1d_dp(capacity, tuple(weights), tuple(prices), len(prices))
+    return knapsack_recursive(capacity, weights, prices)
 
 
 def test_knapsack_problem():
@@ -279,3 +274,84 @@ def uniquePaths_bottom_up(m: int, n: int) -> int:
 
 def test_uniquePaths():
     assert uniquePaths(3, 7) == 28
+
+
+# https://leetcode.com/problems/best-time-to-buy-and-sell-stock-v/description/?envType=daily-question&envId=2025-12-17
+# https://leetcode.com/problems/best-time-to-buy-and-sell-stock-v/solutions/7079325/python-recursive-dfs-with-cache-dp-with-6w8oh/?envType=daily-question&envId=2025-12-17
+def maximumProfit(prices: list[int], k: int) -> int:
+    n = len(prices)
+
+    @lru_cache
+    def dfs(i: int, t: int, state: int):
+        if t < 0:
+            return -math.inf
+        if i == n:
+            return -math.inf if state else 0
+
+        p = prices[i]
+
+        # dfs(i,j,0): max profit on index = i day, transact at most t times, not holding stock
+        # dfs(i,j,1): max profit on index = i day, transact at most t times, holding stock
+        # dfs(i,j,2): max profit on index = i day, transact at most t times, in a short position (currently short)
+        if state == 0:
+            return max(dfs(i + 1, t, 0), dfs(i + 1, t, 1) + p, dfs(i + 1, t, 2) - p)
+        if state == 1:
+            return max(dfs(i + 1, t, 1), dfs(i + 1, t - 1, 0) - p)
+        else:  # elif state == 2
+            return max(dfs(i + 1, t, 2), dfs(i + 1, t - 1, 0) + p)
+
+    return dfs(0, k, 0)
+
+
+def test_maximumProfit():
+    assert maximumProfit([1, 7, 9, 8, 2], 2) == 14
+
+
+# https://leetcode.com/problems/delete-columns-to-make-sorted-iii/description/?envType=daily-question&envId=2025-12-22
+def minDeletionSize(strs: list[str]) -> int:
+    m = len(strs)
+    n = len(strs[0])
+
+    @lru_cache
+    def dfs(start_index: int, prev_index: int) -> int:
+        if start_index == n:
+            return 0
+        res = 1 + dfs(start_index + 1, prev_index)  # delete kth column
+        if prev_index == -1 or all(
+            strs[i][prev_index] <= strs[i][start_index] for i in range(m)
+        ):
+            res = min(res, dfs(start_index + 1, start_index))  # retain kth column
+        return res
+
+    return dfs(start_index=0, prev_index=-1)
+
+
+def test_minDeletionSize():
+    assert minDeletionSize(strs=["babca", "bbazb"]) == 3
+
+
+# https://leetcode.com/problems/two-best-non-overlapping-events/solutions/7432723/just-for-fun-by-a_m_rohit-r5gl/?envType=daily-question&envId=2025-12-23
+def maxTwoEvents(events: list[list[int]]) -> int:
+    events.sort()
+    n = len(events)
+
+    @lru_cache
+    def dfs(i: int, cnt: int) -> int:
+        if i >= n or cnt == 2:
+            return 0
+
+        start_time, end_time, value = events[i]
+        return max(
+            value + dfs(bisect_left(events, end_time + 1, key=lambda x: x[0]), cnt + 1),
+            dfs(i + 1, cnt),
+        )
+
+    return dfs(0, 0)
+
+
+def test_maxTwoEvents():
+    assert (
+        maxTwoEvents(events=[[10, 83, 53], [63, 87, 45], [97, 100, 32], [51, 61, 16]])
+        == 85
+    )
+    assert maxTwoEvents(events=[[1, 3, 2], [4, 5, 2], [2, 4, 3]]) == 4

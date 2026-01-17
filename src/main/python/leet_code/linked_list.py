@@ -91,10 +91,31 @@ def addTwoNumbers(l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[Li
     return head
 
 
+# https://leetcode.com/problems/odd-even-linked-list/description/
+def oddEvenList(head: Optional[ListNode]) -> Optional[ListNode]:
+    if not head:
+        return None
+
+    evens_head = ListNode()
+    evens = evens_head
+    node = head
+    while node:
+        evens.next = node.next
+        if node.next:
+            node.next = node.next.next
+        else:
+            break
+
+        node = node.next
+        evens = evens.next
+
+    node.next = evens_head.next
+    return head
+
+
 if __name__ == "__main__":
-    l1 = ListNode(2, ListNode(4, ListNode(3)))
-    l2 = ListNode(5, ListNode(6, ListNode(4)))
-    node = addTwoNumbers(l1, l2)
+    l = ListNode(1, ListNode(2, ListNode(3, ListNode(4, ListNode(5)))))
+    node = oddEvenList(l)
 
     while node:
         print(node.val)

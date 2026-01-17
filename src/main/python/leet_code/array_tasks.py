@@ -564,3 +564,50 @@ def findDisappearedNumbers(nums: list[int]) -> list[int]:
 def test_findDisappearedNumbers():
     assert findDisappearedNumbers([2, 3, 4, 5, 6, 7, 8, 1]) == []
     assert findDisappearedNumbers([4, 3, 2, 7, 8, 2, 3, 1]) == [5, 6]
+
+
+# https://leetcode.com/problems/count-negative-numbers-in-a-sorted-matrix/?envType=daily-question&envId=2025-12-28
+def countNegatives(grid: list[list[int]]) -> int:
+    rows = len(grid)
+    cols = len(grid[0])
+
+    res = 0
+    row = rows
+    col = 0
+    while row > 0:
+        while col < cols and grid[row - 1][col] >= 0:
+            col += 1
+        res += cols - col
+        row -= 1
+
+    return res
+
+
+def test_countNegatives():
+    assert countNegatives([[3, 2], [1, 0]]) == 0
+    assert (
+        countNegatives(
+            grid=[[4, 3, 2, -1], [3, 2, 1, -1], [1, 1, -1, -2], [-1, -1, -2, -3]]
+        )
+        == 8
+    )
+
+
+def minDominoRotations(tops: list[int], bottoms: list[int]) -> int:
+    for i in range(1, 7):
+        top = bottom = 0
+        for t, b in zip(tops, bottoms):
+            if t != i and b != i:
+                break
+            if t != i:
+                top += 1
+            if b != i:
+                bottom += 1
+        else:
+            return min(top, bottom)
+
+    return -1
+
+
+def test_minDominoRotations():
+    assert minDominoRotations(tops=[2, 1, 2, 4, 2, 2], bottoms=[5, 2, 6, 2, 3, 2]) == 2

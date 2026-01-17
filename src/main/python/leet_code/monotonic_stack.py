@@ -1,4 +1,7 @@
 # https://leetcode.com/problems/minimum-operations-to-convert-all-elements-to-zero/description/?envType=daily-question&envId=2025-11-10
+from numpy.ma.core import max_val
+
+
 def minOperations(nums: list[int]) -> int:
     stack = []
     ans = 0

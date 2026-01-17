@@ -32,14 +32,14 @@ class UnionSet:
 # https://leetcode.com/problems/number-of-provinces/description/
 def findCircleNum(is_connected: list[list[int]]) -> int:
     n = len(is_connected)
-    disjoint_sets = UnionSet(n)
+    union_set = UnionSet(n)
 
     for i in range(n):
         for j in range(i + 1, n):
             if is_connected[i][j] == 1:
-                disjoint_sets.union(i, j)
+                union_set.union(i, j)
 
-    return sum(disjoint_sets.parent[i] == i for i in range(len(disjoint_sets.parent)))
+    return sum(union_set.parent[i] == i for i in range(n))
 
 
 def test_findCircleNum():

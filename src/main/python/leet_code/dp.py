@@ -355,3 +355,45 @@ def test_maxTwoEvents():
         == 85
     )
     assert maxTwoEvents(events=[[1, 3, 2], [4, 5, 2], [2, 4, 3]]) == 4
+
+
+# https://leetcode.com/problems/max-dot-product-of-two-subsequences/description/?envType=daily-question&envId=2026-01-08
+def maxDotProduct(nums1: list[int], nums2: list[int]) -> int:
+    n = len(nums1)
+    m = len(nums2)
+    dp = [[0] * (m + 1) for _ in range(n + 1)]
+    for i in range(n + 1):
+        dp[i][0] = float("-inf")
+    for i in range(m + 1):
+        dp[0][i] = float("-inf")
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            dp[i][j] = max(
+                dp[i - 1][j],
+                dp[i][j - 1],
+                nums1[i - 1] * nums2[j - 1] + max(dp[i - 1][j - 1], 0),
+            )
+    return dp[n][m]
+
+
+def maxDotProduct_dfs(nums1: list[int], nums2: list[int]) -> int:
+    n = len(nums1)
+    m = len(nums2)
+
+    @lru_cache(None)
+    def dfs(i, j):
+        if i == n or j == m:
+            return -math.inf
+        return max(
+            dfs(i + 1, j),
+            dfs(i, j + 1),
+            nums1[i] * nums2[j] + max(0, dfs(i + 1, j + 1)),
+        )
+
+    return dfs(0, 0)
+
+
+def test_maxDotProduct():
+    assert maxDotProduct_dfs(nums1=[-1, -1], nums2=[1, 1]) == -1
+    assert maxDotProduct(nums1=[2, -2], nums2=[3, -6]) == 18
+    assert maxDotProduct(nums1=[2, 1, -2, 5], nums2=[3, 0, -6]) == 18

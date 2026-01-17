@@ -1,3 +1,6 @@
+import math
+
+
 def is_power_of_four(n: int) -> bool:
     return n > 0 and (n & (n - 1)) == 0 and n % 3 == 1
 
@@ -57,3 +60,29 @@ def hammingWeight(n: int) -> int:
 
 def test_hammingWeight():
     assert hammingWeight(11) == 3
+
+
+def bestClosingTime(customers: str) -> int:
+    customers_binary = 0
+    for i in map(lambda c: 1 if c == "Y" else 0, customers):
+        customers_binary += i
+        customers_binary <<= 1
+    customers_binary >>= 1
+
+    opened_binary = 0
+    res = 0
+    min_penalty = math.inf
+    n = len(customers)
+    for i in range(n + 1):
+        penalty = (customers_binary ^ opened_binary).bit_count()
+        if penalty < min_penalty:
+            min_penalty = penalty
+            res = i
+        opened_binary += 2 ** (n - i - 1)
+
+    return res
+
+
+def test_bestClosingTime():
+    assert bestClosingTime(customers="YYYY") == 4
+    assert bestClosingTime(customers="YYNY") == 2

@@ -1,5 +1,7 @@
 import heapq
+from bisect import bisect_left
 from collections import defaultdict, deque
+from itertools import starmap
 
 
 # https://leetcode.com/problems/lexicographically-smallest-string-after-applying-operations/description/?envType=daily-question&envId=2025-10-19
@@ -718,3 +720,66 @@ def test_task_scheduling():
     assert task_scheduling(
         tasks=["a", "b", "c", "d"], requirements=[["a", "b"], ["c", "b"], ["b", "d"]]
     ) == ["a", "c", "b", "d"]
+
+
+# https://leetcode.com/problems/last-day-where-you-can-still-cross/description/?envType=daily-question&envId=2025-12-31
+def latestDayToCross(row: int, col: int, cells: list[list[int]]) -> int:
+    def check(k):
+        def dfs(i, j, visited):
+            if not (0 < i <= row and 0 < j <= col) or (i, j) in visited:
+                return False
+            if i == row:
+                return True
+            visited.add((i, j))
+            return any(
+                starmap(
+                    dfs, ((i, j + 1, visited), (i + 1, j, visited), (i, j - 1, visited))
+                )
+            )
+
+        return not any(dfs(1, j + 1, {*map(tuple, cells[: k + 1])}) for j in range(col))
+
+    return bisect_left(range(len(cells)), x=True, key=check)
+
+
+def test_latestDayToCross():
+    assert (
+        latestDayToCross(
+            row=6,
+            col=2,
+            cells=[
+                [4, 2],
+                [6, 2],
+                [2, 1],
+                [4, 1],
+                [6, 1],
+                [3, 1],
+                [2, 2],
+                [3, 2],
+                [1, 1],
+                [5, 1],
+                [5, 2],
+                [1, 2],
+            ],
+        )
+        == 3
+    )
+    assert latestDayToCross(row=2, col=2, cells=[[1, 1], [1, 2], [2, 1], [2, 2]]) == 1
+    assert (
+        latestDayToCross(
+            row=3,
+            col=3,
+            cells=[
+                [1, 2],
+                [2, 1],
+                [3, 3],
+                [2, 2],
+                [1, 1],
+                [1, 3],
+                [2, 3],
+                [3, 2],
+                [3, 1],
+            ],
+        )
+        == 3
+    )

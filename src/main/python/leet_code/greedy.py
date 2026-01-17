@@ -123,3 +123,22 @@ def test_maxSumDivThree():
     assert maxSumDivThree(nums=[1, 2, 3, 4, 4]) == 12
     assert maxSumDivThree(nums=[3, 6, 5, 1, 8]) == 18
     assert maxSumDivThree(nums=[1, 1, 1]) == 3
+
+
+def bestClosingTime(customers: str) -> int:
+    n = len(customers)
+    res = 0
+    total = sum(map(lambda c: c == "Y", customers))
+    min_penalty = total
+
+    for i in range(n):
+        total -= 1 if customers[i] == "Y" else -1
+        if total < min_penalty:
+            min_penalty = total
+            res = i + 1
+    return res
+
+
+def test_bestClosingTime():
+    assert bestClosingTime(customers="YYYY") == 4
+    assert bestClosingTime(customers="YYNY") == 2

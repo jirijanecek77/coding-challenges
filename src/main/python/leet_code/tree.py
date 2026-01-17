@@ -228,3 +228,23 @@ def test_maxOverlappingEvents():
         == 93
     )
     assert maxOverlappingEvents(events=[[1, 3, 2], [4, 5, 2], [2, 4, 3]]) == 4
+
+
+def maxProduct(root: Optional[TreeNode]) -> int:
+    sums = []
+
+    def dfs(node: Optional[TreeNode]) -> int:
+        if node is None:
+            return 0
+        s = node.val + dfs(node.left) + dfs(node.right)
+        sums.append(s)
+        return s
+
+    total_sum = dfs(root)
+    return max(
+        map(lambda subtree_sum: (total_sum - subtree_sum) * subtree_sum, sums)
+    ) % (10**9 + 7)
+
+
+def test_maxProduct():
+    assert maxProduct(TreeNode(1, TreeNode(2), TreeNode(3))) == 9

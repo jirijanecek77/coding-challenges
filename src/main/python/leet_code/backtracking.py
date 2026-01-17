@@ -1,3 +1,6 @@
+from collections import defaultdict
+
+
 def letter_combinations_of_phone_number(digits: str) -> list[str]:
     res = []
 
@@ -87,3 +90,40 @@ def minSubarray(nums: list[int], p: int) -> int:
 def test_minSubarray():
     assert minSubarray(nums=[6, 3, 5, 2], p=9) == 2
     assert minSubarray(nums=[3, 1, 4, 2], p=6) == 1
+
+
+def pyramidTransition(bottom: str, allowed: list[str]) -> bool:
+    combinations = defaultdict(set)
+    for a, b, c in allowed:
+        combinations[(a, b)].add(c)
+
+    def add_neighbor(node):
+        res = [""]
+        for i in range(1, len(node)):
+            eles = combinations[(node[i - 1], node[i])]
+            if eles:
+                res = [a + e for e in eles for a in res]
+            else:
+                return []
+        return res
+
+    visited = set()
+
+    def dfs(node):
+        if len(node) == 1:
+            return True
+        if node in visited:
+            return False
+
+        for nxt in add_neighbor(node):
+            if dfs(nxt):
+                return True
+
+        visited.add(node)
+        return False
+
+    return dfs(bottom)
+
+
+def test_pyramidTransition():
+    assert pyramidTransition(bottom="BCD", allowed=["BCC", "CDE", "CEA", "FFF"])

@@ -1,3 +1,4 @@
+import math
 from collections import namedtuple
 from enum import Enum
 
@@ -35,34 +36,34 @@ def get_vector(start: Position, end: Position) -> Vector:
     return end.row - start.row, end.col - start.col
 
 
-def move(position: Position, direction: Direction) -> Position:
+def move(position: Position, direction: Direction, steps: int = 1) -> Position:
     direction_to_move_map = {
         Direction.UP: move_up,
         Direction.DOWN: move_down,
         Direction.LEFT: move_left,
         Direction.RIGHT: move_right,
     }
-    return direction_to_move_map[direction](position)
+    return direction_to_move_map[direction](position, steps)
 
 
 def move_to_position(position: Position, vector: Vector) -> Position:
     return Position(position.row + vector[0], position.col + vector[1])
 
 
-def move_up(position: Position) -> Position:
-    return Position(position.row - 1, position.col)
+def move_up(position: Position, steps: int = 1) -> Position:
+    return Position(position.row - steps, position.col)
 
 
-def move_down(position: Position) -> Position:
-    return Position(position.row + 1, position.col)
+def move_down(position: Position, steps: int = 1) -> Position:
+    return Position(position.row + steps, position.col)
 
 
-def move_left(position: Position) -> Position:
-    return Position(position.row, position.col - 1)
+def move_left(position: Position, steps: int = 1) -> Position:
+    return Position(position.row, position.col - steps)
 
 
-def move_right(position: Position) -> Position:
-    return Position(position.row, position.col + 1)
+def move_right(position: Position, steps: int = 1) -> Position:
+    return Position(position.row, position.col + steps)
 
 
 def turn_right(direction: Direction) -> Direction:
@@ -79,3 +80,7 @@ def turn_right(direction: Direction) -> Direction:
 
 def is_in_matrix(position: Position, playground_size: int) -> bool:
     return 0 <= position.row < playground_size and 0 <= position.col < playground_size
+
+
+def distance(p1: Position, p2: Position) -> float:
+    return math.sqrt((p1.row - p2.row) ** 2 + (p1.col - p2.col) ** 2)

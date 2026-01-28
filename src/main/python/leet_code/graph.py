@@ -1,4 +1,5 @@
 import heapq
+import math
 from bisect import bisect_left
 from collections import defaultdict, deque
 from itertools import starmap
@@ -783,3 +784,35 @@ def test_latestDayToCross():
         )
         == 3
     )
+
+
+# https://leetcode.com/problems/minimum-cost-path-with-edge-reversals/?envType=daily-question&envId=2026-01-27
+def minCost(n: int, edges: list[list[int]]) -> int:
+    graph = defaultdict(list)
+
+    for u, v, w in edges:
+        graph[u].append((v, w))
+        graph[v].append((u, 2 * w))
+
+    # Initialize distance array from 0 node
+    distances = [math.inf] * n
+    distances[0] = 0
+
+    # Dijkstra - Uniform Cost Search
+    heap = [(0, 0)]
+    while heap:
+        distance, node = heapq.heappop(heap)
+        if node == n - 1:
+            return distance
+
+        for neighbor, weight in graph[node]:
+            new_distance = distance + weight
+            if new_distance < distances[neighbor]:
+                distances[neighbor] = new_distance
+                heapq.heappush(heap, (new_distance, neighbor))
+
+    return -1
+
+
+def test_minCost():
+    assert minCost(n=4, edges=[[0, 1, 3], [3, 1, 1], [2, 3, 4], [0, 2, 2]]) == 5

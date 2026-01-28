@@ -1,4 +1,5 @@
 # Definition for singly-linked list.
+import math
 from typing import Optional
 
 
@@ -6,6 +7,13 @@ class ListNode:
     def __init__(self, val=0, next=None):
         self.val = val
         self.next = next
+
+
+class DLListNode:
+    def __init__(self, val=0, prev=None, next=None):
+        self.val = val
+        self.next = next
+        self.prev = prev
 
 
 # https://leetcode.com/problems/swapping-nodes-in-a-linked-list/
@@ -113,10 +121,65 @@ def oddEvenList(head: Optional[ListNode]) -> Optional[ListNode]:
     return head
 
 
+def print_list(node):
+    res = []
+    while node:
+        res.append(node.val)
+        node = node.next
+
+    print(res, end="\n")
+
+
 if __name__ == "__main__":
     l = ListNode(1, ListNode(2, ListNode(3, ListNode(4, ListNode(5)))))
     node = oddEvenList(l)
+    print_list(node)
 
-    while node:
-        print(node.val)
-        node = node.next
+
+def minimumPairRemoval(nums: list[int]) -> int:
+    dll = None
+    prev = None
+    for num in nums:
+        node = DLListNode(num, prev=prev)
+        if not prev:
+            dll = node
+        else:
+            prev.next = node
+        prev = node
+
+    def is_sorted(node):
+        while node:
+            if node.prev and node.prev.val > node.val:
+                return False
+            node = node.next
+        return True
+
+    res = 0
+    while not is_sorted(dll):
+        min_val = math.inf
+        min_node = dll
+        node = dll.next
+        while node:
+            if (node.val + node.prev.val) < min_val:
+                min_node = node
+                min_val = node.val + node.prev.val
+            node = node.next
+
+        p = min_node.prev.prev
+        n = min_node.next
+        new_node = DLListNode(min_node.val + min_node.prev.val, prev=p, next=n)
+        if p:
+            p.next = new_node
+        else:
+            dll = new_node
+        if n:
+            n.prev = new_node
+
+        res += 1
+    return res
+
+
+def test_minimumPairRemoval():
+    assert minimumPairRemoval(nums=[2, 2, -1, 3, -2, 2, 1, 1, 1, 0, -1]) == 9
+    assert minimumPairRemoval(nums=[5, 2, 3, 1]) == 2
+    assert minimumPairRemoval(nums=[2, 1, 3, 2]) == 2

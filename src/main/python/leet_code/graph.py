@@ -2,6 +2,7 @@ import heapq
 import math
 from bisect import bisect_left
 from collections import defaultdict, deque
+from functools import lru_cache
 from itertools import starmap
 
 
@@ -816,3 +817,72 @@ def minCost(n: int, edges: list[list[int]]) -> int:
 
 def test_minCost():
     assert minCost(n=4, edges=[[0, 1, 3], [3, 1, 1], [2, 3, 4], [0, 2, 2]]) == 5
+
+
+def minimumCost(
+    source: str, target: str, original: list[str], changed: list[str], cost: list[int]
+) -> int:
+    graph = defaultdict(list)
+    for o, ch, c in zip(original, changed, cost):
+        i = ord(o) - ord("a")
+        j = ord(ch) - ord("a")
+        if i in graph:
+            curr = next(filter(lambda x: x[0] == j, graph[i]), None)
+            if curr:
+                new_cost = min(curr[1], c)
+                graph[i].remove((j, c))
+                graph[i].append((j, new_cost))
+            else:
+                graph[i].append((j, c))
+        else:
+            graph[i].append((j, c))
+
+    @lru_cache(None)
+    def dijkstra(s: int, t: int) -> int:
+        distances = [math.inf] * 26
+        distances[s] = 0
+
+        heap = [(0, s)]
+        while heap:
+            distance, node = heapq.heappop(heap)
+
+            if node == t:
+                return distance
+
+            for neighbor, weight in graph[node]:
+                new_distance = distance + weight
+                if new_distance < distances[neighbor]:
+                    distances[neighbor] = new_distance
+                    heapq.heappush(heap, (new_distance, neighbor))
+        return -1
+
+    res = 0
+    for s, t in zip(source, target):
+        if s != t:
+            dist = dijkstra(ord(s) - ord("a"), ord(t) - ord("a"))
+            if dist == -1:
+                break
+            else:
+                res += dist
+    else:
+        return res
+    return -1
+
+
+def test_minimumCost():
+    assert (
+        minimumCost(
+            source="abcd",
+            target="acbe",
+            original=["a", "b", "c", "c", "e", "d"],
+            changed=["b", "c", "b", "e", "b", "e"],
+            cost=[2, 5, 5, 1, 2, 20],
+        )
+        == 28
+    )
+    assert (
+        minimumCost(
+            source="abcd", target="abce", original=["a"], changed=["e"], cost=[10000]
+        )
+        == -1
+    )

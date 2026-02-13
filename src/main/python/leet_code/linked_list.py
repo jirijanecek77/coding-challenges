@@ -1,4 +1,3 @@
-# Definition for singly-linked list.
 import math
 from typing import Optional
 
@@ -8,12 +7,24 @@ class ListNode:
         self.val = val
         self.next = next
 
+    def __str__(self):
+        return str(self.val)
+
 
 class DLListNode:
     def __init__(self, val=0, prev=None, next=None):
         self.val = val
         self.next = next
         self.prev = prev
+
+
+def print_list(head: Optional[ListNode]) -> None:
+    res = []
+    while head:
+        res.append(head.val)
+        head = head.next
+
+    print(res, end="\n")
 
 
 # https://leetcode.com/problems/swapping-nodes-in-a-linked-list/
@@ -36,10 +47,154 @@ def swap_nodes(head: Optional[ListNode], k: int) -> Optional[ListNode]:
     return head
 
 
+# https://leetcode.com/problems/swap-nodes-in-pairs/description/
+def swapPairs(head: Optional[ListNode]) -> Optional[ListNode]:
+    prev_node = None
+    curr_node = head
+
+    while curr_node and curr_node.next:
+        next_node = curr_node.next
+        curr_node.next = next_node.next
+        next_node.next = curr_node
+
+        if not prev_node:
+            head = next_node
+        else:
+            prev_node.next = next_node
+        prev_node = curr_node
+        curr_node = curr_node.next
+
+    return head
+
+
+def reverse_list_rec(head: Optional[ListNode]) -> Optional[ListNode]:
+    # reverse list using recursion, go to the before last node and in postorder process the reverted list
+    # ALWAYS return the last node in the recursion, and connect the current node to the end of the reverted list
+    if not head or not head.next:
+        return head
+
+    new_head = reverse_list_rec(head.next)
+    head.next.next = head
+    head.next = None
+    return new_head
+
+
+def reverse_list(head: Optional[ListNode]) -> Optional[ListNode]:
+    prev = None
+    while head:
+        next_node = head.next
+        head.next = prev
+        prev = head
+        head = next_node
+    return prev
+
+
+# https://leetcode.com/problems/reorder-list/description/
+def reorder_list(head: ListNode) -> ListNode:
+    # Reverse list using recursion, go to the before last node and in postorder process the reverted list.
+    # In this task only second half has to be reverted
+    # always disconnect the last node, or use dummy if it could be inserted before the first one
+
+    def reorder(node: ListNode, tail: Optional[ListNode]) -> Optional[ListNode]:
+        if not tail or not tail.next:
+            return node
+
+        last = reorder(node, tail.next)
+        res = last.next
+        last.next = tail.next
+        tail.next.next = res
+        tail.next = None
+
+        return res
+
+    tmp = head
+    half = head
+    while tmp and tmp.next:
+        tmp = tmp.next.next
+        half = half.next
+
+    reorder(head, half)
+    return head
+
+
+# https://leetcode.com/problems/linked-list-cycle-ii/description/
+def detectCycle(head: Optional[ListNode]) -> Optional[ListNode]:
+    slow = head
+    fast = head
+
+    # Move the slow pointer one step and the fast pointer two steps at a time through the linked list,
+    # until they either meet or the fast pointer reaches the end of the list.
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        if slow == fast:
+            # If the pointers meet, there is a cycle in the linked list.
+            # Reset the slow pointer to the head of the linked list, and move both pointers one step at a time
+            # until they meet again. The node where they meet is the starting point of the cycle.
+            slow = head
+            while slow != fast:
+                slow = slow.next
+                fast = fast.next
+            return slow
+
+    # If the fast pointer reaches the end of the list without meeting the slow pointer,
+    # there is no cycle in the linked list. Return None.
+    return None
+
+
+# https://leetcode.com/problems/merge-two-sorted-lists/
+def mergeTwoLists(
+    list1: Optional[ListNode], list2: Optional[ListNode]
+) -> Optional[ListNode]:
+    head = None
+    last_node = None
+    while list1 or list2:
+        if not list1:
+            node = list2
+            list2 = list2.next
+        elif not list2:
+            node = list1
+            list1 = list1.next
+        elif list1.val < list2.val:
+            node = list1
+            list1 = list1.next
+        else:
+            node = list2
+            list2 = list2.next
+
+        if not head:
+            head = node
+            last_node = head
+        else:
+            last_node.next = node
+            last_node = last_node.next
+
+    return head
+
+
+# https://leetcode.com/problems/intersection-of-two-linked-lists/
+def getIntersectionNode(headA: ListNode, headB: ListNode) -> Optional[ListNode]:
+    seen = set()
+    node = headA
+    while node:
+        seen.add(node)
+        node = node.next
+
+    node = headB
+    while node:
+        if node in seen:
+            return node
+        node = node.next
+
+    return None
+
+
 # https://leetcode.com/problems/remove-nth-node-from-end-of-list/
 def removeNthFromEnd(head: Optional[ListNode], n: int) -> Optional[ListNode]:
     # Input: head = [1,2,3,4,5], n = 2
     # Output: [1,2,3,5]
+    # go to the nth node from the beginning
+    # start the second pointer from the beginning and move both until the first one reaches the end, then remove the node pointed by the second pointer
     if not head:
         return None
 
@@ -76,6 +231,7 @@ def modifiedList(nums: list[int], head: Optional[ListNode]) -> Optional[ListNode
     return
 
 
+# https://leetcode.com/problems/add-two-numbers/description/
 def addTwoNumbers(l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
     carry = 0
     head = last_node = None
@@ -121,21 +277,7 @@ def oddEvenList(head: Optional[ListNode]) -> Optional[ListNode]:
     return head
 
 
-def print_list(node):
-    res = []
-    while node:
-        res.append(node.val)
-        node = node.next
-
-    print(res, end="\n")
-
-
-if __name__ == "__main__":
-    l = ListNode(1, ListNode(2, ListNode(3, ListNode(4, ListNode(5)))))
-    node = oddEvenList(l)
-    print_list(node)
-
-
+# https://leetcode.com/problems/minimum-pair-removal-to-sort-array-i/description/
 def minimumPairRemoval(nums: list[int]) -> int:
     dll = None
     prev = None
@@ -179,7 +321,14 @@ def minimumPairRemoval(nums: list[int]) -> int:
     return res
 
 
-def test_minimumPairRemoval():
-    assert minimumPairRemoval(nums=[2, 2, -1, 3, -2, 2, 1, 1, 1, 0, -1]) == 9
-    assert minimumPairRemoval(nums=[5, 2, 3, 1]) == 2
-    assert minimumPairRemoval(nums=[2, 1, 3, 2]) == 2
+if __name__ == "__main__":
+    l1 = ListNode(1, ListNode(2, ListNode(5, ListNode(6, ListNode(6)))))
+    node = reverse_list(l1)
+    print_list(node)
+
+
+#
+# def test_minimumPairRemoval():
+#     assert minimumPairRemoval(nums=[2, 2, -1, 3, -2, 2, 1, 1, 1, 0, -1]) == 9
+#     assert minimumPairRemoval(nums=[5, 2, 3, 1]) == 2
+#     assert minimumPairRemoval(nums=[2, 1, 3, 2]) == 2

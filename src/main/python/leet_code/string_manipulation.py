@@ -1,5 +1,6 @@
 import re
 from collections import Counter
+from itertools import zip_longest
 
 
 def isPalindrome(x: int) -> bool:
@@ -180,3 +181,39 @@ def test_validateCoupons():
 def heightChecker(heights: list[int]) -> int:
     expected = sorted(heights)
     return [i for i, (e, h) in enumerate(zip(expected, heights)) if e != h]
+
+
+def compareVersion(version1: str, version2: str) -> int:
+
+    def compare(i1: int, i2: int) -> int:
+        if i1 < i2:
+            return -1
+        if i1 > i2:
+            return 1
+        return 0
+
+    def map_version(v: str) -> int:
+        res = 0
+        for ch in v:
+            res *= 10
+            res += int(ch)
+        return res
+
+    def map_versions(versions: tuple[str, str]) -> int:
+        v1, v2 = versions
+        return compare(map_version(v1), map_version(v2))
+
+    return next(
+        filter(
+            None,
+            map(
+                map_versions,
+                zip_longest(version1.split("."), version2.split("."), fillvalue="0"),
+            ),
+        ),
+        0,
+    )
+
+
+def test_compareVersion():
+    assert compareVersion(version1="1.0.1", version2="1") == 1

@@ -2,6 +2,74 @@ import operator
 from itertools import accumulate
 
 
+# https://leetcode.com/problems/container-with-most-water/description/
+def container_with_most_water(arr: list[int]) -> int:
+    # two pointers from left and right until they meet
+    # for every iteration, calculate the area between them
+    # move the pointer with the smaller height to catch bigger area
+
+    left = 0
+    right = len(arr) - 1
+
+    res = 0
+    while left < right:
+        res = max(res, min(arr[left], arr[right]) * (right - left))
+        if arr[left] < arr[right]:
+            left += 1
+        else:
+            right -= 1
+    return res
+
+
+def test_container_with_most_water():
+    assert container_with_most_water(arr=[1, 8, 6, 2, 5, 4, 8, 3, 7]) == 49
+    assert container_with_most_water(arr=[1, 1]) == 1
+    assert container_with_most_water(arr=[4, 3, 2, 1, 4]) == 16
+    assert container_with_most_water(arr=[1, 2, 1]) == 2
+
+
+# https://leetcode.com/problems/trapping-rain-water/description/
+def trap_water(height: list[int]) -> int:
+    # precalculate left and right max heights
+    # for every index, calculate the water trapped as min from left and right subtracted by height
+
+    left = accumulate(height, lambda a, h: max(a, h))
+    right = reversed(list(accumulate(reversed(height), lambda a, h: max(a, h))))
+
+    # [0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]
+    # [0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3]
+    # [3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 1, 0]
+    return sum(max(0, min(l, r) - h) for l, r, h in zip(left, right, height))
+
+
+def trap_water_two_pointers(height: list[int]) -> int:
+    # the same principle as container_with_most_water
+    left = 0
+    right = len(height) - 1
+    result = 0
+    max_left = max_right = 0
+
+    while left <= right:
+        if height[left] <= height[right]:
+            if height[left] >= max_left:
+                max_left = height[left]
+            else:
+                result += max_left - height[left]
+            left += 1
+        else:
+            if height[right] >= max_right:
+                max_right = height[right]
+            else:
+                result += max_right - height[right]
+            right -= 1
+    return result
+
+
+def test_trap_water():
+    assert trap_water_two_pointers(height=[0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]) == 6
+    assert trap_water(height=[4, 2, 0, 3, 2, 5]) == 9
+
+
 def reverseVowels(s: str) -> str:
     left = 0
     right = len(s) - 1

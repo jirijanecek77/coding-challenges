@@ -1,4 +1,5 @@
 from collections import deque
+from heapq import nlargest
 from typing import Optional
 
 
@@ -248,3 +249,65 @@ def maxProduct(root: Optional[TreeNode]) -> int:
 
 def test_maxProduct():
     assert maxProduct(TreeNode(1, TreeNode(2), TreeNode(3))) == 9
+
+
+# https://leetcode.com/problems/k-th-largest-perfect-subtree-size-in-binary-tree/
+def kthLargestPerfectSubtree(root: Optional[TreeNode], k: int) -> int:
+    candidates = []
+
+    def dfs(node) -> int:
+        if not node:
+            return 0
+
+        left = dfs(node.left)
+        right = dfs(node.right)
+
+        if left == -1 or right == -1 or left != right:
+            return -1
+
+        candidates.append(1 + left + right)
+        return 1 + left + right
+
+    dfs(root)
+    return nlargest(k, candidates)[-1] if len(candidates) >= k else -1
+
+
+def test_kthLargestPerfectSubtree():
+    assert (
+        kthLargestPerfectSubtree(
+            TreeNode(
+                5,
+                TreeNode(3, TreeNode(5, TreeNode(1), TreeNode(8)), TreeNode(2)),
+                TreeNode(6, TreeNode(5, TreeNode(8), TreeNode(8)), TreeNode(7)),
+            ),
+            2,
+        )
+        == 3
+    )
+
+
+def level_order_traversal(root: Optional[TreeNode]) -> list[list[int]]:
+    if not root:
+        return []
+
+    queue = deque([root])
+
+    res = []
+    while queue:
+        n = len(queue)
+
+        level_nodes = []
+        for _ in range(n):
+            node = queue.popleft()
+            level_nodes.append(node.val)
+            if node.left:
+                queue.append(node.left)
+            if node.right:
+                queue.append(node.right)
+
+        res.append(level_nodes)
+    return res
+
+
+def test_level_order_traversal():
+    assert level_order_traversal(TreeNode(1, TreeNode(2), TreeNode(3))) == [[1], [2, 3]]

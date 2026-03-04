@@ -27,7 +27,7 @@ public class AdventOfCodeDay09 {
             }
         }
 
-        return result.stream().mapToInt(e -> e).sum();
+        return result.stream().mapToInt(Integer::intValue).sum();
     }
 
     private static int calcLastExtrapolation(List<Integer> data) {

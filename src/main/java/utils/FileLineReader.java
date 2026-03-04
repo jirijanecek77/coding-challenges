@@ -1,6 +1,5 @@
 package utils;
 
-import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,7 +20,6 @@ public class FileLineReader implements Iterable<String> {
         return new FileLineReader("src/test/resources/" + fileName);
     }
 
-    @NotNull
     @Override
     public Iterator<String> iterator() {
         return new LineIterator(fileName);

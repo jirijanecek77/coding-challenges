@@ -321,14 +321,81 @@ def minimumPairRemoval(nums: list[int]) -> int:
     return res
 
 
-if __name__ == "__main__":
-    l1 = ListNode(1, ListNode(2, ListNode(5, ListNode(6, ListNode(6)))))
-    node = reverse_list(l1)
-    print_list(node)
+class LRUCacheNode:
+    def __init__(self, key=None, val=None):
+        self.key = key
+        self.val = val
+        self.prev = None
+        self.next = None
+
+
+class LRUCache:
+    # use dict for O(1) lookup and doubly linked list for O(1) insertion/removal
+    # linked list has dummy head and tail nodes connected to each other at the beginning to simplify the logic
+    # get and set have to maintain dict and linked list in sync
+    # keep list size in sync with dict size to have capacity check in O(1)
+
+    def __init__(self, n):
+        # your code goes here
+        self.capacity = n
+        self.size = 0
+        self.cache = {}
+
+        self.head = LRUCacheNode()
+        self.tail = LRUCacheNode()
+        self.head.next = self.tail
+        self.tail.prev = self.head
+
+    def _add_node(self, node: LRUCacheNode):
+        node.next = self.head.next
+        node.prev = self.head
+        self.head.next = node
+        node.next.prev = node
+
+    def _remove_node(self, node: LRUCacheNode):
+        node.next.prev = node.prev
+        node.prev.next = node.next
+
+    def get(self, key):
+        if key not in self.cache:
+            return None
+
+        node = self.cache[key]
+        self._remove_node(node)
+        self._add_node(node)
+        return node.val
+
+    def set(self, key, val):
+        if key in self.cache:
+            node = self.cache[key]
+            self._remove_node(node)
+
+        node = LRUCacheNode(key, val)
+        self.cache[key] = node
+        self._add_node(node)
+        self.size += 1
+
+        if self.size > self.capacity:
+            lru_node = self.tail.prev
+            self.cache.pop(lru_node.key)
+            self._remove_node(lru_node)
+            self.size -= 1
+
+
+def test_lru_cache():
+    cache = LRUCache(2)
+    cache.set("user1", "Alex")
+    assert cache.get("user1") == "Alex"
+
+
+def test_minimumPairRemoval():
+    assert minimumPairRemoval(nums=[2, 2, -1, 3, -2, 2, 1, 1, 1, 0, -1]) == 9
+    assert minimumPairRemoval(nums=[5, 2, 3, 1]) == 2
+    assert minimumPairRemoval(nums=[2, 1, 3, 2]) == 2
 
 
 #
-# def test_minimumPairRemoval():
-#     assert minimumPairRemoval(nums=[2, 2, -1, 3, -2, 2, 1, 1, 1, 0, -1]) == 9
-#     assert minimumPairRemoval(nums=[5, 2, 3, 1]) == 2
-#     assert minimumPairRemoval(nums=[2, 1, 3, 2]) == 2
+# if __name__ == "__main__":
+#     l1 = ListNode(1, ListNode(2, ListNode(5, ListNode(6, ListNode(6)))))
+#     node = reverse_list(l1)
+#     print_list(node)

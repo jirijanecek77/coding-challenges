@@ -886,3 +886,63 @@ def test_minimumCost():
         )
         == -1
     )
+
+
+# https://leetcode.com/problems/shortest-path-in-binary-matrix/description/
+def shortestPathBinaryMatrix(grid: list[list[int]]) -> int:
+    # takeaways:
+    # BFS is the shortest path algorithm for unweighted graphs
+    # no need to store distance in a queue if iterating level by level, just increment the distance at the end of each level
+    # follow the basic BFS template with visited check at the beginning of each level and continue if found in visited, no visited check before adding to queue !!
+    # this causes the performance issue
+
+    n = len(grid)
+    queue = deque([(0, 0)] if grid[0][0] == 0 else [])
+    visited = set()
+    level = 1
+    while queue:
+        for _ in range(len(queue)):
+            row, col = queue.popleft()
+            if row == n - 1 and col == n - 1:
+                return level
+
+            if (row, col) in visited:
+                continue
+            visited.add((row, col))
+
+            for dr, dc in [
+                (1, 0),
+                (-1, 0),
+                (0, 1),
+                (0, -1),
+                (1, 1),
+                (1, -1),
+                (-1, 1),
+                (-1, -1),
+            ]:
+                new_row = row + dr
+                new_col = col + dc
+                if (
+                    0 <= new_row < n
+                    and 0 <= new_col < n
+                    and 0 == grid[new_row][new_col]
+                ):
+                    queue.append((new_row, new_col))
+        level += 1
+    return -1
+
+
+def test_shortestPathBinaryMatrix():
+    assert (
+        shortestPathBinaryMatrix(
+            grid=[
+                [0, 1, 1, 0, 0, 0],
+                [0, 1, 0, 1, 1, 0],
+                [0, 1, 1, 0, 1, 0],
+                [0, 0, 0, 1, 1, 0],
+                [1, 1, 1, 1, 1, 0],
+                [1, 1, 1, 1, 1, 0],
+            ]
+        )
+        == 14
+    )

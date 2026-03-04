@@ -172,4 +172,20 @@ public class BinaryTreeChallenges {
         max = Math.max(max, node.data());
         return Math.max(dfsMaxDiff(node.left(), min, max), dfsMaxDiff(node.right(), min, max));
     }
+
+    private static int dfs(Node node, int acc) {
+        if (node == null) {
+            return 0;
+        }
+
+        acc = acc * 2 + node.data();
+        if (node.left() == null && node.right() == null) {
+            return acc;
+        }
+        return dfs(node.left(), acc) + dfs(node.right(), acc);
+    }
+
+    public static int sumRootToLeaf(Node root) {
+        return dfs(root, 0);
+    }
 }

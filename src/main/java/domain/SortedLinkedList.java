@@ -1,7 +1,5 @@
 package domain;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.*;
 
 /**
@@ -17,20 +15,6 @@ public class SortedLinkedList<T extends Comparable<T>> implements Iterable<T> {
 
     private int size = 0;
     private Node first;
-
-    private class Node {
-
-        T item;
-
-        Node next;
-
-        Node(Node next, T item) {
-            this.item = item;
-            this.next = next;
-        }
-
-
-    }
 
     /**
      * Constructs an empty list.
@@ -56,7 +40,6 @@ public class SortedLinkedList<T extends Comparable<T>> implements Iterable<T> {
      *
      * @return a Iterator of the elements in this list
      */
-    @NotNull
     @Override
     public Iterator<T> iterator() {
         return new SorterdLinkedListIterator();
@@ -213,6 +196,36 @@ public class SortedLinkedList<T extends Comparable<T>> implements Iterable<T> {
         return false;
     }
 
+    private void initializeByCollection(Collection<? extends T> c) {
+        c.stream()
+                .filter(Objects::nonNull)
+                .sorted(Comparator.reverseOrder())
+                .forEach(item -> {
+                    first = new Node(first, item);
+                    size++;
+                });
+    }
+
+    private void checkNonNull(T item) {
+        if (item == null) {
+            throw new IllegalArgumentException("Item cannot be null");
+        }
+    }
+
+    private class Node {
+
+        T item;
+
+        Node next;
+
+        Node(Node next, T item) {
+            this.item = item;
+            this.next = next;
+        }
+
+
+    }
+
     private class SorterdLinkedListIterator implements Iterator<T> {
 
         private Node currentNode = first;
@@ -232,21 +245,5 @@ public class SortedLinkedList<T extends Comparable<T>> implements Iterable<T> {
             throw new NoSuchElementException();
         }
 
-    }
-
-    private void initializeByCollection(Collection<? extends T> c) {
-        c.stream()
-                .filter(Objects::nonNull)
-                .sorted(Comparator.reverseOrder())
-                .forEach(item -> {
-                    first = new Node(first, item);
-                    size++;
-                });
-    }
-
-    private void checkNonNull(T item) {
-        if (item == null) {
-            throw new IllegalArgumentException("Item cannot be null");
-        }
     }
 }

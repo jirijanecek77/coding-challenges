@@ -2,8 +2,10 @@ package challenge;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 public class BitChallenges {
@@ -121,5 +123,11 @@ public class BitChallenges {
         }
 
         return result;
+    }
+
+    public static int[] sortByBits(int[] arr) {
+        return IntStream.of(arr).boxed()
+                .sorted(Comparator.comparing(Integer::bitCount))
+                .mapToInt(Integer::intValue).toArray();
     }
 }

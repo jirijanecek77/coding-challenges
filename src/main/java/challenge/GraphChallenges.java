@@ -67,4 +67,32 @@ public class GraphChallenges {
 
         rooms.get(room).forEach(e -> dfsRooms(rooms, e, visited));
     }
+
+    private static int dfs(int node, Map<Integer, List<Edge>> edges, Set<Integer> visited) {
+        visited.add(node);
+        return edges.get(node).stream()
+                .filter(e -> !visited.contains(e.neighbor()))
+                .mapToInt(e -> dfs(e.neighbor(), edges, visited) + e.cost())
+                .sum();
+    }
+
+    public static int minReorder(int n, int[][] connections) {
+        Map<Integer, List<Edge>> edges = new HashMap<>();
+
+        for (var con : connections) {
+            int from = con[0], to = con[1];
+
+            edges.computeIfAbsent(from, k -> new ArrayList<>()).add(new Edge(to, 1));
+            edges.computeIfAbsent(to, k -> new ArrayList<>()).add(new Edge(from, 0));
+        }
+
+        return dfs(0, edges, new HashSet<>());
+    }
+
+    public static void main(String[] args) {
+        System.out.println(minReorder(6, new int[][]{{0, 1}, {1, 3}, {2, 3}, {4, 0}, {4, 5}}));
+    }
+
+    private record Edge(int neighbor, int cost) {
+    }
 }

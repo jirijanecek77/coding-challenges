@@ -31,3 +31,22 @@ def test_mostBooked():
     )
     assert mostBooked(n=2, meetings=[[0, 10], [1, 5], [2, 7], [3, 4]]) == 0
     assert mostBooked(n=3, meetings=[[1, 20], [2, 10], [3, 5], [4, 9], [6, 8]]) == 1
+
+
+def missingMultiple(nums: list[int], k: int) -> int:
+    heapify(nums)
+    n = k
+    while nums:
+        num = heappop(nums)
+        if num == n:
+            n += k
+        elif num > n:
+            return n
+
+    return n
+
+
+def test_missingMultiple():
+    assert missingMultiple(nums=[1, 2, 3, 4], k=2) == 6
+    assert missingMultiple(nums=[2, 3, 4, 7, 11], k=5) == 5
+    assert missingMultiple(nums=[1, 2, 3, 4], k=1) == 5

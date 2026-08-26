@@ -351,10 +351,12 @@ class LRUCache:
         node.prev = self.head
         self.head.next = node
         node.next.prev = node
+        self.size += 1
 
     def _remove_node(self, node: LRUCacheNode):
         node.next.prev = node.prev
         node.prev.next = node.next
+        self.size -= 1
 
     def get(self, key):
         if key not in self.cache:
@@ -373,19 +375,23 @@ class LRUCache:
         node = LRUCacheNode(key, val)
         self.cache[key] = node
         self._add_node(node)
-        self.size += 1
 
         if self.size > self.capacity:
             lru_node = self.tail.prev
             self.cache.pop(lru_node.key)
             self._remove_node(lru_node)
-            self.size -= 1
 
 
 def test_lru_cache():
     cache = LRUCache(2)
     cache.set("user1", "Alex")
+    cache.set("user2", "Bob")
     assert cache.get("user1") == "Alex"
+    assert cache.get("user2") == "Bob"
+    cache.set("user3", "Charlie")
+    assert cache.get("user1") is None
+    assert cache.get("user2") == "Bob"
+    assert cache.get("user3") == "Charlie"
 
 
 def test_minimumPairRemoval():

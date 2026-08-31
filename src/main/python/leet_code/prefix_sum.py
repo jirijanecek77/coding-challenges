@@ -84,3 +84,52 @@ def minOperations(boxes: str) -> list[int]:
 def test_minOperations():
     assert minOperations(boxes="001011") == [11, 8, 5, 4, 3, 4]
     assert minOperations(boxes="110") == [1, 1, 3]
+
+
+def findMaxLength(nums: list[int]) -> int:
+    prefix_sum = 0
+    seen = {0: -1}
+    max_length = 0
+    for i, num in enumerate(nums):
+        prefix_sum += 1 if num == 1 else -1
+        if prefix_sum in seen:
+            max_length = max(max_length, i - seen[prefix_sum])
+        else:
+            seen[prefix_sum] = i
+    return max_length
+
+
+def test_findMaxLength():
+    assert findMaxLength([0, 1]) == 2
+    assert findMaxLength([0, 1, 1, 1, 1, 1, 0, 0, 0]) == 6
+
+
+class ProductOfNumbers:
+    # https://leetcode.com/problems/product-of-the-last-k-numbers/description/
+    def __init__(self):
+        self.prefix_product = [1]
+
+    def add(self, num: int) -> None:
+        if num == 0:
+            self.prefix_product = [1]
+        else:
+            self.prefix_product.append(self.prefix_product[-1] * num)
+
+    def getProduct(self, k: int) -> int:
+        if k >= len(self.prefix_product):
+            return 0
+        return self.prefix_product[-1] // self.prefix_product[-k - 1]
+
+
+def test_product_of_numbers():
+    product = ProductOfNumbers()
+    product.add(3)
+    product.add(0)
+    product.add(2)
+    product.add(5)
+    product.add(4)
+    assert product.getProduct(2) == 20
+    assert product.getProduct(3) == 40
+    assert product.getProduct(4) == 0
+    product.add(8)
+    assert product.getProduct(2) == 32

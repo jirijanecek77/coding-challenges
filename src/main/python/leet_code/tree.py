@@ -1,4 +1,4 @@
-from collections import deque
+from collections import deque, defaultdict
 from heapq import nlargest
 from typing import Optional
 
@@ -311,3 +311,44 @@ def level_order_traversal(root: Optional[TreeNode]) -> list[list[int]]:
 
 def test_level_order_traversal():
     assert level_order_traversal(TreeNode(1, TreeNode(2), TreeNode(3))) == [[1], [2, 3]]
+
+
+def path_sum(root: Optional[TreeNode], target_sum: int) -> int:
+    prefix_sums = defaultdict(int)
+    prefix_sums[0] = 1
+
+    def dfs(node, current_sum: int) -> int:
+        if not node:
+            return 0
+
+        current_sum += node.val
+
+        valid_paths_count = prefix_sums[current_sum - target_sum]
+
+        prefix_sums[current_sum] += 1
+
+        valid_paths_count += dfs(node.left, current_sum)
+        valid_paths_count += dfs(node.right, current_sum)
+
+        prefix_sums[current_sum] -= 1
+        return valid_paths_count
+
+    return dfs(root, 0)
+
+
+def test_path_sum():
+    assert (
+        path_sum(
+            TreeNode(
+                10,
+                TreeNode(
+                    5,
+                    TreeNode(3, TreeNode(3), TreeNode(-2)),
+                    TreeNode(2, None, TreeNode(1)),
+                ),
+                TreeNode(-3, None, TreeNode(11)),
+            ),
+            8,
+        )
+        == 3
+    )

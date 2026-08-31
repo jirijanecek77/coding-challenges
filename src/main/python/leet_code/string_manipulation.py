@@ -10,9 +10,8 @@ def isPalindrome(x: int) -> bool:
     temp = x
     rev = 0
     while temp > 0:
-        num = temp % 10
-        rev = rev * 10 + num
-        temp = temp // 10
+        temp, rem = divmod(temp, 10)
+        rev = rev * 10 + rem
     return x == rev
 
 
@@ -217,3 +216,42 @@ def compareVersion(version1: str, version2: str) -> int:
 
 def test_compareVersion():
     assert compareVersion(version1="1.0.1", version2="1") == 1
+
+
+def backspaceCompare(s: str, t: str) -> bool:
+    # https://leetcode.com/problems/backspace-string-compare/
+    def parse(text: str) -> str:
+        count = 0
+        n = len(text)
+        for i in reversed(range(n)):
+            if text[i] == "#":
+                count += 1
+            else:
+                count -= 1
+                text = text[: max(0, i - count)] + text[i + count :]
+        return text
+
+    return parse(s) == parse(t)
+
+
+def test_backspaceCompare():
+    assert backspaceCompare(s="ab##x", t="c#d#x") is True
+
+
+def countSymmetricIntegers(low: int, high: int) -> int:
+    def is_symmetric(num: int) -> bool:
+        s = str(num)
+        n = len(s)
+        if n % 2 != 0:
+            return False
+
+        n //= 2
+        left, right = s[:n], s[n:]
+        return sum(map(int, left)) == sum(map(int, right))
+
+    return sum(map(is_symmetric, range(low, high + 1)))
+
+
+def test_countSymmetricIntegers():
+    assert countSymmetricIntegers(low=1, high=100) == 9
+    assert countSymmetricIntegers(low=1200, high=1230) == 4

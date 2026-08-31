@@ -397,3 +397,29 @@ def test_maxDotProduct():
     assert maxDotProduct_dfs(nums1=[-1, -1], nums2=[1, 1]) == -1
     assert maxDotProduct(nums1=[2, -2], nums2=[3, -6]) == 18
     assert maxDotProduct(nums1=[2, 1, -2, 5], nums2=[3, 0, -6]) == 18
+
+
+def getMoneyAmount(n: int) -> int:
+    dp = [[0] * (n + 2) for _ in range(n + 2)]
+
+    for length in range(2, n + 1):
+        for i in range(1, n - length + 2):
+            j = i + length - 1
+            dp[i][j] = float("inf")
+
+            for k in range(i, j + 1):
+                cost = k + max(dp[i][k - 1], dp[k + 1][j])
+                dp[i][j] = min(dp[i][j], cost)
+
+    return dp[1][n]
+
+
+def test_getMoneyAmount():
+    assert getMoneyAmount(1) == 0
+    assert getMoneyAmount(2) == 1
+    assert getMoneyAmount(3) == 2
+    assert getMoneyAmount(4) == 4
+    assert getMoneyAmount(5) == 6
+    assert getMoneyAmount(6) == 8
+    assert getMoneyAmount(7) == 10
+    assert getMoneyAmount(10) == 16

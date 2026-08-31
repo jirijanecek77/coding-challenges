@@ -68,3 +68,17 @@ def test_largestSquareArea():
         )
         == 1
     )
+
+
+def to_base62(num: int) -> str:
+    BASE62_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    res = ""
+    while num:
+        num, rem = divmod(num, 62)
+        res = BASE62_ALPHABET[rem] + res
+    return res or "0"
+
+
+def test_to_base62():
+    assert to_base62(1) == "1"
+    assert to_base62(519019116161116161) == "cL70az61gn"

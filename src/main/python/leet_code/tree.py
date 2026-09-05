@@ -9,6 +9,9 @@ class TreeNode:
         self.left = left
         self.right = right
 
+    def __repr__(self):
+        return f"Node({self.val})"
+
 
 # https://leetcode.com/problems/generate-parentheses/
 def generate_parenthesis(n: int) -> list[str]:
@@ -351,4 +354,66 @@ def test_path_sum():
             8,
         )
         == 3
+    )
+
+
+def subtreeWithAllDeepest(root: Optional[TreeNode]) -> Optional[TreeNode]:
+    def dfs(node: Optional[TreeNode], depth: int, max_depth: int = 0, result=None):
+        if not node:
+            return depth
+
+        left, result_l = dfs(node.left, depth + 1, max_depth, result)
+        right, result_r = dfs(node.right, depth + 1, max_depth, result)
+
+        new_depth = max(left, right)
+
+        if new_depth > max_depth:
+            max_depth = new_depth
+
+            if left == right:
+                result = node
+            elif left > right:
+                result = node.left
+            else:
+                result = node.right
+        return max_depth, result
+
+    _, result = dfs(root, 0)
+    return result
+
+
+def test_subtreeWithAllDeepest():
+    expected = TreeNode(2, TreeNode(7), TreeNode(4))
+    assert (
+        subtreeWithAllDeepest(
+            TreeNode(
+                3,
+                TreeNode(5, TreeNode(6), expected),
+                TreeNode(1, TreeNode(0), TreeNode(8)),
+            )
+        )
+        == expected
+    )
+
+
+def lowestCommonAncestor(root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNode:
+    if root.val > p.val and root.val > q.val:
+        return lowestCommonAncestor(root.left, p, q)
+    elif root.val < p.val and root.val < q.val:
+        return lowestCommonAncestor(root.right, p, q)
+    else:
+        return root
+
+
+def test_lowestCommonAncestor():
+    p = TreeNode(2, TreeNode(0), TreeNode(4, TreeNode(3), TreeNode(5)))
+    q = TreeNode(8, TreeNode(7), TreeNode(9))
+    expected = TreeNode(6, p, q)
+    assert (
+        lowestCommonAncestor(
+            expected,
+            p=p,
+            q=q,
+        )
+        == expected
     )

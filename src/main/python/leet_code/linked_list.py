@@ -1,4 +1,5 @@
 import math
+from collections import OrderedDict
 from typing import Optional
 
 
@@ -338,7 +339,6 @@ class LRUCache:
     def __init__(self, n):
         # your code goes here
         self.capacity = n
-        self.size = 0
         self.cache = {}
 
         self.head = LRUCacheNode()
@@ -351,12 +351,10 @@ class LRUCache:
         node.prev = self.head
         self.head.next = node
         node.next.prev = node
-        self.size += 1
 
     def _remove_node(self, node: LRUCacheNode):
         node.next.prev = node.prev
         node.prev.next = node.next
-        self.size -= 1
 
     def get(self, key):
         if key not in self.cache:
@@ -376,10 +374,13 @@ class LRUCache:
         self.cache[key] = node
         self._add_node(node)
 
-        if self.size > self.capacity:
+        if len(self.cache) > self.capacity:
             lru_node = self.tail.prev
             self.cache.pop(lru_node.key)
             self._remove_node(lru_node)
+
+
+OrderedDict
 
 
 def test_lru_cache():

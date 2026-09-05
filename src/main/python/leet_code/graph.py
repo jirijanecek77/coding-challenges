@@ -570,6 +570,7 @@ def orangesRotting(grid: list[list[int]]) -> int:
     for i, row in enumerate(grid):
         for j, cell in enumerate(row):
             if cell == 2:
+
                 rotten.append((i, j))
 
     directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
@@ -687,41 +688,6 @@ def sliding_puzzle(board: list[list[int]]) -> int:
 
 def test_sliding_puzzle():
     assert sliding_puzzle(board=[[4, 1, 3], [2, 0, 5]]) == 5
-
-
-def task_scheduling(tasks: list[str], requirements: list[list[str]]) -> list[str]:
-    # topological sorting
-
-    graph = {node: [] for node in tasks}
-    for pre, post in requirements:
-        graph[pre].append(post)
-
-    res = []
-    queue = deque()
-
-    indegree = {node: 0 for node in graph}
-    for neighbors in graph.values():
-        for neighbor in neighbors:
-            indegree[neighbor] += 1
-    for node, degree in indegree.items():
-        if degree == 0:
-            queue.append(node)
-
-    while queue:
-        node = queue.popleft()
-        res.append(node)
-        for neighbor in graph[node]:
-            indegree[neighbor] -= 1
-            if indegree[neighbor] == 0:
-                queue.append(neighbor)
-
-    return res if len(res) == len(tasks) else None
-
-
-def test_task_scheduling():
-    assert task_scheduling(
-        tasks=["a", "b", "c", "d"], requirements=[["a", "b"], ["c", "b"], ["b", "d"]]
-    ) == ["a", "c", "b", "d"]
 
 
 # https://leetcode.com/problems/last-day-where-you-can-still-cross/description/?envType=daily-question&envId=2025-12-31

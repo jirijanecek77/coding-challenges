@@ -396,18 +396,50 @@ def test_subtreeWithAllDeepest():
     )
 
 
-def lowestCommonAncestor(root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNode:
+def lowestCommonAncestorBST(root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNode:
     if root.val > p.val and root.val > q.val:
-        return lowestCommonAncestor(root.left, p, q)
+        return lowestCommonAncestorBST(root.left, p, q)
     elif root.val < p.val and root.val < q.val:
-        return lowestCommonAncestor(root.right, p, q)
+        return lowestCommonAncestorBST(root.right, p, q)
     else:
         return root
 
 
-def test_lowestCommonAncestor():
+def test_lowestCommonAncestorBST():
     p = TreeNode(2, TreeNode(0), TreeNode(4, TreeNode(3), TreeNode(5)))
     q = TreeNode(8, TreeNode(7), TreeNode(9))
+    expected = TreeNode(6, p, q)
+    assert (
+        lowestCommonAncestorBST(
+            expected,
+            p=p,
+            q=q,
+        )
+        == expected
+    )
+
+
+def lowestCommonAncestor(
+    root: TreeNode, p: TreeNode, q: TreeNode
+) -> Optional[TreeNode]:
+    if not root:
+        return None
+
+    if root == p or root == q:
+        return root
+
+    left = lowestCommonAncestor(root.left, p, q)
+    right = lowestCommonAncestor(root.right, p, q)
+
+    if left and right:
+        return root
+
+    return left or right
+
+
+def test_lowestCommonAncestor():
+    p = TreeNode(2, TreeNode(0), TreeNode(4, TreeNode(20), TreeNode(5)))
+    q = TreeNode(8, TreeNode(7), TreeNode(1))
     expected = TreeNode(6, p, q)
     assert (
         lowestCommonAncestor(
@@ -417,3 +449,53 @@ def test_lowestCommonAncestor():
         )
         == expected
     )
+
+
+class PTreeNode:
+    def __init__(self, val=0, left=None, right=None, parent=None):
+        self.val = val
+        self.left = left
+        self.right = right
+        self.parent = parent
+
+    def __repr__(self):
+        return f"Node({self.val})"
+
+
+def lowestCommonAncestorIII(p: PTreeNode, q: PTreeNode) -> Optional[PTreeNode]:
+    a = p
+    b = q
+    while a != b:
+        a = a.parent if a else q
+        b = b.parent if b else p
+    return a
+
+
+def test_lowestCommonAncestorIII():
+    n3 = PTreeNode(3)
+    n5 = PTreeNode(5)
+    n1 = PTreeNode(1)
+    n6 = PTreeNode(6)
+    n2 = PTreeNode(2)
+    n0 = PTreeNode(0)
+    n8 = PTreeNode(8)
+    n7 = PTreeNode(7)
+    n4 = PTreeNode(4)
+
+    n3.left = n5
+    n3.right = n1
+    n5.parent = n3
+    n1.parent = n3
+    n5.left = n6
+    n5.right = n2
+    n6.parent = n5
+    n2.parent = n5
+    n1.left = n0
+    n1.right = n8
+    n0.parent = n1
+    n8.parent = n1
+    n2.left = n7
+    n2.right = n4
+    n7.parent = n2
+    n4.parent = n2
+    assert lowestCommonAncestorIII(p=n5, q=n4) == n5

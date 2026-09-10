@@ -322,6 +322,31 @@ def minimumPairRemoval(nums: list[int]) -> int:
     return res
 
 
+def test_minimumPairRemoval():
+    assert minimumPairRemoval(nums=[2, 2, -1, 3, -2, 2, 1, 1, 1, 0, -1]) == 9
+    assert minimumPairRemoval(nums=[5, 2, 3, 1]) == 2
+    assert minimumPairRemoval(nums=[2, 1, 3, 2]) == 2
+
+
+def getIntersectionNode(headA: ListNode, headB: ListNode) -> Optional[ListNode]:
+    # https://leetcode.com/problems/intersection-of-two-linked-lists/description/
+    a = headA
+    b = headB
+
+    while a != b:
+        a = a.next if a else headB
+        b = b.next if b else headA
+
+    return a
+
+
+def test_getIntersectionNode():
+    intersection = ListNode(6, ListNode(7))
+    a = ListNode(1, ListNode(2, ListNode(3, intersection)))
+    b = ListNode(4, ListNode(5, intersection))
+    assert getIntersectionNode(a, b) == intersection
+
+
 class LRUCacheNode:
     def __init__(self, key=None, val=None):
         self.key = key
@@ -393,12 +418,6 @@ def test_lru_cache():
     assert cache.get("user1") is None
     assert cache.get("user2") == "Bob"
     assert cache.get("user3") == "Charlie"
-
-
-def test_minimumPairRemoval():
-    assert minimumPairRemoval(nums=[2, 2, -1, 3, -2, 2, 1, 1, 1, 0, -1]) == 9
-    assert minimumPairRemoval(nums=[5, 2, 3, 1]) == 2
-    assert minimumPairRemoval(nums=[2, 1, 3, 2]) == 2
 
 
 #

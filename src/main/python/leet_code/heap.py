@@ -1,5 +1,5 @@
 # https://leetcode.com/problems/meeting-rooms-iii/description/?envType=daily-question&envId=2025-12-27
-from collections import defaultdict
+from collections import defaultdict, Counter
 from heapq import heapify, heappush, heappop
 
 
@@ -50,3 +50,42 @@ def test_missingMultiple():
     assert missingMultiple(nums=[1, 2, 3, 4], k=2) == 6
     assert missingMultiple(nums=[2, 3, 4, 7, 11], k=5) == 5
     assert missingMultiple(nums=[1, 2, 3, 4], k=1) == 5
+
+
+class Element:
+    def __init__(self, freq: int, word: str):
+        self.freq = freq
+        self.word = word
+
+    def __lt__(self, other):
+        if self.freq == other.freq:
+            return self.word > other.word
+        return self.freq < other.freq
+
+
+def topKFrequent(words: list[str], k: int) -> list[str]:
+
+    counter = Counter(words)
+    heap = []
+
+    for word, freq in counter.items():
+        heappush(heap, Element(freq, word))
+
+        while len(heap) > k:
+            heappop(heap)
+
+    res = []
+    while heap:
+        res.append(heappop(heap).word)
+    return res[::-1]
+
+
+def test_topKFrequent():
+    assert topKFrequent(
+        words=["i", "love", "leetcode", "i", "love", "coding"], k=2
+    ) == ["i", "love"]
+
+    assert topKFrequent(
+        words=["the", "day", "is", "sunny", "the", "the", "the", "sunny", "is", "is"],
+        k=4,
+    ) == ["the", "is", "sunny", "day"]

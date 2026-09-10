@@ -142,3 +142,18 @@ def bestClosingTime(customers: str) -> int:
 def test_bestClosingTime():
     assert bestClosingTime(customers="YYYY") == 4
     assert bestClosingTime(customers="YYNY") == 2
+
+
+def countCommas(n: int) -> int:
+    res = 0
+    curr = 10**3
+    while n >= curr:
+        res += n - curr + 1
+        curr *= 10**3
+    return res
+
+
+def test_countCommas():
+    assert countCommas(998) == 0
+    assert countCommas(1002) == 3
+    assert countCommas(1004590) == 1008182

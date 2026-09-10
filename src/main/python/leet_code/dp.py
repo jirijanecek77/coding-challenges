@@ -423,3 +423,21 @@ def test_getMoneyAmount():
     assert getMoneyAmount(6) == 8
     assert getMoneyAmount(7) == 10
     assert getMoneyAmount(10) == 16
+
+
+def distinctSubseqII(s: str) -> int:
+
+    MOD = 10**9 + 7
+    dp = [0] * 26
+
+    for ch in s:
+        index = ord(ch) - ord("a")
+        dp[index] = (sum(dp) % MOD + 1) % MOD
+
+    return sum(dp) % MOD
+
+
+def test_distinctSubseqII():
+    assert distinctSubseqII("abc") == 7
+    assert distinctSubseqII("aba") == 6
+    assert distinctSubseqII("aaa") == 3

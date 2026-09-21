@@ -1,5 +1,5 @@
 import itertools
-from collections import Counter, defaultdict
+from collections import Counter, defaultdict, deque
 from functools import lru_cache
 from math import comb, gcd
 
@@ -611,3 +611,81 @@ def minDominoRotations(tops: list[int], bottoms: list[int]) -> int:
 
 def test_minDominoRotations():
     assert minDominoRotations(tops=[2, 1, 2, 4, 2, 2], bottoms=[5, 2, 6, 2, 3, 2]) == 2
+
+
+def countStudents(students: list[int], sandwiches: list[int]) -> int:
+    queue = deque(students)
+
+    for sandwich in sandwiches:
+
+        student = queue.popleft()
+        if student == sandwich:
+            continue
+
+        i = 0
+        q_len = len(queue) + 1
+        while student != sandwich:
+            queue.append(student)
+            student = queue.popleft()
+            i += 1
+
+            if i == q_len:
+                return q_len
+
+    return 0
+
+
+def test_countStudents():
+    assert countStudents([1, 1, 0, 0], [0, 1, 0, 1]) == 0
+    assert countStudents([1, 1, 1, 0, 0, 1], [1, 0, 0, 0, 1, 1]) == 3
+
+
+def decodeString(s: str) -> str:
+    stack = []
+    for ch in s:
+        if ch == "]":
+            buffer = ""
+            while (stack_ch := stack.pop()) != "[":
+                buffer = stack_ch + buffer
+
+            multi_buffer = ""
+            while stack and stack[-1].isdigit():
+                multi_buffer = stack.pop() + multi_buffer
+
+            stack.append(buffer * int(multi_buffer))
+        else:
+            stack.append(ch)
+
+    return "".join(stack)
+
+
+def test_decodeString():
+    assert decodeString("100[leetcode]") == "leetcode" * 100
+    assert decodeString("3[a]2[bc]") == "aaabcbc"
+    assert decodeString("3[a2[c]]") == "accaccacc"
+
+
+def parse_brackets(s: str) -> bool:
+    n = len(s)
+
+    def dfs(i: int, counter: int) -> bool:
+        if i == n:
+            return counter == 0
+
+        if counter < 0:
+            return False
+
+        if s[i] == "(":
+            return dfs(i + 1, counter + 1)
+        else:
+            return dfs(i + 1, counter - 1)
+
+    return dfs(0, 0)
+
+
+def test_parse_brackets():
+    assert parse_brackets("(()(()))") is True
+    assert parse_brackets("(()())())") is False
+    assert parse_brackets(")(") is False
+    assert parse_brackets("()") is True
+    assert parse_brackets("") is True

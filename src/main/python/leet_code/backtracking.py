@@ -53,12 +53,14 @@ def partition_palindromes(s: str) -> list[list[str]]:
 
     def dfs(start_index: int, path: list[str]):
         if start_index == n:
-            result.append(path)
+            result.append(path[:])
             return
         for end_index in range(start_index + 1, n + 1):
             prefix = s[start_index:end_index]
             if is_palindrome(prefix):
-                dfs(end_index, path + [prefix])
+                path.append(prefix)
+                dfs(end_index, path)
+                path.pop()
 
     dfs(0, [])
     return result

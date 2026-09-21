@@ -174,3 +174,37 @@ def test_min_meeting_rooms():
     assert min_meeting_rooms([[7, 10], [10, 11]]) == 1
     assert min_meeting_rooms([[7, 10], [2, 4]]) == 1
     assert min_meeting_rooms([]) == 0
+
+
+def merge_intervals_sweep_line(intervals: list[list[int]]) -> list[list[int]]:
+    events = []
+    for start, end in intervals:
+        events.extend([(start, 1), (end, -1)])
+
+    events.sort(key=lambda x: (x[0], -x[1]))
+
+    start = 0
+    prefix_sum = 0
+    result = []
+    for time, delta in events:
+        if not prefix_sum:
+            start = time
+
+        prefix_sum += delta
+
+        if not prefix_sum:
+            result.append([start, time])
+
+    return result
+
+
+def test_merge_intervals():
+    assert merge_intervals_sweep_line([[1, 3], [2, 6], [8, 10], [15, 18]]) == [
+        [1, 6],
+        [8, 10],
+        [15, 18],
+    ]
+    assert merge_intervals_sweep_line([[1, 4], [4, 5]]) == [[1, 5]]
+    assert merge_intervals_sweep_line([[1, 4], [3, 3]]) == [[1, 4]]
+    assert merge_intervals_sweep_line([[1, 3], [3, 3], [5, 7]]) == [[1, 3], [5, 7]]
+    assert merge_intervals_sweep_line([[3, 3], [5, 6]]) == [[3, 3], [5, 6]]

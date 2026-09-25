@@ -666,21 +666,22 @@ def test_decodeString():
 
 
 def parse_brackets(s: str) -> bool:
-    n = len(s)
+    tokens = iter(s)
 
-    def dfs(i: int, counter: int) -> bool:
-        if i == n:
-            return counter == 0
+    def dfs(is_sub_level: bool = False) -> bool:
+        char = next(tokens, None)
 
-        if counter < 0:
-            return False
+        if char is None:
+            return not is_sub_level
 
-        if s[i] == "(":
-            return dfs(i + 1, counter + 1)
+        if char == "(":
+            if not dfs(is_sub_level=True):
+                return False
         else:
-            return dfs(i + 1, counter - 1)
+            return is_sub_level
+        return dfs(is_sub_level)
 
-    return dfs(0, 0)
+    return dfs()
 
 
 def test_parse_brackets():

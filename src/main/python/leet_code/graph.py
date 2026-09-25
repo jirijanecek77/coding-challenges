@@ -4,6 +4,7 @@ from bisect import bisect_left
 from collections import defaultdict, deque
 from functools import lru_cache
 from itertools import starmap
+from typing import Iterator
 
 
 # https://leetcode.com/problems/lexicographically-smallest-string-after-applying-operations/description/?envType=daily-question&envId=2025-10-19
@@ -912,3 +913,40 @@ def test_shortestPathBinaryMatrix():
         )
         == 14
     )
+
+
+def openLock(deadends: list[str], target: str) -> int:
+    # https://leetcode.com/problems/open-the-lock/description/
+    def get_next(node: tuple[int, ...]) -> Iterator[tuple[int, ...]]:
+        for i in range(len(node)):
+            yield node[:i] + ((node[i] + 1) % 10,) + node[i + 1 :]
+            yield node[:i] + ((node[i] - 1) % 10,) + node[i + 1 :]
+
+    visited = set(tuple(map(int, e)) for e in deadends)
+    target = tuple(map(int, target))
+
+    queue = deque([(0, 0, 0, 0)] if (0, 0, 0, 0) not in visited else [])
+    visited.add((0, 0, 0, 0))
+    result = 0
+    while queue:
+        n = len(queue)
+        for _ in range(n):
+            node = queue.popleft()
+            if node == target:
+                return result
+
+            for next_node in get_next(node):
+                if next_node not in visited:
+                    visited.add(next_node)
+                    queue.append(next_node)
+
+        result += 1
+
+    return -1
+
+
+def test_openLock():
+    assert (
+        openLock(deadends=["0201", "0101", "0102", "1212", "2002"], target="0202") == 6
+    )
+    assert openLock(deadends=["0000"], target="8888") == -1

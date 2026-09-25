@@ -2,6 +2,7 @@ import random
 import threading
 import time
 from collections import deque
+from queue import Queue
 
 
 class Counter:
@@ -110,3 +111,49 @@ def test_bounded_blocking_queue():
 
     assert queue.size() == 0
     assert results == [1, 2, 3]
+
+
+def producer_consumer():
+    q = Queue(maxsize=5)
+
+    def producer():
+        for i in range(10):
+            item = f"Data-{i}"
+
+            q.put(item)
+            print(f"[Producer] Created: {item}")
+
+            time.sleep(random.uniform(0.1, 0.5))
+
+        q.put(None)
+        print("[Producer] Done.")
+
+    def consumer():
+        while True:
+            item = q.get()
+
+            if item is None:
+                q.task_done()
+                break
+
+            print(f"[Consumer] Processing: {item}")
+            time.sleep(random.uniform(0.3, 0.8))
+
+            q.task_done()
+
+        print("[Consumer] Processed.")
+
+    t1 = threading.Thread(target=producer)
+    t2 = threading.Thread(target=consumer)
+
+    t1.start()
+    t2.start()
+
+    t1.join()
+    t2.join()
+
+    print("Finished.", flush=True)
+
+
+def test_producer_consumer():
+    producer_consumer()

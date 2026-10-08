@@ -12,6 +12,39 @@ class TreeNode:
     def __repr__(self):
         return f"Node({self.val})"
 
+    def __eq__(self, value: object, /) -> bool:
+        if not isinstance(value, TreeNode):
+            return NotImplemented
+        return (
+            self.val == value.val
+            and self.left == value.left
+            and self.right == value.right
+        )
+
+    @classmethod
+    def build(cls, level_order: list[int | None]) -> "TreeNode | None":
+        if not level_order:
+            return None
+
+        values = iter(level_order)
+        val = next(values, None)
+        if val is None:
+            return None
+
+        root = cls(val)
+        queue = deque([root])
+        while queue:
+            node = queue.popleft()
+            left = next(values, None)
+            if left is not None:
+                node.left = cls(left)
+                queue.append(node.left)
+            right = next(values, None)
+            if right is not None:
+                node.right = cls(right)
+                queue.append(node.right)
+        return root
+
 
 # https://leetcode.com/problems/generate-parentheses/
 def generate_parenthesis(n: int) -> list[str]:
@@ -46,11 +79,7 @@ def findTarget(root: Optional[TreeNode], k: int) -> bool:
 def test_find_target():
     assert (
         findTarget(
-            root=TreeNode(
-                val=5,
-                left=TreeNode(3, TreeNode(2)),
-                right=TreeNode(val=6, right=TreeNode(7)),
-            ),
+            root=TreeNode.build([5, 3, 6, 2, None, None, 7]),
             k=9,
         )
         == True
@@ -77,13 +106,7 @@ def largestValues(root: Optional[TreeNode]) -> list[int]:
 
 
 def test_largest_values():
-    assert largestValues(
-        root=TreeNode(
-            val=1,
-            left=TreeNode(3, TreeNode(5), TreeNode(3)),
-            right=TreeNode(val=2, right=TreeNode(9)),
-        )
-    ) == [1, 3, 9]
+    assert largestValues(root=TreeNode.build([1, 3, 2, 5, 3, None, 9])) == [1, 3, 9]
 
 
 def permute(nums: list[int]) -> list[list[int]]:
@@ -187,18 +210,16 @@ def find_cousins_bfs(root: Optional[TreeNode], x: int, y: int) -> bool:
 
 def test_find_cousins():
     assert find_cousins_bfs(
-        TreeNode(1, TreeNode(2, TreeNode(4)), TreeNode(3, TreeNode(5), TreeNode(6))),
+        TreeNode.build([1, 2, 3, 4, None, 5, 6]),
         4,
         5,
     )
     assert not find_cousins_bfs(
-        TreeNode(1, TreeNode(2, TreeNode(4)), TreeNode(3, TreeNode(5), TreeNode(6))),
+        TreeNode.build([1, 2, 3, 4, None, 5, 6]),
         2,
         5,
     )
-    assert not find_cousins_bfs(
-        TreeNode(1, TreeNode(2), TreeNode(3, TreeNode(4), TreeNode(5))), 4, 5
-    )
+    assert not find_cousins_bfs(TreeNode.build([1, 2, 3, None, None, 4, 5]), 4, 5)
 
 
 def maxOverlappingEvents(events: list[list[int]]) -> int:
@@ -251,7 +272,7 @@ def maxProduct(root: Optional[TreeNode]) -> int:
 
 
 def test_maxProduct():
-    assert maxProduct(TreeNode(1, TreeNode(2), TreeNode(3))) == 9
+    assert maxProduct(TreeNode.build([1, 2, 3])) == 9
 
 
 # https://leetcode.com/problems/k-th-largest-perfect-subtree-size-in-binary-tree/
@@ -278,11 +299,7 @@ def kthLargestPerfectSubtree(root: Optional[TreeNode], k: int) -> int:
 def test_kthLargestPerfectSubtree():
     assert (
         kthLargestPerfectSubtree(
-            TreeNode(
-                5,
-                TreeNode(3, TreeNode(5, TreeNode(1), TreeNode(8)), TreeNode(2)),
-                TreeNode(6, TreeNode(5, TreeNode(8), TreeNode(8)), TreeNode(7)),
-            ),
+            TreeNode.build([5, 3, 6, 5, 2, 5, 7, 1, 8, None, None, 8, 8]),
             2,
         )
         == 3
@@ -313,7 +330,7 @@ def level_order_traversal(root: Optional[TreeNode]) -> list[list[int]]:
 
 
 def test_level_order_traversal():
-    assert level_order_traversal(TreeNode(1, TreeNode(2), TreeNode(3))) == [[1], [2, 3]]
+    assert level_order_traversal(TreeNode.build([1, 2, 3])) == [[1], [2, 3]]
 
 
 def path_sum(root: Optional[TreeNode], target_sum: int) -> int:
@@ -342,15 +359,7 @@ def path_sum(root: Optional[TreeNode], target_sum: int) -> int:
 def test_path_sum():
     assert (
         path_sum(
-            TreeNode(
-                10,
-                TreeNode(
-                    5,
-                    TreeNode(3, TreeNode(3), TreeNode(-2)),
-                    TreeNode(2, None, TreeNode(1)),
-                ),
-                TreeNode(-3, None, TreeNode(11)),
-            ),
+            TreeNode.build([10, 5, -3, 3, 2, None, 11, 3, -2, None, 1]),
             8,
         )
         == 3
@@ -358,42 +367,28 @@ def test_path_sum():
 
 
 def subtreeWithAllDeepest(root: Optional[TreeNode]) -> Optional[TreeNode]:
-    def dfs(node: Optional[TreeNode], depth: int, max_depth: int = 0, result=None):
+
+    def dfs(node: Optional[TreeNode]) -> tuple[int, Optional[TreeNode]]:
         if not node:
-            return depth
+            return 0, None
 
-        left, result_l = dfs(node.left, depth + 1, max_depth, result)
-        right, result_r = dfs(node.right, depth + 1, max_depth, result)
+        left_depth, left_result = dfs(node.left)
+        right_depth, right_result = dfs(node.right)
 
-        new_depth = max(left, right)
+        if left_depth > right_depth:
+            return left_depth + 1, left_result
+        if right_depth > left_depth:
+            return right_depth + 1, right_result
+        return left_depth + 1, node
 
-        if new_depth > max_depth:
-            max_depth = new_depth
-
-            if left == right:
-                result = node
-            elif left > right:
-                result = node.left
-            else:
-                result = node.right
-        return max_depth, result
-
-    _, result = dfs(root, 0)
+    _, result = dfs(root)
     return result
 
 
 def test_subtreeWithAllDeepest():
-    expected = TreeNode(2, TreeNode(7), TreeNode(4))
-    assert (
-        subtreeWithAllDeepest(
-            TreeNode(
-                3,
-                TreeNode(5, TreeNode(6), expected),
-                TreeNode(1, TreeNode(0), TreeNode(8)),
-            )
-        )
-        == expected
-    )
+    root = TreeNode.build([3, 5, 1, 6, 2, 0, 8, None, None, 7, 4])
+    expected = root.left.right
+    assert subtreeWithAllDeepest(root) == expected
 
 
 def lowestCommonAncestorBST(root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNode:
@@ -406,9 +401,9 @@ def lowestCommonAncestorBST(root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNod
 
 
 def test_lowestCommonAncestorBST():
-    p = TreeNode(2, TreeNode(0), TreeNode(4, TreeNode(3), TreeNode(5)))
-    q = TreeNode(8, TreeNode(7), TreeNode(9))
-    expected = TreeNode(6, p, q)
+    expected = TreeNode.build([6, 2, 8, 0, 4, 7, 9, None, None, 3, 5])
+    p = expected.left
+    q = expected.right
     assert (
         lowestCommonAncestorBST(
             expected,
@@ -438,9 +433,9 @@ def lowestCommonAncestor(
 
 
 def test_lowestCommonAncestor():
-    p = TreeNode(2, TreeNode(0), TreeNode(4, TreeNode(20), TreeNode(5)))
-    q = TreeNode(8, TreeNode(7), TreeNode(1))
-    expected = TreeNode(6, p, q)
+    expected = TreeNode.build([6, 2, 8, 0, 4, 7, 1, None, None, 20, 5])
+    p = expected.left
+    q = expected.right
     assert (
         lowestCommonAncestor(
             expected,
@@ -499,3 +494,59 @@ def test_lowestCommonAncestorIII():
     n7.parent = n2
     n4.parent = n2
     assert lowestCommonAncestorIII(p=n5, q=n4) == n5
+
+
+def numOfMinutes(n: int, headID: int, manager: list[int], informTime: list[int]) -> int:
+
+    employees = defaultdict(list)
+    times = defaultdict(int)
+
+    for employee, (mng, time) in enumerate(zip(manager, informTime)):
+        employees[mng].append(employee)
+        times[mng] = time
+
+    queue = deque([-1])
+
+    result = 0
+    while queue:
+        n = len(queue)
+
+        max_time = 0
+        for _ in range(n):
+            mng = queue.popleft()
+            max_time = max(max_time, times[mng])
+
+            queue.extend(employees[mng])
+
+        result += max_time
+
+    return result
+
+
+def test_numOfMinutes():
+    assert numOfMinutes(7, 6, [1, 2, 3, 4, 5, 6, -1], [0, 6, 5, 4, 3, 2, 1]) == 21
+    assert (
+        numOfMinutes(
+            n=6, headID=2, manager=[2, 2, -1, 2, 2, 2], informTime=[0, 0, 1, 0, 0, 0]
+        )
+        == 1
+    )
+
+
+def sufficientSubset(root: TreeNode | None, limit: int) -> TreeNode | None:
+    if not root:
+        return None
+
+    if not root.left and not root.right:
+        return None if root.val < limit else root
+
+    root.left = sufficientSubset(root.left, limit - root.val)
+    root.right = sufficientSubset(root.right, limit - root.val)
+    return root if root.left or root.right else None
+
+
+def test_sufficientSubset():
+    assert sufficientSubset(
+        TreeNode.build([1, 2, 3, 4, -99, -99, 7, 8, 9, -99, -99, 12, 13, -99, 14]),
+        1,
+    ) == TreeNode.build([1, 2, 3, 4, None, None, 7, 8, 9, None, 14])

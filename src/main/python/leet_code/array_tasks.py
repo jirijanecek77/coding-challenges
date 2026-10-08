@@ -287,6 +287,25 @@ def test_relativeSortArray():
     ) == [2, 2, 2, 1, 4, 3, 3, 9, 6, 7, 19]
 
 
+def validParentheses(s: str) -> bool:
+
+    balance = 0
+    for ch in s:
+        if ch == "(":
+            balance += 1
+        else:
+            balance -= 1
+        if balance < 0:
+            return False
+    return balance == 0
+
+
+def test_validParentheses():
+    assert validParentheses("()()()") is True
+    assert validParentheses("()(()") is False
+    assert validParentheses(")()(()") is False
+
+
 def longestValidParentheses(s: str) -> int:
     stack = [-1]  # Base index
     max_length = 0

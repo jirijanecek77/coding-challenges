@@ -2,36 +2,34 @@ from itertools import combinations
 
 
 def fractionToDecimal(numerator: int, denominator: int) -> str:
-    sign = "-" if numerator * denominator < 0 else ""
-    numerator = abs(numerator)
-    num = numerator // denominator
-    rem = numerator % denominator
-    res = [str(num)]
-    seen = [rem]
-    numerator = rem
+    if numerator == 0:
+        return "0"
 
+    res = []
+
+    if (numerator < 0) ^ (denominator < 0):
+        res.append("-")
+    numerator = abs(numerator)
+    denominator = abs(denominator)
+
+    num, rem = divmod(numerator, denominator)
+    res.append(str(num))
     if rem == 0:
-        return sign + "".join(res)
+        return "".join(res)
 
     res.append(".")
-
-    while rem > 0:
-        numerator *= 10
-        if numerator < denominator:
-            res.append("0")
-            continue
-
-        num = numerator // denominator
-        res.append(str(num))
-        rem = numerator % denominator
+    seen = {}
+    while rem:
         if rem in seen:
-            index = seen.index(rem) + 2
+            index = seen[rem]
+            return f'{"".join(res[:index])}({"".join(res[index:])})'
+        seen[rem] = len(res)
 
-            return sign + "".join(res[:index]) + "(" + "".join(res[index:]) + ")"
-        seen.append(rem)
-        numerator = rem
+        rem *= 10
+        num, rem = divmod(rem, denominator)
+        res.append(str(num))
 
-    return sign + "".join(res)
+    return "".join(res)
 
 
 def test_fractionToDecimal():

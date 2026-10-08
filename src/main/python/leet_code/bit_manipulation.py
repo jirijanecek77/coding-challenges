@@ -86,3 +86,47 @@ def bestClosingTime(customers: str) -> int:
 def test_bestClosingTime():
     assert bestClosingTime(customers="YYYY") == 4
     assert bestClosingTime(customers="YYNY") == 2
+
+
+import hashlib
+
+
+class BloomFilter:
+    def __init__(self, size=1000, num_hashes=5):
+        self.size = size
+        self.num_hashes = num_hashes
+        self.bit_array = [0] * self.size
+
+    def _get_hashes(self, item):
+        item_bytes = str(item).encode("utf-8")
+        digest = hashlib.sha256(item_bytes).digest()
+
+        for i in range(self.num_hashes):
+            yield int.from_bytes(digest[i : i + 4], byteorder="big") % self.size
+
+    def add(self, item):
+        for index in self._get_hashes(item):
+            self.bit_array[index] = 1
+
+    def contains(self, item):
+        for index in self._get_hashes(item):
+            if self.bit_array[index] == 0:
+                return False
+        return True
+
+
+def containsDuplicate(nums: list[int]) -> bool:
+    # https://leetcode.com/problems/contains-duplicate/
+    bloom = BloomFilter(size=20, num_hashes=3)
+
+    for num in nums:
+        # if bloom.contains(num):
+        #     return True
+        bloom.add(num)
+
+    return False
+
+
+def test_containsDuplicate():
+    assert containsDuplicate([1, 1, 1, 3, 3, 4, 3, 2, 4, 2]) is True
+    assert containsDuplicate([1, 2, 3, 4, 5]) is False
